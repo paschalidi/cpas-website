@@ -66,7 +66,7 @@ export function Hero() {
     },
     {
       icon: <EmailIcon />,
-      href: "mailto:paschalidi@outlook.com?subject=Let's%20Connect%20%7C%20Project%20Inquiry&body=Hi%20Christos%2C%0A%0AI%20came%20across%20your%20portfolio%20and%20would%20love%20to%20discuss%20a%20potential%20collaboration.%0A%0ABest%20regards%2C%0A",
+      href: "mailto:paschalidi@outlook.com?subject=Let's%20Connect&body=Hi%20Christos%2C%0A%0AI%20love%20your%20funny%20website%2C%20not%20really%20%F0%9F%98%84",
       label: "Email"
     }
   ];
