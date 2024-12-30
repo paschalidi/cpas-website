@@ -66,7 +66,7 @@ export function Hero() {
     },
     {
       icon: <EmailIcon />,
-      href: "mailto:paschalidi@outlook.com",
+      href: "mailto:paschalidi@outlook.com?subject=Let's%20Connect%20%7C%20Project%20Inquiry&body=Hi%20Christos%2C%0A%0AI%20came%20across%20your%20portfolio%20and%20would%20love%20to%20discuss%20a%20potential%20collaboration.%0A%0ABest%20regards%2C%0A",
       label: "Email"
     }
   ];
@@ -79,15 +79,12 @@ export function Hero() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,0.1),rgba(0,0,0,0.98))]"/>
       </div>
       <div ref={textRef} className="relative z-10 text-center transition-transform duration-200 ease-out">
-        <h1 className="text-8xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
-          christos
+        <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
+          hi there, i&apos;m christos
         </h1>
-        <p className="text-xl text-white/60">
-          another software developer afraid of losing his job to AI
-        </p>
-        <p className="text-xl text-white/60">
-          until then building this website using AI, because time is of essence
-        </p>
+        <h4 className="text-xl text-white/60 max-w-[700px]">
+          another software developer who doesn&apos;t have time to build his own website
+        </h4>
 
         <div className="mt-12 flex items-center justify-center gap-8">
           {socialLinks.map((link, index) => (
