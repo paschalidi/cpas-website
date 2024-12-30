@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-black overflow-hidden;
+  margin: 0;
+}
+
+.cursor-follower {
+  backdrop-filter: invert(1);
+  mix-blend-mode: difference;
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0) }
+  10% { transform: translate(-5%, -10%) }
+  30% { transform: translate(3%, -15%) }
+  50% { transform: translate(-10%, 5%) }
+  70% { transform: translate(7%, -25%) }
+  90% { transform: translate(-3%, 15%) }
+}
