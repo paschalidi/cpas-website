@@ -95,7 +95,7 @@ export function Projects() {
       title: "Telehealth Platform",
       companyName: "SesameCare",
       duration: "2 years",
-      technologies: ["AWS", "Terraform", "GCP", "Docker", "Kubernetes", "Stripe API"],
+      technologies: ["Terraform", "GCP", "Docker", "Kubernetes", "Stripe API", "Next.js"],
       src: '/images/sesame.png',
       url: 'https://sesamecare.com'
     },
