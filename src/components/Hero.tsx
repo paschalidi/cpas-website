@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useRef } from 'react';
 import { ChevronDown } from "lucide-react";
+import { BlobBackground } from "./BlobBackground";
 
 // Custom icon components for better styling
 const GithubIcon = () => (
@@ -84,6 +85,8 @@ export function Hero() {
 
   return (
     <div ref={containerRef} className="relative h-screen flex items-center justify-center overflow-hidden">
+      <BlobBackground />
+
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-purple-900/5 to-blue-900/10"/>
         <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-transparent to-indigo-600/5"/>
