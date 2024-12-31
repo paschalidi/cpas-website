@@ -68,15 +68,15 @@ export const ProjectCard = ({
 export function Projects() {
   const projects = [
     {
-      title: "Rechat.cloud - AI Chat Analysis",
-      companyName: "Personal Project",
+      title: "Rechat.cloud - SaaS Chat System",
+      companyName: "Open Source Project",
       duration: "2024",
       technologies: ["Rust", "Terraform", "Kubernetes", "PostgreSQL", "Next.js", "Stripe API"],
       src: '/images/rechat.png',
       url: 'https://www.rechat.cloud'
     },
     {
-      title: "Full-Stack Vehicle Management Platform",
+      title: "Electrical Vehicle Marketplace",
       companyName: "Ever Cars",
       duration: "18 months",
       technologies: ["Golang", "AWS", "Next.js", "OpenSearch", "PostgreSQL", "gRPC"],
