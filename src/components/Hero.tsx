@@ -92,7 +92,7 @@ export function Hero() {
           hi there, i&apos;m christos
         </h1>
         <h4 className="text-xl text-white/60 max-w-[700px]">
-          another software developer who doesn&apos;t have time to build his own website
+          another software developer who doesn&apos;t have time to build their own website
         </h4>
 
         <div className="mt-12 flex items-center justify-center gap-8">
@@ -103,7 +103,6 @@ export function Hero() {
               target="_blank"
               rel="noopener noreferrer"
               className="group relative p-4 hover:-translate-y-1 transition-all duration-300 cursor-none"
-              aria-label={link.label}
             >
               <div className="absolute inset-0 transition-all duration-300"/>
               <div className="relative flex flex-col items-center gap-2">
