@@ -79,7 +79,7 @@ export function Projects() {
       title: "Electrical Vehicle Marketplace",
       companyName: "Ever Cars",
       duration: "18 months",
-      technologies: ["Golang", "AWS", "Next.js", "OpenSearch", "PostgreSQL", "gRPC"],
+      technologies: ["Golang", "AWS", "Next.js", "OpenSearch", "PostgreSQL", "Docker"],
       src: '/images/ever.png',
       url: 'https://evercars.com'
     },
@@ -87,7 +87,7 @@ export function Projects() {
       title: "Freelance Booking Platform",
       companyName: "Hirespace",
       duration: "18 months",
-      technologies: ["NeonDB", "Next.js", "Prisma", "TypeScript", "tRPC", "TailwindCSS"],
+      technologies: ["NeonDB", "Next.js", "Prisma", "TypeScript", "Docker", "TailwindCSS"],
       src: '/images/hirespace.png',
       url: 'https://hirespace.io'
     },
