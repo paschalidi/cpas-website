@@ -1,4 +1,6 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
+import { useRef } from 'react';
+import { ChevronDown } from "lucide-react";
 
 // Custom icon components for better styling
 const GithubIcon = () => (
@@ -89,10 +91,10 @@ export function Hero() {
       </div>
       <div ref={textRef} className="relative z-10 text-center transition-transform duration-200 ease-out">
         <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
-          hi there, i&apos;m christos
+          hi there, I&apos;m christos
         </h1>
         <h4 className="text-xl text-white/60 max-w-[700px]">
-          another software developer who doesn&apos;t have time to build their own website
+         a full stack software developer
         </h4>
 
         <div className="mt-12 flex items-center justify-center gap-8">
@@ -113,6 +115,10 @@ export function Hero() {
             </a>
           ))}
         </div>
+      </div>
+
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+        <ChevronDown className="w-6 h-6 text-white/60 animate-bounce"/>
       </div>
     </div>
   );

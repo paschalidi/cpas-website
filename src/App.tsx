@@ -1,11 +1,17 @@
+// App.tsx
+import React from 'react';
 import { Cursor } from './components/Cursor';
 import { Hero } from './components/Hero';
+import { Projects } from "./components/Projects";
 
 function App() {
   return (
-    <div className="min-h-screen bg-black text-white cursor-none">
+    <div className="relative bg-black text-white cursor-none">
       <Cursor />
-      <Hero />
+      <div className="flex flex-col">
+        <Hero />
+        <Projects />
+      </div>
     </div>
   );
 }
