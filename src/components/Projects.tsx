@@ -42,13 +42,13 @@ export const ProjectCard = ({
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60"/>
-          <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="absolute bottom-0 left-0 right-0 p-4">
             <h3 className="text-xl font-semibold text-white/90">{title}</h3>
             <p className="text-sm text-white/60 mt-1">{companyName} · {duration}</p>
           </div>
         </div>
 
-        <CardContent className="pt-6">
+        <CardContent className="pt-6 px-4">
           <div className="flex flex-wrap gap-2">
             {technologies.map((tech, index) => (
               <span
@@ -104,7 +104,7 @@ export function Projects() {
   return (
     <div className="min-h-screen bg-gradient-to-br py-20">
       <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-4xl font-bold mb-24 text-center bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
+        <h2 className="font-sans text-4xl font-bold mb-24 text-center bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
           Have worked on
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

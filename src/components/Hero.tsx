@@ -93,10 +93,10 @@ export function Hero() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,0.1),rgba(0,0,0,0.98))]"/>
       </div>
       <div ref={textRef} className="relative z-10 text-center transition-transform duration-200 ease-out">
-        <h1 className="text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
+        <h1 className="font-sans text-6xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
           hi there, I&apos;m christos
         </h1>
-        <h4 className="text-xl text-white/60 max-w-[700px]">
+        <h4 className="text-2xl text-white/60 max-w-[700px]">
          a full stack software developer
         </h4>
 
