@@ -70,7 +70,7 @@ export function Projects() {
     {
       title: "Rechat.cloud - SaaS Chat System",
       companyName: "Open Source Project",
-      duration: "2024",
+      duration: "Founder Engineer",
       technologies: ["Rust", "Terraform", "Kubernetes", "PostgreSQL", "Next.js", "Stripe API"],
       src: '/images/rechat.png',
       url: 'https://www.rechat.cloud'
@@ -78,34 +78,68 @@ export function Projects() {
     {
       title: "Electrical Vehicle Marketplace",
       companyName: "Ever Cars",
-      duration: "18 months",
+      duration: "Fullstack Engineer",
       technologies: ["Golang", "AWS", "Next.js", "OpenSearch", "PostgreSQL", "Docker"],
       src: '/images/ever.png',
       url: 'https://evercars.com'
     },
     {
+      title: "Coding Bootcamp",
+      companyName: "Redi School",
+      duration: "DevOps Engineer",
+      technologies: ["Terraform", "Azure", "Github Actions", "PostgreSQL", "Docker"],
+      src: '/images/redi.png',
+      url: 'https://www.redi-school.org/redi-school-berlin'
+    },
+    {
+      title: "Carbon Offset Platform",
+      companyName: "Offset",
+      duration: "Founder Engineer",
+      technologies: ["Nextjs", "React", "PostgreSQL", "Docker"],
+      src: '/images/offset3.png',
+      url: 'https://offset.org/'
+    },
+    {
       title: "Freelance Booking Platform",
-      companyName: "Hirespace",
-      duration: "18 months",
-      technologies: ["NeonDB", "Next.js", "Prisma", "TypeScript", "Docker", "TailwindCSS"],
+      companyName: "HireSpace",
+      duration: "Fullstack Engineer",
+      technologies: ["NeonDB", "Next.js", "Prisma", "TypeScript", "Docker"],
       src: '/images/hirespace.png',
       url: 'https://hirespace.io'
     },
     {
       title: "Telehealth Platform",
       companyName: "SesameCare",
-      duration: "2 years",
+      duration: "Software Engineer",
       technologies: ["Terraform", "GCP", "Docker", "Kubernetes", "Stripe API", "Next.js"],
       src: '/images/sesame.png',
       url: 'https://sesamecare.com'
     },
+    {
+      title: "E2EE Healthcare Platform",
+      companyName: "Vivy GmbH",
+      duration: "Software Engineer",
+      technologies: ["AWS", "Jenkins", "React", "Typescript", "Node.js"],
+      src: '/images/vivy.png',
+      url: 'https://vivy.com'
+    },
+    {
+      title: "Health information management system",
+      companyName: "DHIS2",
+      duration: "Fullstack Engineer",
+      technologies: ["Next.js", "Typescript", "Node.js", "Open Source"],
+      src: '/images/dhis2.png',
+      url: 'https://dhis2.org'
+    },
+
+
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br py-20">
       <div className="max-w-6xl mx-auto px-4">
         <h2 className="font-sans text-4xl font-bold mb-24 text-center bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
-          Have worked on
+          Portfolio
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {projects.map((project, index) => (
