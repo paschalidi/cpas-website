@@ -1,18 +1,19 @@
 import React from 'react';
 import { Card, CardContent } from "./ui/card";
 
+
 export const ProjectCard = ({
                               title,
                               src,
                               companyName,
-                              duration,
+                              workTitle,
                               technologies,
                               url
                             }: {
   title: string;
   src: string;
   companyName: string;
-  duration: string;
+  workTitle: string;
   technologies: string[];
   url?: string;
 }) => {
@@ -41,10 +42,11 @@ export const ProjectCard = ({
             alt={title}
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/60"/>
+          {/* Overlay gradient that becomes more visible on hover */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/90 opacity-90 via-50% transition-opacity duration-300 group-hover:opacity-100"/>
           <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h3 className="text-xl font-semibold text-white/90">{title}</h3>
-            <p className="text-sm text-white/60 mt-1">{companyName} · {duration}</p>
+            <h3 className="text-xl font-semibold text-white">{title}</h3>
+            <p className="text-sm text-white/80 mt-1">{companyName} · {workTitle}</p>
           </div>
         </div>
 
@@ -64,13 +66,12 @@ export const ProjectCard = ({
     </CardWrapper>
   );
 };
-
 export function Projects() {
   const projects = [
     {
       title: "Rechat.cloud - SaaS Chat System",
       companyName: "Open Source Project",
-      duration: "Founder Engineer",
+      workTitle: "Founder Engineer",
       technologies: ["Rust", "Terraform", "Kubernetes", "PostgreSQL", "Next.js", "Stripe API"],
       src: '/images/rechat.png',
       url: 'https://www.rechat.cloud'
@@ -78,7 +79,7 @@ export function Projects() {
     {
       title: "Electrical Vehicle Marketplace",
       companyName: "Ever Cars",
-      duration: "Fullstack Engineer",
+      workTitle: "Fullstack Engineer",
       technologies: ["Golang", "AWS", "Next.js", "OpenSearch", "PostgreSQL", "Docker"],
       src: '/images/ever.png',
       url: 'https://evercars.com'
@@ -86,7 +87,7 @@ export function Projects() {
     {
       title: "Coding Bootcamp",
       companyName: "Redi School",
-      duration: "DevOps Engineer",
+      workTitle: "DevOps Engineer",
       technologies: ["Terraform", "Azure", "Github Actions", "PostgreSQL", "Docker"],
       src: '/images/redi.png',
       url: 'https://www.redi-school.org/redi-school-berlin'
@@ -94,7 +95,7 @@ export function Projects() {
     {
       title: "Carbon Offset Platform",
       companyName: "Offset",
-      duration: "Founder Engineer",
+      workTitle: "Founder Engineer",
       technologies: ["Nextjs", "React", "PostgreSQL", "Docker"],
       src: '/images/offset3.png',
       url: 'https://offset.org/'
@@ -102,7 +103,7 @@ export function Projects() {
     {
       title: "Freelance Booking Platform",
       companyName: "HireSpace",
-      duration: "Fullstack Engineer",
+      workTitle: "Fullstack Engineer",
       technologies: ["NeonDB", "Next.js", "Prisma", "TypeScript", "Docker"],
       src: '/images/hirespace.png',
       url: 'https://hirespace.io'
@@ -110,7 +111,7 @@ export function Projects() {
     {
       title: "Telehealth Platform",
       companyName: "SesameCare",
-      duration: "Software Engineer",
+      workTitle: "Software Engineer",
       technologies: ["Terraform", "GCP", "Docker", "Kubernetes", "Stripe API", "Next.js"],
       src: '/images/sesame.png',
       url: 'https://sesamecare.com'
@@ -118,7 +119,7 @@ export function Projects() {
     {
       title: "E2EE Healthcare Platform",
       companyName: "Vivy GmbH",
-      duration: "Software Engineer",
+      workTitle: "Software Engineer",
       technologies: ["AWS", "Jenkins", "React", "Typescript", "Node.js"],
       src: '/images/vivy.png',
       url: 'https://vivy.com'
@@ -126,7 +127,7 @@ export function Projects() {
     {
       title: "Health information management system",
       companyName: "DHIS2",
-      duration: "Fullstack Engineer",
+      workTitle: "Fullstack Engineer",
       technologies: ["Next.js", "Typescript", "Node.js", "Open Source"],
       src: '/images/dhis2.png',
       url: 'https://dhis2.org'
