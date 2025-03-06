@@ -71,13 +71,13 @@ export function Projects() {
     {
       title: "Rechat.cloud - SaaS Chat System",
       companyName: "Open Source Project",
-      workTitle: "Founder Engineer",
+      workTitle: "Founder Fullstack Engineer",
       technologies: ["Rust", "Terraform", "Kubernetes", "PostgreSQL", "Next.js", "Stripe API"],
       src: '/images/rechat.png',
       url: 'https://www.rechat.cloud'
     },
     {
-      title: "Electrical Vehicle Marketplace",
+      title: "Largest US Marketplace for Electrical Vehicles",
       companyName: "Ever Cars",
       workTitle: "Fullstack Engineer",
       technologies: ["Golang", "AWS", "Next.js", "OpenSearch", "PostgreSQL", "Docker"],
@@ -85,7 +85,15 @@ export function Projects() {
       url: 'https://evercars.com'
     },
     {
-      title: "Coding Bootcamp",
+      title: "Booking Platform for Freelancers",
+      companyName: "HireSpace",
+      workTitle: "Founding Fullstack Engineer",
+      technologies: ["NeonDB", "Next.js", "Prisma", "TypeScript", "Docker"],
+      src: '/images/hirespace.png',
+      url: 'https://hirespace.io'
+    },
+    {
+      title: "NGO Coding Bootcamp for migrants",
       companyName: "Redi School",
       workTitle: "DevOps Engineer",
       technologies: ["Terraform", "Azure", "Github Actions", "PostgreSQL", "Docker"],
@@ -101,15 +109,7 @@ export function Projects() {
       url: 'https://offset.org/'
     },
     {
-      title: "Freelance Booking Platform",
-      companyName: "HireSpace",
-      workTitle: "Fullstack Engineer",
-      technologies: ["NeonDB", "Next.js", "Prisma", "TypeScript", "Docker"],
-      src: '/images/hirespace.png',
-      url: 'https://hirespace.io'
-    },
-    {
-      title: "Telehealth Platform",
+      title: "Largest US Telehealth Platform",
       companyName: "SesameCare",
       workTitle: "Software Engineer",
       technologies: ["Terraform", "GCP", "Docker", "Kubernetes", "Stripe API", "Next.js"],
