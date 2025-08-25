@@ -71,7 +71,7 @@ export function Hero() {
     },
     {
       icon: <ResumeIcon/>,
-      href: "https://www.canva.com/design/DADmXbSgqTE/3TINOQfKAGpAjtyrMaaFJg/view?utm_content=DADmXbSgqTE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h50e805bb91#3"
+      href: "https://www.canva.com/design/DADmXbSgqTE/3TINOQfKAGpAjtyrMaaFJg/view?utm_content=DADmXbSgqTE&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h50e805bb91"
     },
     {
       icon: <ToptalIcon/>,
