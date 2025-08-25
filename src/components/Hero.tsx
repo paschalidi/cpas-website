@@ -97,7 +97,7 @@ export function Hero() {
           hi there, I&apos;m christos
         </h1>
         <h4 className="text-2xl text-white/60 max-w-[700px]">
-         a full stack software developer
+         a tech lead and full stack software developer
         </h4>
 
         <div className="mt-12 flex items-center justify-center gap-8">
