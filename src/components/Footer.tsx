@@ -28,7 +28,7 @@ const socialLinks = [
   { icon: <GithubIcon/>, href: "https://github.com/paschalidi", label: "GitHub" },
   { icon: <LinkedInIcon/>, href: "https://www.linkedin.com/in/christos-paschalidis/", label: "LinkedIn" },
   { icon: <ToptalIcon/>, href: "https://www.toptal.com/resume/christos-paschalidis", label: "Toptal" },
-  { icon: <EmailIcon/>, href: "mailto:paschalidi@outlook.com?subject=Let's%20Connect&body=Hi%20Christos%2C%0A%0AI%20love%20your%20funny%20website%2C%20not%20really%20%F0%9F%98%84", label: "Email" },
+  { icon: <EmailIcon/>, href: "mailto:paschalidi@outlook.com?subject=Let's%20work%20together&body=Hi%20Christos%2C%0A%0AI%20came%20across%20your%20work%20and%20I%27d%20love%20to%20explore%20the%20possibility%20of%20collaborating.%0A%0ALooking%20forward%20to%20connecting.", label: "Email" },
 ];
 
 export function Footer() {
@@ -38,24 +38,31 @@ export function Footer() {
       className="relative w-full"
       style={{ cursor: 'none' }}
     >
-      {/* Aurora-colored top gradient with big radius */}
-      <div className="relative overflow-hidden rounded-t-[3rem] bg-black">
-        {/* Subtle aurora color glow at top edge */}
+      <div className="relative overflow-hidden rounded-t-[3rem] md:rounded-t-[5rem] bg-[#0a0a0a]">
+        {/* Warm top edge glow — peach/coral gradient line */}
         <div
-          className="absolute top-0 left-0 right-0 h-px"
+          className="absolute top-0 left-0 right-0 h-[2px]"
           style={{
-            background: 'linear-gradient(90deg, transparent, rgba(236, 72, 153, 0.5), rgba(139, 92, 246, 0.5), rgba(59, 130, 246, 0.5), rgba(52, 211, 153, 0.5), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgba(245, 168, 133, 0.6), rgba(232, 134, 95, 0.4), rgba(245, 168, 133, 0.6), transparent)',
           }}
         />
 
-        <div className="px-6 md:px-12 py-16 md:py-24">
-          {/* Top: CTA-ish line */}
-          <div className="mb-12 md:mb-16">
-            <h3 className="text-3xl md:text-4xl font-semibold text-white mb-4">
+        {/* Subtle warm ambient glow at bottom */}
+        <div
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60rem] h-[20rem] rounded-full opacity-20 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(245, 168, 133, 0.15) 0%, transparent 70%)',
+          }}
+        />
+
+        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-20 md:pt-28 md:pb-16">
+          {/* CTA area */}
+          <div className="mb-4 md:mb-6">
+            <h3 className="font-sans text-4xl md:text-6xl font-bold text-white leading-[1.1] mb-6 max-w-xl">
               Let&apos;s build something together
             </h3>
             <a
-              href="mailto:paschalidi@outlook.com?subject=Let's%20Connect&body=Hi%20Christos%2C%0A%0AI%20love%20your%20funny%20website%2C%20not%20really%20%F0%9F%98%84"
+              href="mailto:paschalidi@outlook.com?subject=Let's%20work%20together&body=Hi%20Christos%2C%0A%0AI%20came%20across%20your%20work%20and%20I%27d%20love%20to%20explore%20the%20possibility%20of%20collaborating.%0A%0ALooking%20forward%20to%20connecting."
               className="
                 inline-flex items-center gap-2
                 px-6 py-3 rounded-full
@@ -67,17 +74,17 @@ export function Footer() {
               style={{ cursor: 'none' }}
             >
               <EmailIcon />
-              <span className="text-sm font-medium">Get in touch</span>
+              <span className="text-sm font-semibold">Get in touch</span>
             </a>
           </div>
 
           {/* Divider */}
-          <div className="w-full h-px bg-white/10 mb-12" />
+          <div className="w-full h-px bg-white/8 mb-12" />
 
-          {/* Bottom row: socials + copyright */}
+          {/* Bottom row */}
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             {/* Social links */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               {socialLinks.map((link) => (
                 <a
                   key={link.label}
@@ -87,10 +94,10 @@ export function Footer() {
                   aria-label={link.label}
                   className="
                     p-3 rounded-full
-                    text-white/60
+                    text-white/50
                     hover:text-white hover:bg-white/10 hover:-translate-y-0.5
                     transition-all duration-300
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a885] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]
                   "
                   style={{ cursor: 'none' }}
                 >
@@ -99,10 +106,9 @@ export function Footer() {
               ))}
             </div>
 
-            {/* Copyright + colophon */}
-            <div className="flex flex-col md:items-end gap-2 text-white/40 text-sm">
+            {/* Copyright */}
+            <div className="text-white/30 text-sm">
               <p>© {new Date().getFullYear()} Christos Paschalidis</p>
-              <p className="text-xs">Built with React, Vite & Tailwind CSS</p>
             </div>
           </div>
         </div>

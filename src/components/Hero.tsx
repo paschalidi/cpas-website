@@ -79,7 +79,7 @@ export function Hero() {
     },
     {
       icon: <EmailIcon/>,
-      href: "mailto:paschalidi@outlook.com?subject=Let's%20Connect&body=Hi%20Christos%2C%0A%0AI%20love%20your%20funny%20website%2C%20not%20really%20%F0%9F%98%84",
+      href: "mailto:paschalidi@outlook.com?subject=Let's%20work%20together&body=Hi%20Christos%2C%0A%0AI%20came%20across%20your%20work%20and%20I%27d%20love%20to%20explore%20the%20possibility%20of%20collaborating.%0A%0ALooking%20forward%20to%20connecting.",
     },
   ];
 
@@ -88,10 +88,10 @@ export function Hero() {
       <AuroraBackground />
 
       <div ref={textRef} className="relative z-10 text-center transition-transform duration-200 ease-out">
-        <h1 className="font-sans text-5xl md:text-6xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-neutral-900 to-neutral-700 px-4">
+        <h1 className="font-sans text-5xl md:text-6xl font-semibold mb-6 text-[#0d2418] px-4">
           hi there, I&apos;m christos
         </h1>
-        <h4 className="text-2xl text-neutral-700/80 max-w-[700px]">
+        <h4 className="text-2xl text-[#0d2418]/80 max-w-[700px]">
          a tech lead and full stack software developer
         </h4>
 

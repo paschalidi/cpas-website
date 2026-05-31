@@ -3,7 +3,8 @@ import { Card, CardContent } from "./ui/card";
 
 // Single warm badge color
 const BADGE_BG = '#fef0e6';
-const BADGE_TEXT = '#b8722d';
+const BADGE_TEXT = '#0d2418';
+
 
 export const ProjectCard = ({
   title,
@@ -51,14 +52,14 @@ export const ProjectCard = ({
         </div>
 
         <CardContent className="pt-5 px-5 pb-6">
-          <h3 className="text-lg md:text-xl font-semibold text-[#1a1a1a] leading-tight">{title}</h3>
+          <h3 className="text-lg md:text-xl font-semibold text-[#0d2418] leading-tight">{title}</h3>
           <p className="text-sm text-[#8a8a8a] mt-1.5 mb-5">{companyName} · {workTitle}</p>
 
           <div className="flex flex-wrap gap-2">
             {technologies.map((tech, i) => (
               <span
                 key={i}
-                className="px-3 py-1.5 text-xs font-medium rounded-full"
+                className="px-3 py-1.5 text-xs font-medium rounded-full "
                 style={{ backgroundColor: BADGE_BG, color: BADGE_TEXT }}
               >
                 {tech}
@@ -142,13 +143,13 @@ export function Projects() {
   return (
     <section
       id="work"
-      className="relative bg-[#fcfaf5] rounded-t-[3rem] md:rounded-t-[5rem] -mt-12 z-10"
+      className="relative bg-[#fcfaf5] rounded-t-[3rem] md:rounded-t-[5rem] overflow-hidden"
       style={{ cursor: 'none' }}
     >
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 pt-20 md:pt-28 pb-40 md:pb-56">
         {/* Section heading */}
         <div className="mb-16 md:mb-20 text-center">
-          <h2 className="font-sans text-5xl md:text-7xl font-bold text-[#1a1a1a] leading-[1.1] mb-5">
+          <h2 className="font-sans text-5xl md:text-7xl font-bold text-[#0d2418] leading-[1.1] mb-5">
             Selected Work
           </h2>
           <p className="text-[#6b6b6b] text-lg md:text-xl max-w-lg mx-auto leading-relaxed">

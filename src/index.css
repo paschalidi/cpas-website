@@ -12,6 +12,12 @@ body {
   margin: 0;
 }
 
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    color: #0d2418;
+  }
+}
+
 .cursor-follower {
   backdrop-filter: invert(1);
   mix-blend-mode: difference;

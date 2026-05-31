@@ -12,13 +12,15 @@ function App() {
       <Cursor />
       <Navbar />
       <div className="flex flex-col">
-        <section id="hero">
+        <section id="hero" className="sticky top-0 z-10">
           <Hero />
         </section>
-        <section id="work">
+        <section id="work" className="relative z-20">
           <Projects />
         </section>
-        <Footer />
+        <section className="relative z-30 -mt-12 md:-mt-20">
+          <Footer />
+        </section>
       </div>
     </div>
   );
