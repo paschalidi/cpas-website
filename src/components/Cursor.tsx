@@ -27,13 +27,13 @@ export function Cursor() {
     <>
       <div
         ref={cursorRef}
-        className={`cursor-follower fixed pointer-events-none z-50 w-16 h-16 border border-white/30 rounded-full transition-transform duration-200 ease-out ${
+        className={`cursor-follower fixed pointer-events-none z-[100] w-3 h-3 border border-white/30 rounded-full transition-transform duration-200 ease-out ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}
       />
       <div
         ref={cursorDotRef}
-        className={`cursor-dot fixed pointer-events-none z-50 w-2 h-2 bg-white rounded-full transition-transform duration-100 ease-out ${
+        className={`cursor-dot fixed pointer-events-none z-[100] w-2 h-2 bg-white rounded-full transition-transform duration-100 ease-out ${
           isVisible ? 'opacity-100' : 'opacity-0'
         }`}
       />

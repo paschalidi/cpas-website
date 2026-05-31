@@ -75,18 +75,18 @@ const fragmentShader = /* glsl */ `
       fbm(uv * 1.5 + vec2(0.0, t * 2.0))
     ) * 0.35 - 0.175;
 
-    // Palette — vivid but on a near-white base
-    vec3 cPink   = vec3(1.00, 0.36, 0.62);
-    vec3 cViolet = vec3(0.58, 0.36, 1.00);
-    vec3 cBlue   = vec3(0.30, 0.70, 1.00);
-    vec3 cMint   = vec3(0.35, 0.95, 0.80);
-    vec3 cBase   = vec3(0.98, 0.97, 1.00);
+    // Palette — soft pastels on an off-white base (peach / sky / cream)
+    vec3 cPeach  = vec3(0.96, 0.66, 0.52);
+    vec3 cCoral  = vec3(0.95, 0.74, 0.65);
+    vec3 cSky    = vec3(0.69, 0.82, 0.92);
+    vec3 cCream  = vec3(0.94, 0.92, 0.82);
+    vec3 cBase   = vec3(0.99, 0.98, 0.96);
 
     vec3 col = cBase;
-    col = mix(col, cPink,   blob(warp, c1, 0.95, 0.85) * 0.85);
-    col = mix(col, cViolet, blob(warp, c2, 0.90, 0.85) * 0.75);
-    col = mix(col, cBlue,   blob(warp, c3, 1.00, 0.85) * 0.70);
-    col = mix(col, cMint,   blob(warp, c4, 0.85, 0.85) * 0.55);
+    col = mix(col, cPeach,  blob(warp, c1, 0.95, 0.85) * 0.70);
+    col = mix(col, cSky,    blob(warp, c2, 0.90, 0.85) * 0.65);
+    col = mix(col, cCream,  blob(warp, c3, 1.00, 0.85) * 0.60);
+    col = mix(col, cCoral,  blob(warp, c4, 0.85, 0.85) * 0.55);
 
     // Soft grain — keeps gradients from banding & adds texture
     float grain = (hash21(gl_FragCoord.xy + uTime) - 0.5) * 0.02;

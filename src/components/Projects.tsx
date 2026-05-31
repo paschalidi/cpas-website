@@ -1,21 +1,39 @@
 import React from 'react';
 import { Card, CardContent } from "./ui/card";
 
+// Aurora palette
+const colors = {
+  base: '#fcfaf5',
+  cream: '#f0e8c4',
+  sky: '#b0d1eb',
+  coral: '#f2bca6',
+  peach: '#f5a885',
+  deepPeach: '#e8865f',
+};
+
+const techTagColors = [
+  { bg: '#fef0e6', text: '#c45a2c' },   // peach tint
+  { bg: '#e8f0f9', text: '#3a7ab8' },   // sky tint
+  { bg: '#fdf6e3', text: '#8a7420' },   // cream tint
+  { bg: '#fef1ec', text: '#b86a4a' },   // coral tint
+];
 
 export const ProjectCard = ({
-                              title,
-                              src,
-                              companyName,
-                              workTitle,
-                              technologies,
-                              url
-                            }: {
+  title,
+  src,
+  companyName,
+  workTitle,
+  technologies,
+  url,
+  index,
+}: {
   title: string;
   src: string;
   companyName: string;
   workTitle: string;
   technologies: string[];
   url?: string;
+  index: number;
 }) => {
   const CardWrapper = ({ children }: { children: React.ReactNode }) => {
     if (url) {
@@ -35,37 +53,45 @@ export const ProjectCard = ({
 
   return (
     <CardWrapper>
-      <Card className="group bg-black/20 border-white/10 backdrop-blur-sm transition-all duration-300 hover:bg-black/30 rounded-2xl">
-        <div className="relative w-full h-[20rem] overflow-hidden rounded-t-2xl rounded-b-lg">
+      <Card
+        className="group bg-white border border-[#f5a885]/15 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-[#f5a885]/10 rounded-[2rem] overflow-hidden"
+        style={{ cursor: 'none' }}
+      >
+        <div className="relative w-full h-[16rem] md:h-[18rem] overflow-hidden rounded-t-[2rem]">
           <img
             src={src}
             alt={title}
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
-          {/* Overlay gradient that becomes more visible on hover */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/90 opacity-90 via-50% transition-opacity duration-300 group-hover:opacity-100"/>
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h3 className="text-xl font-semibold text-white">{title}</h3>
-            <p className="text-sm text-white/80 mt-1">{companyName} · {workTitle}</p>
-          </div>
         </div>
 
-        <CardContent className="pt-6 px-4">
+        <CardContent className="pt-5 px-5 pb-6">
+          <h3 className="text-lg md:text-xl font-semibold text-[#1a1a1a] leading-tight">{title}</h3>
+          <p className="text-sm text-[#8a8a8a] mt-1.5 mb-5">{companyName} · {workTitle}</p>
+
           <div className="flex flex-wrap gap-2">
-            {technologies.map((tech, index) => (
-              <span
-                key={index}
-                className="px-2 py-1 text-sm rounded-full bg-purple-500/10 text-purple-200/80 backdrop-blur-sm"
-              >
-                {tech}
-              </span>
-            ))}
+            {technologies.map((tech, techIndex) => {
+              const color = techTagColors[(index + techIndex) % techTagColors.length];
+              return (
+                <span
+                  key={techIndex}
+                  className="px-3 py-1.5 text-xs font-medium rounded-full"
+                  style={{
+                    backgroundColor: color.bg,
+                    color: color.text,
+                  }}
+                >
+                  {tech}
+                </span>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
     </CardWrapper>
   );
 };
+
 export function Projects() {
   const projects = [
     {
@@ -132,22 +158,31 @@ export function Projects() {
       src: '/images/dhis2.png',
       url: 'https://dhis2.org'
     },
-
-
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br py-20">
-      <div className="max-w-6xl mx-auto px-4">
-        <h2 className="font-sans text-4xl font-bold mb-24 text-center bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
-          Portfolio
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <section
+      id="work"
+      className="relative bg-[#fcfaf5] rounded-t-[3rem] md:rounded-t-[5rem] -mt-12 z-10"
+      style={{ cursor: 'none' }}
+    >
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28">
+        {/* Section heading */}
+        <div className="mb-16 md:mb-20 text-center">
+          <h2 className="font-sans text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#e8865f] to-[#f5a885]">
+            Selected Work
+          </h2>
+          <p className="text-[#6b6b6b] text-lg max-w-md mx-auto">
+            Products and platforms I&apos;ve helped build
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {projects.map((project, index) => (
-            <ProjectCard key={index} {...project} />
+            <ProjectCard key={index} index={index} {...project} />
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   @apply bg-black;
   margin: 0;
@@ -20,4 +24,16 @@ body {
   50% { transform: translate(-10%, 5%) }
   70% { transform: translate(7%, -25%) }
   90% { transform: translate(-3%, 15%) }
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
