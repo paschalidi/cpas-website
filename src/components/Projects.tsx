@@ -1,15 +1,19 @@
 import React from 'react';
 import { Card, CardContent } from "./ui/card";
 
+// Single warm badge color
+const BADGE_BG = '#fef0e6';
+const BADGE_TEXT = '#0d2418';
+
 
 export const ProjectCard = ({
-                              title,
-                              src,
-                              companyName,
-                              workTitle,
-                              technologies,
-                              url
-                            }: {
+  title,
+  src,
+  companyName,
+  workTitle,
+  technologies,
+  url,
+}: {
   title: string;
   src: string;
   companyName: string;
@@ -35,27 +39,28 @@ export const ProjectCard = ({
 
   return (
     <CardWrapper>
-      <Card className="group bg-black/20 border-white/10 backdrop-blur-sm transition-all duration-300 hover:bg-black/30 rounded-2xl">
-        <div className="relative w-full h-[20rem] overflow-hidden rounded-t-2xl rounded-b-lg">
+      <Card
+        className="group bg-white border border-[#f5a885]/15 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-[#f5a885]/10 rounded-[2rem] overflow-hidden"
+        style={{ cursor: 'none' }}
+      >
+        <div className="relative w-full h-[16rem] md:h-[18rem] overflow-hidden rounded-t-[2rem]">
           <img
             src={src}
             alt={title}
             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           />
-          {/* Overlay gradient that becomes more visible on hover */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/90 opacity-90 via-50% transition-opacity duration-300 group-hover:opacity-100"/>
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <h3 className="text-xl font-semibold text-white">{title}</h3>
-            <p className="text-sm text-white/80 mt-1">{companyName} · {workTitle}</p>
-          </div>
         </div>
 
-        <CardContent className="pt-6 px-4">
+        <CardContent className="pt-5 px-5 pb-6">
+          <h3 className="text-lg md:text-xl font-semibold text-[#0d2418] leading-tight">{title}</h3>
+          <p className="text-sm text-[#8a8a8a] mt-1.5 mb-5">{companyName} · {workTitle}</p>
+
           <div className="flex flex-wrap gap-2">
-            {technologies.map((tech, index) => (
+            {technologies.map((tech, i) => (
               <span
-                key={index}
-                className="px-2 py-1 text-sm rounded-full bg-purple-500/10 text-purple-200/80 backdrop-blur-sm"
+                key={i}
+                className="px-3 py-1.5 text-xs font-medium rounded-full "
+                style={{ backgroundColor: BADGE_BG, color: BADGE_TEXT }}
               >
                 {tech}
               </span>
@@ -66,6 +71,7 @@ export const ProjectCard = ({
     </CardWrapper>
   );
 };
+
 export function Projects() {
   const projects = [
     {
@@ -132,22 +138,30 @@ export function Projects() {
       src: '/images/dhis2.png',
       url: 'https://dhis2.org'
     },
-
-
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br py-20">
-      <div className="max-w-6xl mx-auto px-4">
-        <h2 className="font-sans text-4xl font-bold mb-24 text-center bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
-          Portfolio
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <section
+      className="relative bg-[#fcfaf5] rounded-t-[3rem] md:rounded-t-[5rem] overflow-hidden"
+      style={{ cursor: 'none' }}
+    >
+      <div className="max-w-6xl mx-auto px-4 md:px-6 pt-20 md:pt-28 pb-40 md:pb-56">
+        {/* Section heading */}
+        <div className="mb-16 md:mb-20 text-center">
+          <h2 className="font-sans text-5xl md:text-7xl font-bold text-[#0d2418] leading-[1.1] mb-5">
+            Selected Work
+          </h2>
+          <p className="text-[#6b6b6b] text-lg md:text-xl max-w-lg mx-auto leading-relaxed">
+            Products and platforms I&apos;ve helped build
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
           {projects.map((project, index) => (
             <ProjectCard key={index} {...project} />
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

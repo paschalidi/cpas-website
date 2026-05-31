@@ -1,0 +1,19 @@
+---
+title: Generate a Github webhook token
+author: Christos Paschalidis
+hero: /blog/images/generate-githut-webhook-token/github.jpeg
+date: 2020-11-12
+excerpt: what I learned today
+---
+
+Generate a GitHub access token
+You need to generate a GitHub personal access token to use for
+creating the webhook and for accessing the repository source
+code during PipelineRuns. To generate the token:
+
+Go to https://github.com/settings/tokens and click Generate new token.
+
+Check the `admin:repo_hook` option and click Generate token.
+If you are working in a private repository, more options might be required.
+Check with your administrator for details. Make sure to save the token to a
+file because you can’t see it after you leave this page.
