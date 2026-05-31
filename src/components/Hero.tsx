@@ -88,17 +88,11 @@ export function Hero() {
       <AuroraBackground />
 
       <div ref={textRef} className="relative z-10 text-center transition-transform duration-200 ease-out">
-        <h1 className="font-sans text-5xl md:text-6xl font-semibold mb-4 text-[#0d2418] px-4 mt-20">
-          Code is the easy part.
+        <h1 className="font-sans text-5xl md:text-6xl font-semibold mb-6 text-[#0d2418] px-4 mt-20">
+          From product idea to reliable software.
         </h1>
-        <p className="text-2xl md:text-3xl font-medium text-[#0d2418]/70 mb-4 px-4">
-          The product thinking is harder.
-        </p>
-        <p className="text-base md:text-lg text-[#0d2418]/50 max-w-[480px] mx-auto leading-relaxed px-4">
-          I lead teams that ship products end-to-end.
-        </p>
-        <p className="text-base md:text-lg text-[#0d2418]/50 max-w-[480px] mx-auto leading-relaxed px-4">
-          The blog is where I unpack how.
+        <p className="text-xl md:text-2xl text-[#0d2418]/60 max-w-[720px] mx-auto leading-relaxed px-4">
+          A tech lead and full-stack engineer helping teams ship ambitious products end to end.
         </p>
 
         <div className="mt-12 flex items-center justify-center gap-8">

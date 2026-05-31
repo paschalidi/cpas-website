@@ -35,15 +35,14 @@ export function Footer() {
   return (
     <footer
       id="contact"
-      className="relative w-full"
-      style={{ cursor: 'none' }}
+      className="relative w-full cursor-none"
     >
-      <div className="relative overflow-hidden rounded-t-[3rem] md:rounded-t-[5rem] bg-[#0a0a0a]">
+      <div className="relative overflow-hidden rounded-t-[3rem] md:rounded-t-[5rem] bg-forest-950">
         {/* Warm top edge glow — peach/coral gradient line */}
         <div
           className="absolute top-0 left-0 right-0 h-[2px]"
           style={{
-            background: 'linear-gradient(90deg, transparent, rgba(245, 168, 133, 0.6), rgba(232, 134, 95, 0.4), rgba(245, 168, 133, 0.6), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgb(var(--color-peach-300) / 0.6), rgb(var(--color-peach-200) / 0.4), rgb(var(--color-peach-300) / 0.6), transparent)',
           }}
         />
 
@@ -51,7 +50,7 @@ export function Footer() {
         <div
           className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60rem] h-[20rem] rounded-full opacity-20 pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(245, 168, 133, 0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse at center, rgb(var(--color-peach-300) / 0.15) 0%, transparent 70%)',
           }}
         />
 
@@ -69,9 +68,8 @@ export function Footer() {
                 bg-white/10 text-white
                 hover:bg-white/20 hover:-translate-y-0.5
                 transition-all duration-300
-                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-peach-300 focus-visible:ring-offset-2 focus-visible:ring-offset-forest-950
               "
-              style={{ cursor: 'none' }}
             >
               <EmailIcon />
               <span className="text-sm font-semibold">Get in touch</span>
@@ -97,9 +95,8 @@ export function Footer() {
                     text-white/50
                     hover:text-white hover:bg-white/10 hover:-translate-y-0.5
                     transition-all duration-300
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f5a885] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-peach-300 focus-visible:ring-offset-2 focus-visible:ring-offset-forest-950
                   "
-                  style={{ cursor: 'none' }}
                 >
                   {link.icon}
                 </a>

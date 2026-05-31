@@ -49,6 +49,25 @@ Derived from the aurora gradient. Used as a warm contrast break from the dark he
 - No gray text on colored backgrounds.
 - Contrast: white on black is ∞:1. Dark text (`#1a1a1a`) on `#fcfaf5` is ~15:1.
 
+### Blog Theme
+
+The blog uses the botanical green and peach palette as shared design tokens. Do not hardcode these hex values in components; use the Tailwind tokens instead.
+
+| Token | Value | Tailwind class prefix | Usage |
+|-------|-------|-----------------------|-------|
+| `--color-blog-background` | `#020A05` | `blog-background` | Blog page background, image overlays |
+| `--color-blog-surface` | `#0C2A17` | `blog-surface` | Code blocks, quote blocks, author bio |
+| `--color-blog-border` | `#F8F7F4` | `blog-border` | Dividers, borders, progress track at low opacity |
+| `--color-blog-text` | `#F8F7F4` | `blog-text` | Blog headings and primary text |
+| `--color-blog-muted` | `#F8F7F4` | `blog-muted` | Body copy and secondary metadata at reduced opacity |
+| `--color-blog-accent` | `#F3C6AD` | `blog-accent` | Links, progress fill, hover states |
+| `--color-blog-accent-muted` | `#F7D9CC` | `blog-accent-muted` | Softer accents and gradients |
+
+**Rules:**
+- Use semantic blog tokens in blog components: `bg-blog-background`, `text-blog-muted`, `border-blog-border`, `from-blog-accent`.
+- Use base palette tokens only when a semantic blog token is not specific enough, e.g. `text-peach-200` for inline code.
+- Component-level arbitrary hex classes like `bg-[#020A05]` are banned for blog styling.
+
 ## Typography
 
 **Primary font:** `Cabinet Grotesk` (Fontshare CDN), weights 100–400.
