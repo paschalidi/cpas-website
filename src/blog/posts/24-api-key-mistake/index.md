@@ -67,6 +67,16 @@ Public/private key pairs are the right answer. The frontend gets a public key. T
 
 This is how AWS does it. No proxy, no token server, no expiration logic. The customer's backend only generates the signature. The frontend talks directly to ReChat.
 
+**How this actually prevents abuse:**
+
+The customer's backend holds the secret key. When a user opens the chat widget, the backend generates a signature that includes the user's ID and a timestamp. The frontend sends this signature with every WebSocket connection and API request.
+
+The ReChat server verifies the signature using the public key. If the signature is valid and not expired, the request is processed. If someone steals the public key, they cannot forge a signature without the secret key. They cannot impersonate users, create channels, or send messages.
+
+The public key only identifies the organization. The signature proves the request is legitimate. Without the signature, the public key is useless.
+
+This means even if someone copies the public key from the HTML, they cannot do anything with it. They can see the organization ID, but they cannot send messages, create channels, or delete data. The secret key never touches the frontend, so it cannot be stolen.
+
 I did not do this. I did not do anything. I left the API key in the React prop and moved on to the next feature.
 
 Then I got the bill.
