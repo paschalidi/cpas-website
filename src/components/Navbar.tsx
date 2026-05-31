@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 
 const navLinks = [
-  { label: 'Christos', href: '#hero' },
+  { label: 'About', href: '#hero' },
   { label: 'Work', href: '#work' },
-  { label: 'Blog', href: '#blog' },
   { label: 'Contact', href: '#contact' },
 ];
 
@@ -22,9 +21,13 @@ export function Navbar() {
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
+    if (href === '#hero') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
     }
     setMenuOpen(false);
   };

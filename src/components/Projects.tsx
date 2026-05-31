@@ -142,7 +142,6 @@ export function Projects() {
 
   return (
     <section
-      id="work"
       className="relative bg-[#fcfaf5] rounded-t-[3rem] md:rounded-t-[5rem] overflow-hidden"
       style={{ cursor: 'none' }}
     >
