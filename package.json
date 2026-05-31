@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/build-blog-data.js",
     "dev": "vite",
-    "prebuild": "npx tsx scripts/build-blog-data.ts",
+    "prebuild": "node scripts/build-blog-data.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
