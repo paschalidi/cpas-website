@@ -5,6 +5,9 @@ date: 2021-06-19
 hero: /blog/images/07-notes-on-accessibility/image.jpeg
 excerpt: A note on how to get peers on boarded on accessibility
 ---
+
+# Notes on accessible design systems
+
 _"Accessible design not only helps users with special abilities; it provides better user experiences for our users in general."_
 
 I am writing this issue driven by the assumption that we see the benefits of creating an accessible  design. Therefore this issue will serve as an open discussion regarding accessibility and where our stand on the topic is. We can evaluate the effort, discuss and organise how we would like to tackle the topic.

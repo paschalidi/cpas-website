@@ -1,15 +1,15 @@
 ---
-title: learning rust - day 2
+title: Learning rust — day 2
 author: Christos Paschalidis
 date: 2023-06-17
 excerpt: Structs, enums, Result, and building a small HTTP server
 ---
 
-# learning rust - day 2
+# Learning rust — day 2
 
-today i learned how to model data and handle errors properly. no more throwing exceptions. everything is explicit.
+Today I learned how to model data and handle errors properly. No more throwing exceptions. Everything is explicit.
 
-### structs and enums
+## Structs and enums
 
 ```rust
 struct User {
@@ -25,9 +25,9 @@ enum Status {
 }
 ```
 
-enums with data are powerful. `Banned(String)` carries the reason. no need for nullable `ban_reason` fields.
+Enums with data are powerful. `Banned(String)` carries the reason. No need for nullable `ban_reason` fields. This matters when you are building a chat API where users can be banned, suspended, or limited.
 
-### the Result type
+## The Result type
 
 ```rust
 fn divide(a: f64, b: f64) -> Result<f64, String> {
@@ -36,61 +36,32 @@ fn divide(a: f64, b: f64) -> Result<f64, String> {
     }
     Ok(a / b)
 }
-
-fn main() {
-    match divide(10.0, 2.0) {
-        Ok(result) => println!("result: {}", result),
-        Err(e) => println!("error: {}", e),
-    }
-}
 ```
 
-no exceptions. every possible error is in the type signature. the compiler forces you to handle it.
+No exceptions. Every possible error is in the type signature. The compiler forces you to handle it.
 
-### the ? operator
+This is the thing I wish every language had. When a database query fails in a chat handler, what do you do? In Rust, the type system makes you decide before the code compiles. In JavaScript, you find out in production.
+
+## Building a small HTTP server
+
+I chose Axum. It feels like Express.js but typed. Routing is composable. Handlers are just async functions.
 
 ```rust
-fn read_file(path: &str) -> Result<String, std::io::Error> {
-    let content = std::fs::read_to_string(path)?;
-    Ok(content)
-}
+let app = Router::new()
+    .route("/", get(|| async { "hello, axum!" }));
 ```
 
-the `?` early returns the error. less nesting than `match`. but the function must return `Result`.
+One line and you have a server. But the compiler checks every route, every handler, every database query at build time.
 
-### building a small HTTP server
+## What frustrated me
 
-```rust
-use axum::{
-    routing::get,
-    Router,
-};
+Understanding when to use `String` vs `&str`. `String` is owned. `&str` is borrowed. For function arguments, `&str` is usually better. For struct fields, `String` because they need to own the data.
 
-#[tokio::main]
-async fn main() {
-    let app = Router::new()
-        .route("/", get(|| async { "hello, axum!" }));
+I spent 30 minutes on this. It will make sense eventually.
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
-}
-```
-
-axum is the web framework i chose. it feels like express.js but typed. routing is composable. handlers are just async functions.
-
-### what i learned today
+## What I learned
 
 - `#[derive(Debug)]` — print structs without writing display code
-- `Option<T>` — enum for values that might be absent. no nulls.
-- pattern matching with `match` is exhaustive. the compiler checks every case.
-- `tokio` is the async runtime. add `#[tokio::main]` and you get async/await.
-
-### what frustrated me
-
-understanding when to use `String` vs `&str`. `String` is owned. `&str` is borrowed. for function arguments, `&str` is usually better. for struct fields, `String` because they need to own the data.
-
-```rust
-fn greet(name: &str) -> String {
-    format!("hello, {}", name)
-}
-```
+- `Option<T>` — enum for values that might be absent. No nulls.
+- Pattern matching with `match` is exhaustive. The compiler checks every case.
+- `tokio` is the async runtime. Add `#[tokio::main]` and you get async/await.

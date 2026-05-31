@@ -1,11 +1,11 @@
 ---
-title: Building a React SDK for Your Backend
+title: Building a react SDK for your backend
 author: Christos Paschalidis
 date: 2023-11-20
 excerpt: Packaging components, WebSocket reconnection, and TypeScript types
 ---
 
-# Building a React SDK for Your Backend
+# Building a react SDK for your backend
 
 A chat backend is useless without a client. I built a React SDK so developers can add chat to their app in minutes.
 
@@ -20,7 +20,7 @@ ChatProvider (manages connection + state)
 └── MessageInput (sends messages)
 ```
 
-### The Provider
+### The provider
 
 ```tsx
 import { ChatProvider } from "@rechat-sdk/react";
@@ -50,7 +50,7 @@ The provider handles:
 - Channel discovery via REST API
 - Message history via REST + real-time via WebSocket
 
-### WebSocket Hook
+### WebSocket hook
 
 ```tsx
 export function useWebSocket(channelName: string) {
@@ -125,7 +125,7 @@ REST provides the history. WebSocket provides the real-time updates. Both feed i
 
 Built with `tsup` for fast bundling. Dual CJS/ESM output. Type declarations included.
 
-### What I Learned
+### What I learned
 
 - Context is the right pattern for shared state that rarely changes (connection, user info).
 - Hooks are the right pattern for data that changes often (messages, channels).
@@ -133,7 +133,7 @@ Built with `tsup` for fast bundling. Dual CJS/ESM output. Type declarations incl
 - Cleanup functions in `useEffect` are critical. Leaked WebSocket connections pile up fast.
 - Peer dependencies for React. Don't bundle React into the SDK.
 
-### What I'd Add Next
+### What I'd add next
 
 - Reconnection with exponential backoff
 - Optimistic UI for message sending

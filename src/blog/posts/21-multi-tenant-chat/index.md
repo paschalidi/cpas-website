@@ -1,15 +1,15 @@
 ---
-title: Designing a Multi-Tenant Chat API with API Keys and Usage Limits
+title: Designing a multi-tenant chat API with API keys and usage limits
 author: Christos Paschalidis
 date: 2023-09-10
 excerpt: Organization isolation, API key auth, rate limiting, and Stripe billing
 ---
 
-# Designing a Multi-Tenant Chat API with API Keys and Usage Limits
+# Designing a multi-tenant chat API with API keys and usage limits
 
-Chat-as-a-service means multiple organizations sharing one backend. Each org needs isolation, authentication, and billing.
+Chat-as-a-service means multiple organizations sharing one backend. Each org needs isolation, authentication, and billing. Here is how we built it.
 
-### Data Model
+## Data model
 
 ```
 organizations
@@ -21,7 +21,7 @@ organizations
 
 Every table has `organization_id`. No cross-org queries. No accidental data leaks.
 
-### API Key Authentication
+## API key authentication
 
 Axum custom extractor pattern:
 
@@ -62,7 +62,16 @@ pub async fn create_channel(
 
 The `_auth` parameter forces the middleware to run. No annotation needed. Axum extracts it automatically.
 
-### Usage Limiting with Tiers
+## The middleware pipeline
+
+```
+Request → ApiKeyAuthorizer → UsageTracker → UsageLimiter → Handler
+             (Validate)      (Count)         (Enforce)
+```
+
+Each middleware is a custom extractor. They compose naturally in Axum.
+
+## Usage limiting with tiers
 
 ```rust
 #[async_trait]
@@ -92,9 +101,25 @@ impl FromRequestParts<AppState> for UsageLimiter {
 }
 ```
 
-Graceful degradation: if usage tracking fails, the request still goes through. Only block if we can confirm the limit is exceeded.
+## Graceful degradation
 
-### Stripe Integration
+The difficult decision: what happens when usage tracking fails? If the database is slow, do we block all requests?
+
+Answer: No. If we cannot check usage, we let the request through. Only block if we can confirm the limit is exceeded.
+
+```rust
+let usage = match check_usage(&state, &org_id).await {
+    Ok(u) => u,
+    Err(e) => {
+        tracing::error!("Failed to check usage: {}", e);
+        return Ok(Self); // Let it through
+    }
+};
+```
+
+This is a product decision, not a technical one. Better to serve a slightly over-limit request than to block everything during a DB hiccup.
+
+## Stripe integration
 
 ```rust
 use async_stripe::{Client, CreateSubscription, Subscription};
@@ -116,10 +141,10 @@ pub async fn create_subscription(
 }
 ```
 
-Stripe handles the billing. We store the `subscription_id` on the organization. Webhooks update the tier when payment succeeds or fails.
+Stripe handles billing. We store the `subscription_id` on the organization. Webhooks update the tier when payment succeeds or fails.
 
-### What I Learned
+## What I learned
 
 - Custom extractors in Axum are powerful. Auth, rate limiting, usage tracking — all reusable.
-- Graceful degradation matters more than perfect enforcement. A blocked request because the usage tracker is down is worse than a slightly over-limit request.
+- Graceful degradation matters more than perfect enforcement.
 - SeaORM migrations with `sea-orm-cli` make schema changes manageable. Never modify the DB directly.

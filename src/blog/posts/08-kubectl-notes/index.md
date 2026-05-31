@@ -1,5 +1,5 @@
 ---
-title: K8s Lab – deploying a real world app
+title: K8s lab – deploying a real world app
 author: Christos Paschalidis
 date: 2021-11-5
 hero: /blog/images/08-kubectl-notes/image.png

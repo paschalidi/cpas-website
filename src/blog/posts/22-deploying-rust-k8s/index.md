@@ -1,15 +1,15 @@
 ---
-title: Deploying Rust to Kubernetes on DigitalOcean
+title: Deploying rust to kubernetes on digitalocean
 author: Christos Paschalidis
 date: 2023-10-05
 excerpt: Distroless images, Helm charts, and fast startup times
 ---
 
-# Deploying Rust to Kubernetes on DigitalOcean
+# Deploying rust to kubernetes on digitalocean
 
-I chose DigitalOcean for simplicity. Managed Postgres, managed Redis (Valkey), and a container registry. Here's the setup.
+I chose DigitalOcean for simplicity. Managed Postgres, managed Redis (Valkey), and a container registry. Here is the setup.
 
-### Dockerfile
+## Dockerfile
 
 Multi-stage build for minimal image size:
 
@@ -31,7 +31,7 @@ CMD ["./chat-api"]
 
 Distroless images contain only the binary and libc. No shell, no package manager, no attack surface. Image size: 35MB vs 1.2GB with a full OS.
 
-### Docker Compose for Local Development
+## Docker compose for local development
 
 ```yaml
 version: '3.8'
@@ -64,7 +64,7 @@ services:
 
 `docker-compose up -d` starts everything. No manual setup.
 
-### Helm Chart
+## Helm chart
 
 ```yaml
 # helm/chat-service/values.yaml
@@ -97,18 +97,28 @@ Deploy with:
 helm upgrade --install chat-service ./helm/chat-service
 ```
 
-### Why DigitalOcean
+## The difficult decision: rolling updates with WebSockets
 
-- Managed PostgreSQL: backups, point-in-time recovery, no ops burden
-- Managed Redis (Valkey): clustering, failover, monitoring
-- Container Registry: integrated with Kubernetes, no Docker Hub rate limits
-- Load Balancer: SSL termination, health checks, automatic failover
+WebSocket connections are long-lived. During a rolling update, old pods terminate while clients are still connected. What happens?
 
-### Fast Startup
+Clients reconnect to new pods automatically. The WebSocket handshake is fast. Redis Pub/Sub ensures they still receive messages sent to the room.
+
+But: messages sent during the reconnect window are lost. For our use case (customer support chat), this is acceptable. For financial trading, it would not be.
+
+The fix if needed: Redis Streams with consumer groups. Clients acknowledge messages. Unacknowledged messages are redelivered after reconnect.
+
+## Why DigitalOcean
+
+- **Managed PostgreSQL**: backups, point-in-time recovery, no ops burden
+- **Managed Redis (Valkey)**: clustering, failover, monitoring
+- **Container Registry**: integrated with Kubernetes, no Docker Hub rate limits
+- **Load Balancer**: SSL termination, health checks, automatic failover
+
+## Fast startup
 
 Rust binaries start in milliseconds. No JVM warmup, no Python import time. Kubernetes health checks pass immediately. Rolling deployments are fast because the new pod is ready before the old one is terminated.
 
-### What I Learned
+## What I learned
 
 - Distroless images are worth it. Smaller, safer, faster.
 - Helm is overkill for one service but necessary when you have 3+ microservices.

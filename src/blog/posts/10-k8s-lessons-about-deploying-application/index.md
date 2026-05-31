@@ -1,5 +1,5 @@
 ---
-title: kubctl course and notes
+title: Kubectl course and notes
 author: Christos Paschalidis
 date: 2021-10-26
 hero: /blog/images/10-k8s-lessons-about-deploying-application/image.png

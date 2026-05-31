@@ -1,113 +1,69 @@
 ---
-title: learning rust - day 3
+title: Learning rust — day 3
 author: Christos Paschalidis
 date: 2023-06-24
 excerpt: Async/await with tokio, building a websocket echo server
 ---
 
-# learning rust - day 3
+# Learning rust — day 3
 
-today websockets. i need them for the chat service i'm building. rust async is different from javascript async.
+Today: WebSockets. I need them for the chat service. Rust async is different from JavaScript async.
 
-### tokio basics
+## Tokio basics
 
-```rust
-use tokio::time::{sleep, Duration};
+`tokio::join!` runs multiple futures concurrently. `tokio::spawn` runs them on separate tasks. This is the runtime that will handle thousands of WebSocket connections.
 
-#[tokio::main]
-async fn main() {
-    let task1 = async_task("task 1");
-    let task2 = async_task("task 2");
-    
-    // run concurrently
-    tokio::join!(task1, task2);
-}
+I wrote a small echo server first. Upgrade HTTP to WebSocket, keep the connection open, echo every message back. It worked on the first try, which surprised me.
 
-async fn async_task(name: &str) {
-    sleep(Duration::from_secs(1)).await;
-    println!("{} done", name);
-}
-```
+## WebSocket echo server
 
-`tokio::join!` runs multiple futures concurrently. `tokio::spawn` runs them on separate tasks (threads under the hood).
-
-### websocket echo server
+The Axum handler upgrades the HTTP connection:
 
 ```rust
-use axum::{
-    extract::ws::{WebSocketUpgrade, Message},
-    response::Response,
-    routing::get,
-    Router,
-};
-
 async fn ws_handler(ws: WebSocketUpgrade) -> Response {
     ws.on_upgrade(handle_socket)
 }
+```
 
-async fn handle_socket(mut socket: axum::extract::ws::WebSocket) {
+Then you read from the socket in a loop:
+
+```rust
+async fn handle_socket(mut socket: WebSocket) {
     while let Some(msg) = socket.recv().await {
-        if let Ok(text) = msg {
-            if let Message::Text(t) = text {
-                println!("received: {}", t);
-                socket.send(Message::Text(t)).await.ok();
-            }
+        if let Ok(Message::Text(t)) = msg {
+            socket.send(Message::Text(t)).await.ok();
         }
     }
 }
-
-#[tokio::main]
-async fn main() {
-    let app = Router::new().route("/ws", get(ws_handler));
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
-}
 ```
 
-this is the foundation of the chat service. upgrade HTTP to websocket, keep the connection open, broadcast messages.
+Simple. But I know this will get complicated when I need to broadcast to multiple clients, handle disconnections, and scale across servers.
 
-### broadcasting with channels
+## Broadcasting with channels
+
+Tokio broadcast channels are how I will send messages to all connected clients. One sender, many receivers.
 
 ```rust
-use tokio::sync::broadcast;
-
 let (tx, _rx) = broadcast::channel::<String>(100);
-
-// in the handler
-let mut rx = tx.subscribe();
-
-// send to all subscribers
 tx.send("hello everyone".to_string()).ok();
-
-// receive in another task
-while let Ok(msg) = rx.recv().await {
-    println!("got: {}", msg);
-}
 ```
 
-tokio broadcast channels are how i'll send messages to all connected clients. one sender, many receivers.
+The problem: every WebSocket handler needs access to the broadcaster. I wrapped it in `Arc` (reference counting) so multiple async tasks can share it.
 
-### what i learned today
+## What frustrated me
 
-- `async fn` returns a `Future`, not the result. you must `.await` it.
+Lifetime errors when passing the broadcast sender between handlers. The fix was wrapping it in `std::sync::Arc`. `Arc` is reference counting for shared ownership across async tasks.
+
+This took an hour. In Go, you would just pass a channel around. In Rust, the compiler makes you prove it is safe.
+
+## What I learned
+
+- `async fn` returns a `Future`, not the result. You must `.await` it.
 - `tokio::spawn` for fire-and-forget tasks
-- `tokio::sync::mpsc` for one-to-one channels, `broadcast` for one-to-many
-- websockets in axum are clean. upgrade, handle, done.
+- WebSockets in Axum are clean. Upgrade, handle, done.
+- `Arc` is your friend when you need shared state across async tasks.
 
-### what frustrated me
+## Resources
 
-lifetime errors when passing the broadcast sender between handlers. the fix was wrapping it in `std::sync::Arc`:
-
-```rust
-use std::sync::Arc;
-use tokio::sync::broadcast::Sender;
-
-let tx: Arc<Sender<String>> = Arc::new(tx);
-```
-
-`Arc` is reference counting for shared ownership across async tasks. needed because every websocket handler needs access to the broadcaster.
-
-### resources
-
-- [tokio docs](https://docs.rs/tokio/latest/tokio/) — read the spawn and channel sections
-- [axum websocket example](https://github.com/tokio-rs/axum/blob/main/examples/websockets/src/main.rs) — official example
+- [Tokio docs](https://docs.rs/tokio/latest/tokio/) — read the spawn and channel sections
+- [Axum WebSocket example](https://github.com/tokio-rs/axum/blob/main/examples/websockets/src/main.rs) — official example
