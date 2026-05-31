@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { Cursor } from './components/Cursor';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -23,9 +24,35 @@ function Home() {
   );
 }
 
+function ScrollToRouteTarget() {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    const scrollToTarget = () => {
+      if (pathname === '/' && hash) {
+        if (hash === '#hero') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          return;
+        }
+
+        document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    };
+
+    const animationFrame = window.requestAnimationFrame(scrollToTarget);
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [pathname, hash]);
+
+  return null;
+}
+
 function App() {
   return (
     <div className="relative bg-black text-white cursor-none">
+      <ScrollToRouteTarget />
       <Cursor />
       <Navbar />
       <Routes>
