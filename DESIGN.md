@@ -6,9 +6,11 @@ Dark mode only. Background: `#000000` (pure black). No light mode variant. The b
 
 ## Color Palette
 
+### Dark Theme (Hero, Footer)
+
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--bg-primary` | `black` | Page background, hero, all sections |
+| `--bg-primary` | `black` | Page background, hero, footer |
 | `--text-primary` | `white` | Headings, primary body text |
 | `--text-secondary` | `neutral-700/80` | Subheadings, supporting copy |
 | `--text-gradient-start` | `white` | Gradient text start (bg-clip-text) |
@@ -17,10 +19,35 @@ Dark mode only. Background: `#000000` (pure black). No light mode variant. The b
 | `--accent-text` | `purple-200/80` | Tag/chip text |
 | `--icon-color` | `white` | Social icons, UI icons |
 
+### Light Theme (Work Section)
+
+Derived from the aurora gradient. Used as a warm contrast break from the dark hero:
+
+| Role | Hex | Usage |
+|------|-----|-------|
+| **Base / Background** | `#fcfaf5` | Work section background |
+| **Cream** | `#f0e8c4` | Pale buttery yellow band |
+| **Sky** | `#b0d1eb` | Soft powder blue band |
+| **Coral** | `#f2bca6` | Light peach tint |
+| **Peach** | `#f5a885` | Primary accent / CTAs / focal hero |
+| **Deep Peach** | `#e8865f` | Hover/active states |
+
+**Suggested usage:**
+- Background / surfaces → `#fcfaf5`
+- Primary accent / CTAs / focal hero → `#f5a885` (or `#e8865f` for hover/active)
+- Secondary accent / links / info → `#b0d1eb`
+- Tertiary / highlights / badges → `#f0e8c4`
+- Soft fills / dividers → `#f2bca6`
+
+**Badge color (single, warm):**
+- Background: `#fef0e6`
+- Text: `#b8722d`
+
 **Rules:**
-- No cream, sand, beige, or warm-tinted neutrals. The body bg is pure black.
-- No gray text on colored backgrounds (there are no colored backgrounds besides black and the aurora).
-- Contrast: white on black is ∞:1. `neutral-700/80` on black is checked and must stay ≥4.5:1.
+- Dark hero bg is pure black; no cream/sand/beige warm-tinted neutrals in dark sections.
+- Light section bg is `#fcfaf5` warm off-white — derived from the aurora palette.
+- No gray text on colored backgrounds.
+- Contrast: white on black is ∞:1. Dark text (`#1a1a1a`) on `#fcfaf5` is ~15:1.
 
 ## Typography
 

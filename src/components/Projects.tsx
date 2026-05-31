@@ -1,22 +1,9 @@
 import React from 'react';
 import { Card, CardContent } from "./ui/card";
 
-// Aurora palette
-const colors = {
-  base: '#fcfaf5',
-  cream: '#f0e8c4',
-  sky: '#b0d1eb',
-  coral: '#f2bca6',
-  peach: '#f5a885',
-  deepPeach: '#e8865f',
-};
-
-const techTagColors = [
-  { bg: '#fef0e6', text: '#c45a2c' },   // peach tint
-  { bg: '#e8f0f9', text: '#3a7ab8' },   // sky tint
-  { bg: '#fdf6e3', text: '#8a7420' },   // cream tint
-  { bg: '#fef1ec', text: '#b86a4a' },   // coral tint
-];
+// Single warm badge color
+const BADGE_BG = '#fef0e6';
+const BADGE_TEXT = '#b8722d';
 
 export const ProjectCard = ({
   title,
@@ -25,7 +12,6 @@ export const ProjectCard = ({
   workTitle,
   technologies,
   url,
-  index,
 }: {
   title: string;
   src: string;
@@ -33,7 +19,6 @@ export const ProjectCard = ({
   workTitle: string;
   technologies: string[];
   url?: string;
-  index: number;
 }) => {
   const CardWrapper = ({ children }: { children: React.ReactNode }) => {
     if (url) {
@@ -70,21 +55,15 @@ export const ProjectCard = ({
           <p className="text-sm text-[#8a8a8a] mt-1.5 mb-5">{companyName} · {workTitle}</p>
 
           <div className="flex flex-wrap gap-2">
-            {technologies.map((tech, techIndex) => {
-              const color = techTagColors[(index + techIndex) % techTagColors.length];
-              return (
-                <span
-                  key={techIndex}
-                  className="px-3 py-1.5 text-xs font-medium rounded-full"
-                  style={{
-                    backgroundColor: color.bg,
-                    color: color.text,
-                  }}
-                >
-                  {tech}
-                </span>
-              );
-            })}
+            {technologies.map((tech, i) => (
+              <span
+                key={i}
+                className="px-3 py-1.5 text-xs font-medium rounded-full"
+                style={{ backgroundColor: BADGE_BG, color: BADGE_TEXT }}
+              >
+                {tech}
+              </span>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -169,17 +148,17 @@ export function Projects() {
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-28">
         {/* Section heading */}
         <div className="mb-16 md:mb-20 text-center">
-          <h2 className="font-sans text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#e8865f] to-[#f5a885]">
+          <h2 className="font-sans text-5xl md:text-7xl font-bold text-[#1a1a1a] leading-[1.1] mb-5">
             Selected Work
           </h2>
-          <p className="text-[#6b6b6b] text-lg max-w-md mx-auto">
+          <p className="text-[#6b6b6b] text-lg md:text-xl max-w-lg mx-auto leading-relaxed">
             Products and platforms I&apos;ve helped build
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10">
           {projects.map((project, index) => (
-            <ProjectCard key={index} index={index} {...project} />
+            <ProjectCard key={index} {...project} />
           ))}
         </div>
       </div>

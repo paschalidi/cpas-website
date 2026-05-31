@@ -88,7 +88,7 @@ export function Hero() {
       <AuroraBackground />
 
       <div ref={textRef} className="relative z-10 text-center transition-transform duration-200 ease-out">
-        <h1 className="font-sans text-6xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-neutral-900 to-neutral-700">
+        <h1 className="font-sans text-5xl md:text-6xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-neutral-900 to-neutral-700 px-4">
           hi there, I&apos;m christos
         </h1>
         <h4 className="text-2xl text-neutral-700/80 max-w-[700px]">
