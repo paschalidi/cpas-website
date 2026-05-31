@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useRef } from 'react';
 import { ChevronDown } from "lucide-react";
-import { BlobBackground } from "./BlobBackground";
+import { AuroraBackground } from "./AuroraBackground";
 
 // Custom icon components for better styling
 const GithubIcon = () => (
@@ -84,19 +84,14 @@ export function Hero() {
   ];
 
   return (
-    <div ref={containerRef} className="relative h-screen flex items-center justify-center overflow-hidden">
-      <BlobBackground />
+    <div ref={containerRef} className="relative h-screen flex items-center justify-center overflow-hidden text-neutral-900">
+      <AuroraBackground />
 
-      <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 via-purple-900/5 to-blue-900/10"/>
-        <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 via-transparent to-indigo-600/5"/>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(17,24,39,0.1),rgba(0,0,0,0.98))]"/>
-      </div>
       <div ref={textRef} className="relative z-10 text-center transition-transform duration-200 ease-out">
-        <h1 className="font-sans text-6xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/50">
+        <h1 className="font-sans text-6xl font-semibold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-neutral-900 to-neutral-700">
           hi there, I&apos;m christos
         </h1>
-        <h4 className="text-2xl text-white/60 max-w-[700px]">
+        <h4 className="text-2xl text-neutral-700/80 max-w-[700px]">
          a tech lead and full stack software developer
         </h4>
 
@@ -121,7 +116,7 @@ export function Hero() {
       </div>
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-        <ChevronDown className="w-6 h-6 text-white/60 animate-bounce"/>
+        <ChevronDown className="w-6 h-6 text-neutral-800/60 animate-bounce"/>
       </div>
     </div>
   );
