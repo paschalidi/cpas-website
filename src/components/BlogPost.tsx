@@ -68,7 +68,7 @@ export function BlogPost() {
         </div>
       )}
 
-      <article ref={articleRef} className="relative max-w-3xl mx-auto px-6 md:px-12 -mt-16 md:-mt-20 pb-32">
+      <article ref={articleRef} className={`relative max-w-3xl mx-auto px-6 md:px-12 pb-32 ${post.hero ? '-mt-16 md:-mt-20' : 'pt-28 md:pt-32'}`}>
         {/* Navigation */}
         <nav className="mb-12">
           <Link
@@ -114,7 +114,7 @@ export function BlogPost() {
 
         {/* Content */}
         <div
-          className="prose prose-invert max-w-none
+          className="blog-content prose prose-invert max-w-none
             prose-headings:font-normal prose-headings:tracking-tight prose-headings:text-blog-text
             prose-h1:text-3xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:leading-tight
             prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-14 prose-h2:leading-tight prose-h2:border-b prose-h2:border-blog-border/10 prose-h2:pb-3
@@ -136,27 +136,7 @@ export function BlogPost() {
           dangerouslySetInnerHTML={{ __html: post.html }}
         />
 
-        {/* End divider */}
-        <div className="mt-16 mb-12 flex items-center gap-4">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent to-blog-border/10" />
-          <span className="text-xs text-blog-muted/30 font-mono tracking-widest uppercase">End</span>
-          <div className="h-px flex-1 bg-gradient-to-l from-transparent to-blog-border/10" />
-        </div>
 
-        {/* Author bio */}
-        <footer className="bg-blog-surface/50 rounded-2xl p-6 md:p-8 border border-blog-border/10">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blog-accent to-blog-accent-muted flex items-center justify-center text-blog-background text-sm font-semibold shrink-0">
-              CP
-            </div>
-            <div>
-              <p className="text-sm font-medium text-blog-text mb-1">{post.author}</p>
-              <p className="text-sm text-blog-muted/40 leading-relaxed">
-                Software engineer writing about Docker, Kubernetes, and web development.
-              </p>
-            </div>
-          </div>
-        </footer>
       </article>
 
       {/* Back to top */}
