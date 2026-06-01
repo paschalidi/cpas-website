@@ -1,7 +1,7 @@
 ---
 title: "Designing a checkout flow: what we stole from Carvana, Tesla, and a Swedish EV startup"
 author: Christos Paschalidis
-date: 2024-09-01
+date: 2024-08-01
 excerpt: "We benchmarked Carvana, Tesla, and Carla. Then we built a checkout flow where users reserved an EV, verified their identity, picked insurance, and a human agent closed the sale. Here's what worked."
 ---
 
