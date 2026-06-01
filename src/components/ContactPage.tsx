@@ -43,7 +43,7 @@ export function ContactPage() {
   useEffect(() => {
     if (isSuccess && successRef.current) {
       const element = successRef.current;
-      const offset = 50;
+      const offset = 100;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - offset;
 
