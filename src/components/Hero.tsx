@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useRef } from 'react';
 import { ChevronDown } from "lucide-react";
 import { AuroraBackground } from "./AuroraBackground";
+import { DoodleUnderline } from "./DoodleUnderline";
 
 // Custom icon components for better styling
 const GithubIcon = () => (
@@ -89,7 +90,10 @@ export function Hero() {
 
       <div ref={textRef} className="relative z-10 text-center transition-transform duration-200 ease-out">
         <h1 className="font-sans text-5xl md:text-6xl font-semibold mb-6 text-[#0d2418] px-4 mt-20">
-          From product idea to reliable software.
+          From product idea to{' '}
+          <DoodleUnderline color="#0d2418">
+            reliable software
+          </DoodleUnderline>.
         </h1>
         <p className="text-xl md:text-2xl text-[#0d2418]/60 max-w-[720px] mx-auto leading-relaxed px-4">
           A tech lead and full-stack engineer helping teams ship ambitious products end to end.

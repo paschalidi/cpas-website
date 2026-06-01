@@ -7,7 +7,7 @@ import { sendContactEmail } from '../services/email';
 import { AuroraBackground } from './AuroraBackground';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
-import { DoodleUnderline } from './DoodleUnderline';
+
 
 type FormData = {
   firstName: string;
@@ -106,10 +106,7 @@ export function ContactPage() {
             <div className="relative overflow-visible">
               <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6 pr-16 md:pr-24">
                 Let&apos;s get<br />
-                <DoodleUnderline color="#0d2418">
-                  the ball
-                </DoodleUnderline>{" "}
-                rolling
+                <span className="font-semibold">the ball</span> rolling
               </h1>
               {/* Rolling asterisk */}
               <span
@@ -156,10 +153,10 @@ export function ContactPage() {
                         key={option.id}
                         type="button"
                         onClick={() => toggleInterest(option.id)}
-                        className={`border rounded-full px-5 py-2.5 text-sm transition-all duration-300 flex items-center gap-2 ${
+                        className={`rounded-full px-5 py-2.5 text-sm transition-all duration-300 flex items-center gap-2 backdrop-blur-md ${
                           formData.interests.includes(option.id)
-                            ? 'bg-[#0d2418] border-[#0d2418] text-white'
-                            : 'border-[#0d2418]/20 text-[#0d2418]/60 hover:border-[#0d2418]/40 hover:text-[#0d2418]'
+                            ? 'bg-[#0d2418]/90 border border-[#0d2418] text-white shadow-lg'
+                            : 'bg-white/50 border border-white/60 text-[#0d2418]/80 hover:bg-white/70 hover:border-white/80 hover:text-[#0d2418] shadow-sm'
                         }`}
                         style={{ cursor: 'none' }}
                       >
