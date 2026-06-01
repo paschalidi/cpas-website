@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import { Input } from './ui/input';
@@ -37,6 +37,14 @@ export function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
+  const successRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to success message when form is submitted
+  useEffect(() => {
+    if (isSuccess && successRef.current) {
+      successRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [isSuccess]);
 
   const toggleInterest = (interestId: string) => {
     setFormData(prev => ({
@@ -121,7 +129,7 @@ export function ContactPage() {
 
           <AnimatePresence mode="wait">
             {isSuccess ? (
-              <div className="flex flex-col items-center justify-center py-16 border border-forest-700/10 rounded-3xl bg-white/50 backdrop-blur-sm">
+              <div ref={successRef} className="flex flex-col items-center justify-center py-16 border border-forest-700/10 rounded-3xl bg-white/50 backdrop-blur-sm">
                 <div className="text-forest-700 mb-6">
                   <CheckCircle size={64} />
                 </div>
