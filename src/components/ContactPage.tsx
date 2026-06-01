@@ -119,15 +119,15 @@ export function ContactPage() {
           {/* Header Section */}
           <div className="mb-16 md:mb-24 relative">
             <div ref={headerRef} className="relative overflow-visible">
-              <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6 pr-24 md:pr-36 lg:pr-48 overflow-hidden">
+              <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6 pr-24 md:pr-36 lg:pr-48">
                 Let&apos;s get<br />
                 <span className="font-semibold">the ball</span> rolling{' '}
                 <motion.span
                   className="hidden md:inline-block text-forest-700 text-5xl md:text-7xl lg:text-8xl font-light select-none"
                   style={{ lineHeight: 1 }}
                   initial={{ x: 0, rotate: 0 }}
-                  animate={isHeaderInView ? { x: '100vw', rotate: 720 } : { x: 0, rotate: 0 }}
-                  transition={{ duration: 3.5, ease: 'linear', delay: 0.5 }}
+                  animate={isHeaderInView ? { x: '100vw', rotate: 1440 } : { x: 0, rotate: 0 }}
+                  transition={{ duration: 6, ease: 'linear', delay: 0.5 }}
                 >
                   ✻
                 </motion.span>
