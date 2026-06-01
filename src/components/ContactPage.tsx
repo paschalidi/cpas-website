@@ -107,7 +107,7 @@ export function ContactPage() {
               </h1>
               {/* Rolling asterisk */}
               <span
-                className="absolute bottom-2 left-[280px] md:left-[420px] lg:left-[520px] text-blog-surface text-5xl md:text-7xl lg:text-8xl font-light select-none doodle-rolling-asterisk"
+                className="absolute bottom-2 left-[300px] md:left-[440px] lg:left-[560px] text-blog-surface text-5xl md:text-7xl lg:text-8xl font-light select-none doodle-rolling-asterisk"
                 style={{ lineHeight: 1 }}
               >
                 ✻
