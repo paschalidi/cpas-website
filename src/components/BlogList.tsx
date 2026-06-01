@@ -7,7 +7,7 @@ export function BlogList() {
     <div className="min-h-screen bg-blog-background text-blog-text">
       {/* Sunrise glow from the top center */}
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[40vh] pointer-events-none"
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[20vh] pointer-events-none"
         style={{
           background: 'radial-gradient(ellipse 60% 100% at 50% 0%, rgb(var(--color-peach-300) / 0.12) 0%, transparent 70%)',
         }}
