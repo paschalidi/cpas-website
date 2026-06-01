@@ -39,10 +39,18 @@ export function ContactPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const successRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to success message when form is submitted
+  // Scroll to success message when form is submitted (50px offset for navbar)
   useEffect(() => {
     if (isSuccess && successRef.current) {
-      successRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const element = successRef.current;
+      const offset = 50;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   }, [isSuccess]);
 
