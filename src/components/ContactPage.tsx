@@ -113,9 +113,9 @@ export function ContactPage() {
                 ✻
               </span>
             </div>
-            <p className="text-lg md:text-xl text-forest-700/60 max-w-lg leading-relaxed">
+            <p className="text-xl md:text-2xl text-forest-700/70 max-w-lg leading-relaxed">
               Have a project in mind? Need help with architecture, AI, or fullstack development? 
-              Let&apos;s talk.
+              <br/>Let&apos;s talk.
             </p>
           </div>
 

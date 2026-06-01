@@ -97,7 +97,7 @@ export function Hero() {
           </DoodleUnderline>{' '}
           software.
         </h1>
-        <p className="text-xl md:text-2xl text-forest-700/60 max-w-[720px] mx-auto leading-relaxed px-4">
+        <p className="text-xl md:text-2xl text-forest-700/70 max-w-[720px] mx-auto leading-relaxed px-4">
           A tech lead and full-stack engineer helping teams ship ambitious products end to end.
         </p>
 
