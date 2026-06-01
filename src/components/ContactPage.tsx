@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
@@ -38,6 +38,8 @@ export function ContactPage() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const successRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const isHeaderInView = useInView(headerRef, { once: true, margin: "-100px" });
 
   // Scroll to success message when form is submitted (50px offset for navbar)
   useEffect(() => {
@@ -116,18 +118,25 @@ export function ContactPage() {
         <div className="max-w-5xl mx-auto px-6 md:px-12 py-32 md:py-40">
           {/* Header Section */}
           <div className="mb-16 md:mb-24 relative">
-            <div className="relative overflow-visible">
+            <div ref={headerRef} className="relative overflow-visible">
               <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6 pr-24 md:pr-36 lg:pr-48">
                 Let&apos;s get<br />
                 <span className="font-semibold">the ball</span> rolling
               </h1>
-              {/* Rolling asterisk */}
-              <span
-                className="hidden md:block absolute bottom-2 left-[300px] md:left-[440px] lg:left-[560px] text-blog-surface text-5xl md:text-7xl lg:text-8xl font-light select-none doodle-rolling-asterisk"
-                style={{ lineHeight: 1 }}
-              >
-                ✻
-              </span>
+              {/* Rolling ball */}
+              <motion.span
+                className="hidden md:block absolute bottom-1 -left-2"
+                style={{ 
+                  width: '0.7em',
+                  height: '0.7em',
+                  backgroundColor: 'rgb(var(--color-forest-700))',
+                  borderRadius: '50%',
+                  display: 'inline-block',
+                }}
+                initial={{ x: 0, rotate: 0, opacity: 1 }}
+                animate={isHeaderInView ? { x: '120vw', rotate: 1080 } : { x: 0, rotate: 0 }}
+                transition={{ duration: 4, ease: 'linear', delay: 0.8 }}
+              />
             </div>
             <p className="text-xl md:text-2xl text-forest-700/70 max-w-lg leading-relaxed">
               Have a project in mind? Need help with architecture, AI, or fullstack development? 
