@@ -100,11 +100,8 @@ export function ContactPage() {
         <div className="max-w-5xl mx-auto px-6 md:px-12 py-32 md:py-40">
           {/* Header Section */}
           <div className="mb-16 md:mb-24 relative">
-            <p className="text-sm font-medium mb-4 text-forest-700/60">
-              Get in touch
-            </p>
             <div className="relative overflow-visible">
-              <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6 pr-16 md:pr-24">
+              <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6 pr-24 md:pr-36 lg:pr-48">
                 Let&apos;s get<br />
                 <span className="font-semibold">the ball</span> rolling
               </h1>

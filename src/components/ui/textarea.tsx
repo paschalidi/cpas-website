@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from "../../lib/utils";
 
@@ -11,56 +11,50 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ className, label, animated = true, variant = 'dark', ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [dims, setDims] = useState({ width: 0, height: 0 });
+    const wrapRef = useRef<HTMLDivElement>(null);
     const hasValue = props.value !== undefined && props.value !== '';
 
     const isLight = variant === 'light';
     const textColor = isLight ? 'text-forest-700' : 'text-white';
-    const borderColor = isLight ? 'bg-forest-700/20' : 'bg-white/20';
-    const accentColor = isLight ? 'bg-forest-700' : 'bg-[rgb(243,198,173)]';
+    const underlineColor = isLight ? 'bg-forest-700/20' : 'bg-white/20';
     const labelColor = isLight ? 'rgb(13 36 24 / 0.5)' : 'rgb(255 255 255 / 0.5)';
-    const labelActiveColor = isLight ? 'rgb(13 36 24)' : 'rgb(243 198 173)';
+    const labelActiveColor = isLight ? 'rgb(13 36 24)' : 'rgb(255 255 255)';
 
-    const inputAnimations = {
-      borderLeft: {
-        initial: { scaleY: 0, opacity: 0 },
-        animate: { scaleY: 1, opacity: 1, transition: { delay: 0.1, duration: 0.25 } },
-        exit: { scaleY: 0, opacity: 0, transition: { duration: 0.2 } }
-      },
-      borderTop: {
-        initial: { scaleX: 0, opacity: 0 },
-        animate: { scaleX: 1, opacity: 1, transition: { delay: 0.35, duration: 0.25 } },
-        exit: { scaleX: 0, opacity: 0, transition: { duration: 0.2 } }
-      },
-      borderRight: {
-        initial: { scaleY: 0, opacity: 0 },
-        animate: { scaleY: 1, opacity: 1, transition: { delay: 0.6, duration: 0.25 } },
-        exit: { scaleY: 0, opacity: 0, transition: { duration: 0.2 } }
-      },
-      label: {
-        initial: { y: 0, color: labelColor },
-        animate: { y: -8, color: labelActiveColor, fontWeight: 600, transition: { duration: 0.3 } }
-      }
-    };
+    useEffect(() => {
+      const el = wrapRef.current;
+      if (!el) return;
+      const ro = new ResizeObserver(([entry]) => {
+        const { width, height } = entry.contentRect;
+        setDims({ width, height });
+      });
+      ro.observe(el);
+      return () => ro.disconnect();
+    }, []);
+
+    // Full closed rounded-rect path: bottom-left → up left → top-left arc → top → top-right arc → right down → bottom-right arc → bottom → bottom-left arc → close
+    const rx = 16; // matches rounded-2xl (1rem = 16px)
+    const { width, height } = dims;
+    const svgPath = width > 0 && height > 0
+      ? `M 0.5 ${height - rx} L 0.5 ${rx} A ${rx} ${rx} 0 0 1 ${rx} 0.5 L ${width - rx} 0.5 A ${rx} ${rx} 0 0 1 ${width - 0.5} ${rx} L ${width - 0.5} ${height - rx} A ${rx} ${rx} 0 0 1 ${width - rx} ${height - 0.5} L ${rx} ${height - 0.5} A ${rx} ${rx} 0 0 1 0.5 ${height - rx} Z`
+      : '';
 
     return (
       <div className="space-y-1 relative">
         {label && (
-          <div className="relative">
-            <motion.label
-              className={cn(
-                "block text-sm transition-all duration-300 relative z-10 px-1 -ml-1",
-                (isFocused || hasValue) && "bg-white/60 rounded-md",
-                textColor
-              )}
-              variants={inputAnimations.label}
-              initial="initial"
-              animate={isFocused || hasValue ? "animate" : "initial"}
-            >
-              {label}
-            </motion.label>
-          </div>
+          <motion.label
+            className={cn("block text-sm transition-all duration-300", textColor)}
+            variants={{
+              initial: { y: 0, color: labelColor },
+              active: { y: -8, color: labelActiveColor, fontWeight: 600, transition: { duration: 0.3 } },
+            }}
+            initial="initial"
+            animate={isFocused || hasValue ? "active" : "initial"}
+          >
+            {label}
+          </motion.label>
         )}
-        <div className="relative rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
+        <div ref={wrapRef} className="relative rounded-2xl">
           <textarea
             ref={ref}
             className={cn(
@@ -73,31 +67,41 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             style={{ cursor: 'none' }}
             {...props}
           />
-          
-          {/* Bottom border always visible */}
-          <motion.div
-            className={cn("absolute bottom-0 left-0 right-0 h-[1px]", borderColor)}
+
+          {/* Underline — fades out when SVG border takes over */}
+          <div
+            className={cn(
+              "absolute bottom-0 left-0 right-0 h-[1px] rounded-full transition-opacity duration-200",
+              underlineColor,
+              (isFocused || hasValue) ? 'opacity-0' : 'opacity-100'
+            )}
           />
-          
-          {animated && (
-            <AnimatePresence>
-              {(isFocused || hasValue) && (
-                <>
-                  <motion.div
-                    className={cn("absolute bottom-0 left-0 w-[1px] h-full", accentColor)}
-                    {...inputAnimations.borderLeft}
+
+          {animated && svgPath && (
+            <svg
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              style={{ overflow: 'visible' }}
+            >
+              <AnimatePresence>
+                {(isFocused || hasValue) && (
+                  <motion.path
+                    key="border-trace"
+                    d={svgPath}
+                    fill="none"
+                    stroke="rgb(var(--color-forest-700))"
+                    strokeWidth="1"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    animate={{ pathLength: 1, opacity: 1 }}
+                    exit={{ pathLength: 0, opacity: 0 }}
+                    transition={{
+                      pathLength: { duration: 0.55, ease: 'easeInOut' },
+                      opacity: { duration: 0.15 },
+                    }}
                   />
-                  <motion.div
-                    className={cn("absolute top-0 left-0 right-0 h-[1px]", accentColor)}
-                    {...inputAnimations.borderTop}
-                  />
-                  <motion.div
-                    className={cn("absolute top-0 right-0 w-[1px] h-full", accentColor)}
-                    {...inputAnimations.borderRight}
-                  />
-                </>
-              )}
-            </AnimatePresence>
+                )}
+              </AnimatePresence>
+            </svg>
           )}
         </div>
       </div>

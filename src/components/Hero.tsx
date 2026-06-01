@@ -92,7 +92,7 @@ export function Hero() {
         <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl tracking-tight leading-[1.15] mb-9 text-forest-700 px-4 mt-20">
           From product idea<br className="mb-2" />
           to{' '}
-          <DoodleUnderline color="forest-700">
+          <DoodleUnderline>
             reliable
           </DoodleUnderline>{' '}
           software.
