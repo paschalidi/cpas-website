@@ -119,24 +119,19 @@ export function ContactPage() {
           {/* Header Section */}
           <div className="mb-16 md:mb-24 relative">
             <div ref={headerRef} className="relative overflow-visible">
-              <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6 pr-24 md:pr-36 lg:pr-48">
+              <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6 pr-24 md:pr-36 lg:pr-48 overflow-hidden">
                 Let&apos;s get<br />
-                <span className="font-semibold">the ball</span> rolling
+                <span className="font-semibold">the ball</span> rolling{' '}
+                <motion.span
+                  className="hidden md:inline-block text-forest-700 text-5xl md:text-7xl lg:text-8xl font-light select-none"
+                  style={{ lineHeight: 1 }}
+                  initial={{ x: 0, rotate: 0 }}
+                  animate={isHeaderInView ? { x: '100vw', rotate: 720 } : { x: 0, rotate: 0 }}
+                  transition={{ duration: 3.5, ease: 'linear', delay: 0.5 }}
+                >
+                  ✻
+                </motion.span>
               </h1>
-              {/* Rolling ball */}
-              <motion.span
-                className="hidden md:block absolute bottom-1 -left-2"
-                style={{ 
-                  width: '0.7em',
-                  height: '0.7em',
-                  backgroundColor: 'rgb(var(--color-forest-700))',
-                  borderRadius: '50%',
-                  display: 'inline-block',
-                }}
-                initial={{ x: 0, rotate: 0, opacity: 1 }}
-                animate={isHeaderInView ? { x: '120vw', rotate: 1080 } : { x: 0, rotate: 0 }}
-                transition={{ duration: 4, ease: 'linear', delay: 0.8 }}
-              />
             </div>
             <p className="text-xl md:text-2xl text-forest-700/70 max-w-lg leading-relaxed">
               Have a project in mind? Need help with architecture, AI, or fullstack development? 
