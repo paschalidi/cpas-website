@@ -54,6 +54,14 @@ export function Footer() {
           }}
         />
 
+        {/* Thin shining line at bottom — a hint of light, a reason to scroll back up */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-[1px]"
+          style={{
+            background: 'linear-gradient(90deg, transparent 0%, rgb(var(--color-peach-300) / 0.4) 20%, rgb(var(--color-cream-50) / 0.6) 50%, rgb(var(--color-peach-300) / 0.4) 80%, transparent 100%)',
+          }}
+        />
+
         <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-20 md:pt-28 md:pb-16">
           {/* CTA area */}
           <div className="mb-4 md:mb-6">

@@ -58,7 +58,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             className={cn(
-              "bg-transparent border-0 rounded-2xl px-4 py-3 focus-visible:ring-0 focus-visible:ring-offset-0 w-full outline-none",
+              "bg-transparent border-0 rounded-full px-4 py-3 focus-visible:ring-0 focus-visible:ring-offset-0 w-full outline-none",
               textColor,
               className
             )}

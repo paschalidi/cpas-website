@@ -7,6 +7,7 @@ import { sendContactEmail } from '../services/email';
 import { AuroraBackground } from './AuroraBackground';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
+import { AnimatedRollingSymbol } from './AnimatedRollingSymbol';
 
 type FormData = {
   firstName: string;
@@ -88,11 +89,15 @@ export function ContactPage() {
   };
 
   return (
-    <div className="relative min-h-screen text-[#0d2418] overflow-hidden">
-      <AuroraBackground />
-      <Navbar />
+    <div className="relative text-[#0d2418]">
+      <div className="fixed inset-0">
+        <AuroraBackground />
+      </div>
       
-      <div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12 py-32 md:py-40">
+      <div className="relative z-10">
+        <Navbar />
+        
+        <div className="max-w-5xl mx-auto px-6 md:px-12 py-32 md:py-40">
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -112,6 +117,8 @@ export function ContactPage() {
             Let&apos;s talk.
           </p>
         </motion.div>
+
+        <AnimatedRollingSymbol />
 
         <AnimatePresence mode="wait">
           {isSuccess ? (
@@ -285,6 +292,7 @@ export function ContactPage() {
             </motion.form>
           )}
         </AnimatePresence>
+      </div>
       </div>
 
       <Footer />

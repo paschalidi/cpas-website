@@ -1,0 +1,171 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - link "About" [ref=e6]:
+        - /url: /#hero
+      - link "Work" [ref=e7]:
+        - /url: /#work
+      - link "Blog" [ref=e8]:
+        - /url: /blog
+      - link "Contact" [ref=e9]:
+        - /url: /contact
+  - generic [ref=e10]:
+    - generic [ref=e14]:
+      - navigation [ref=e15]:
+        - generic [ref=e16]:
+          - link "About" [ref=e17]:
+            - /url: /#hero
+          - link "Work" [ref=e18]:
+            - /url: /#work
+          - link "Blog" [ref=e19]:
+            - /url: /blog
+          - link "Contact" [ref=e20]:
+            - /url: /contact
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - paragraph [ref=e23]: Get in touch
+          - heading "Let's get the ball rolling" [level=1] [ref=e24]:
+            - text: Let's get
+            - text: the ball rolling
+          - paragraph [ref=e25]: Have a project in mind? Need help with architecture, AI, or fullstack development? Let's talk.
+        - generic [ref=e27]:
+          - generic [ref=e28]:
+            - text: Let's get the ball rolling
+            - generic [ref=e29]: ✻
+          - generic [ref=e30]:
+            - text: Let's get the ball rolling
+            - generic [ref=e31]: ✻
+          - generic [ref=e32]:
+            - text: Let's get the ball rolling
+            - generic [ref=e33]: ✻
+          - generic [ref=e34]:
+            - text: Let's get the ball rolling
+            - generic [ref=e35]: ✻
+          - generic [ref=e36]:
+            - text: Let's get the ball rolling
+            - generic [ref=e37]: ✻
+          - generic [ref=e38]:
+            - text: Let's get the ball rolling
+            - generic [ref=e39]: ✻
+          - generic [ref=e40]:
+            - text: Let's get the ball rolling
+            - generic [ref=e41]: ✻
+          - generic [ref=e42]:
+            - text: Let's get the ball rolling
+            - generic [ref=e43]: ✻
+          - generic [ref=e44]:
+            - text: Let's get the ball rolling
+            - generic [ref=e45]: ✻
+          - generic [ref=e46]:
+            - text: Let's get the ball rolling
+            - generic [ref=e47]: ✻
+          - generic [ref=e48]:
+            - text: Let's get the ball rolling
+            - generic [ref=e49]: ✻
+          - generic [ref=e50]:
+            - text: Let's get the ball rolling
+            - generic [ref=e51]: ✻
+          - generic [ref=e52]:
+            - text: Let's get the ball rolling
+            - generic [ref=e53]: ✻
+          - generic [ref=e54]:
+            - text: Let's get the ball rolling
+            - generic [ref=e55]: ✻
+          - generic [ref=e56]:
+            - text: Let's get the ball rolling
+            - generic [ref=e57]: ✻
+          - generic [ref=e58]:
+            - text: Let's get the ball rolling
+            - generic [ref=e59]: ✻
+          - generic [ref=e60]:
+            - text: Let's get the ball rolling
+            - generic [ref=e61]: ✻
+          - generic [ref=e62]:
+            - text: Let's get the ball rolling
+            - generic [ref=e63]: ✻
+          - generic [ref=e64]:
+            - text: Let's get the ball rolling
+            - generic [ref=e65]: ✻
+          - generic [ref=e66]:
+            - text: Let's get the ball rolling
+            - generic [ref=e67]: ✻
+          - generic [ref=e68]:
+            - text: Let's get the ball rolling
+            - generic [ref=e69]: ✻
+          - generic [ref=e70]:
+            - text: Let's get the ball rolling
+            - generic [ref=e71]: ✻
+          - generic [ref=e72]:
+            - text: Let's get the ball rolling
+            - generic [ref=e73]: ✻
+          - generic [ref=e74]:
+            - text: Let's get the ball rolling
+            - generic [ref=e75]: ✻
+          - generic [ref=e76]:
+            - text: Let's get the ball rolling
+            - generic [ref=e77]: ✻
+          - generic [ref=e78]:
+            - text: Let's get the ball rolling
+            - generic [ref=e79]: ✻
+          - generic [ref=e80]:
+            - text: Let's get the ball rolling
+            - generic [ref=e81]: ✻
+          - generic [ref=e82]:
+            - text: Let's get the ball rolling
+            - generic [ref=e83]: ✻
+          - generic [ref=e84]:
+            - text: Let's get the ball rolling
+            - generic [ref=e85]: ✻
+          - generic [ref=e86]:
+            - text: Let's get the ball rolling
+            - generic [ref=e87]: ✻
+        - generic [ref=e88]:
+          - generic [ref=e89]:
+            - heading "I am interested in:" [level=2] [ref=e90]
+            - generic [ref=e91]:
+              - button "Consulting" [ref=e92]
+              - button "Fullstack Development" [ref=e93]
+              - button "AI & Agents" [ref=e94]
+              - button "Architecture Review" [ref=e95]
+              - button "Team Leadership" [ref=e96]
+              - button "Something Else" [ref=e97]
+          - generic [ref=e98]:
+            - generic [ref=e99]:
+              - generic [ref=e101]:
+                - generic [ref=e102]: First name *
+                - textbox "John" [ref=e104]
+              - generic [ref=e107]:
+                - generic [ref=e108]: Last name *
+                - textbox "Doe" [ref=e110]
+            - generic [ref=e113]:
+              - generic [ref=e114]: Email *
+              - textbox "john@example.com" [ref=e116]
+            - generic [ref=e119]:
+              - generic [ref=e120]: Message *
+              - textbox "Tell me about your project..." [ref=e122]
+          - button "Send Message" [ref=e125]:
+            - text: Send Message
+            - img [ref=e126]
+    - contentinfo [ref=e128]:
+      - generic [ref=e132]:
+        - generic [ref=e133]:
+          - heading "Let's build something together" [level=3] [ref=e134]
+          - link "Get in touch" [ref=e135] [cursor=pointer]:
+            - /url: mailto:paschalidi@outlook.com?subject=Let's%20work%20together&body=Hi%20Christos%2C%0A%0AI%20came%20across%20your%20work%20and%20I%27d%20love%20to%20explore%20the%20possibility%20of%20collaborating.%0A%0ALooking%20forward%20to%20connecting.
+            - img [ref=e136]
+            - generic [ref=e138]: Get in touch
+        - generic [ref=e140]:
+          - generic [ref=e141]:
+            - link "GitHub" [ref=e142] [cursor=pointer]:
+              - /url: https://github.com/paschalidi
+              - img [ref=e143]
+            - link "LinkedIn" [ref=e145] [cursor=pointer]:
+              - /url: https://www.linkedin.com/in/christos-paschalidis/
+              - img [ref=e146]
+            - link "Toptal" [ref=e148] [cursor=pointer]:
+              - /url: https://www.toptal.com/resume/christos-paschalidis
+              - img [ref=e149]
+            - link "Email" [ref=e151] [cursor=pointer]:
+              - /url: mailto:paschalidi@outlook.com?subject=Let's%20work%20together&body=Hi%20Christos%2C%0A%0AI%20came%20across%20your%20work%20and%20I%27d%20love%20to%20explore%20the%20possibility%20of%20collaborating.%0A%0ALooking%20forward%20to%20connecting.
+              - img [ref=e152]
+          - paragraph [ref=e155]: © 2026 Christos Paschalidis
