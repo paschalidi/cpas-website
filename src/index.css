@@ -158,6 +158,20 @@ body {
   color: rgb(var(--color-blog-background));
 }
 
+/* Rolling asterisk animation for contact page */
+.doodle-rolling-asterisk {
+  animation: doodle-roll-asterisk 3s ease-in-out infinite;
+}
+
+@keyframes doodle-roll-asterisk {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(200px) rotate(360deg);
+  }
+}
+
 /* Respect reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
   html {
