@@ -41,3 +41,6 @@ dist/assets/
 dist/images/
 dist/**/*
 dist/
+.playwright-mcp/
+contact-page-*.png
+*.png
