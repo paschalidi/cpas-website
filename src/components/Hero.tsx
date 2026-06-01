@@ -89,11 +89,13 @@ export function Hero() {
       <AuroraBackground />
 
       <div ref={textRef} className="relative z-10 text-center transition-transform duration-200 ease-out">
-        <h1 className="font-sans text-5xl md:text-6xl font-semibold mb-6 text-[#0d2418] px-4 mt-20">
-          From product idea to{' '}
+        <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl tracking-tight leading-[1.15] mb-9 text-[#0d2418] px-4 mt-20">
+          From product idea<br className="mb-2" />
+          to{' '}
           <DoodleUnderline color="#0d2418">
-            reliable software
-          </DoodleUnderline>.
+            reliable
+          </DoodleUnderline>{' '}
+          software.
         </h1>
         <p className="text-xl md:text-2xl text-[#0d2418]/60 max-w-[720px] mx-auto leading-relaxed px-4">
           A tech lead and full-stack engineer helping teams ship ambitious products end to end.

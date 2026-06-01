@@ -170,7 +170,7 @@ export function ContactPage() {
                 </div>
 
                 {/* Form Fields */}
-                <div className="space-y-8">
+                <div className="p-6 md:p-8 rounded-3xl bg-white/30 backdrop-blur-md border border-white/20 shadow-sm space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <Input

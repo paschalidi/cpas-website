@@ -45,20 +45,26 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="space-y-1 relative">
         {label && (
-          <motion.label
-            className={cn("block text-sm transition-all duration-300", textColor)}
-            variants={inputAnimations.label}
-            initial="initial"
-            animate={isFocused || hasValue ? "animate" : "initial"}
-          >
-            {label}
-          </motion.label>
+          <div className="relative">
+            <motion.label
+              className={cn(
+                "block text-sm transition-all duration-300 relative z-10 px-1 -ml-1",
+                (isFocused || hasValue) && "bg-white/60 rounded-md",
+                textColor
+              )}
+              variants={inputAnimations.label}
+              initial="initial"
+              animate={isFocused || hasValue ? "animate" : "initial"}
+            >
+              {label}
+            </motion.label>
+          </div>
         )}
-        <div className="relative">
+        <div className="relative rounded-2xl bg-white/10 backdrop-blur-sm border border-white/10">
           <input
             ref={ref}
             className={cn(
-              "bg-transparent border-0 rounded-full px-4 py-3 focus-visible:ring-0 focus-visible:ring-offset-0 w-full outline-none",
+              "bg-transparent border-0 rounded-2xl px-6 py-4 focus-visible:ring-0 focus-visible:ring-offset-0 w-full outline-none",
               textColor,
               className
             )}

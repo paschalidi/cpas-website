@@ -84,8 +84,8 @@ export function Navbar() {
           border border-white/10
           transition-all duration-500 ease-out
           ${scrolled
-            ? 'bg-black/70 backdrop-blur-2xl shadow-lg shadow-black/10'
-            : 'bg-black/50 backdrop-blur-xl'
+            ? 'bg-forest-950/90 backdrop-blur-2xl shadow-lg shadow-black/10'
+            : 'bg-forest-950/80 backdrop-blur-xl'
           }
         `}
         style={{ cursor: 'none' }}

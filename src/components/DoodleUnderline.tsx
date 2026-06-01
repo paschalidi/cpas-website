@@ -15,8 +15,8 @@ export const DoodleUnderline: React.FC<DoodleUnderlineProps> = ({
   className = '',
   color = '#0d2418',
 }) => {
-  const pathD = "M2 4c18-1.5 35-1.5 90-2";
-  const pathLength = 92;
+  const pathD = "M1 5 Q8 2, 15 5 T30 5 T45 4 T60 5 T75 4 T90 5";
+  const pathLength = 120;
 
   return (
     <span className={`relative inline-block ${className}`}>
@@ -24,11 +24,11 @@ export const DoodleUnderline: React.FC<DoodleUnderlineProps> = ({
       <svg
         className="absolute left-0 right-0 w-full"
         style={{
-          top: '85%',
+          top: '82%',
           height: '0.5em',
           overflow: 'visible',
         }}
-        viewBox="0 0 92 8"
+        viewBox="0 0 92 10"
         fill="none"
         preserveAspectRatio="none"
         aria-hidden="true"
@@ -38,11 +38,11 @@ export const DoodleUnderline: React.FC<DoodleUnderlineProps> = ({
           stroke={color}
           strokeWidth="1.5"
           strokeLinecap="round"
-          className="doodle-underline-path"
+          fill="none"
           style={{
             strokeDasharray: pathLength,
             strokeDashoffset: 0,
-            animation: 'doodle-underline-draw 1.2s ease-out forwards',
+            animation: 'doodle-underline-draw 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards',
           }}
         />
       </svg>
