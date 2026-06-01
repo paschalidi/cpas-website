@@ -127,7 +127,7 @@ export function ContactPage() {
                   style={{ lineHeight: 1 }}
                   initial={{ x: 0, rotate: 0 }}
                   animate={isHeaderInView ? { x: '100vw', rotate: 1440 } : { x: 0, rotate: 0 }}
-                  transition={{ duration: 6, ease: 'linear', delay: 0.5 }}
+                  transition={{ duration: 5, ease: 'linear', delay: 0.5 }}
                 >
                   ✻
                 </motion.span>
