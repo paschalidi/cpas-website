@@ -14,9 +14,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const hasValue = props.value !== undefined && props.value !== '';
 
     const isLight = variant === 'light';
-    const textColor = isLight ? 'text-[#0d2418]' : 'text-white';
-    const borderColor = isLight ? 'bg-[#0d2418]/20' : 'bg-white/20';
-    const accentColor = isLight ? 'bg-[#0d2418]' : 'bg-[rgb(243,198,173)]';
+    const textColor = isLight ? 'text-forest-700' : 'text-white';
+    const borderColor = isLight ? 'bg-forest-700/20' : 'bg-white/20';
+    const accentColor = isLight ? 'bg-forest-700' : 'bg-[rgb(243,198,173)]';
     const labelColor = isLight ? 'rgb(13 36 24 / 0.5)' : 'rgb(255 255 255 / 0.5)';
     const labelActiveColor = isLight ? 'rgb(13 36 24)' : 'rgb(243 198 173)';
 
