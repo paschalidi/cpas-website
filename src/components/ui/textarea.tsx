@@ -5,12 +5,20 @@ import { cn } from "../../lib/utils";
 export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
   animated?: boolean;
+  variant?: 'dark' | 'light';
 }
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, label, animated = true, ...props }, ref) => {
+  ({ className, label, animated = true, variant = 'dark', ...props }, ref) => {
     const [isFocused, setIsFocused] = useState(false);
     const hasValue = props.value !== undefined && props.value !== '';
+
+    const isLight = variant === 'light';
+    const textColor = isLight ? 'text-[#0d2418]' : 'text-white';
+    const borderColor = isLight ? 'bg-[#0d2418]/20' : 'bg-white/20';
+    const accentColor = isLight ? 'bg-[#0d2418]' : 'bg-[rgb(243,198,173)]';
+    const labelColor = isLight ? 'rgb(13 36 24 / 0.5)' : 'rgb(255 255 255 / 0.5)';
+    const labelActiveColor = isLight ? 'rgb(13 36 24)' : 'rgb(243 198 173)';
 
     const inputAnimations = {
       borderLeft: {
@@ -29,8 +37,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         exit: { scaleY: 0, opacity: 0, transition: { duration: 0.2 } }
       },
       label: {
-        initial: { y: 0, color: 'rgb(255 255 255 / 0.5)' },
-        animate: { y: -8, color: 'rgb(243 198 173)', fontWeight: 600, transition: { duration: 0.3 } }
+        initial: { y: 0, color: labelColor },
+        animate: { y: -8, color: labelActiveColor, fontWeight: 600, transition: { duration: 0.3 } }
       }
     };
 
@@ -38,7 +46,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className="space-y-1 relative">
         {label && (
           <motion.label
-            className="block text-sm transition-all duration-300"
+            className={cn("block text-sm transition-all duration-300", textColor)}
             variants={inputAnimations.label}
             initial="initial"
             animate={isFocused || hasValue ? "animate" : "initial"}
@@ -50,7 +58,8 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           <textarea
             ref={ref}
             className={cn(
-              "bg-transparent border-0 rounded-2xl px-4 py-3 focus-visible:ring-0 focus-visible:ring-offset-0 text-white w-full outline-none resize-none min-h-[120px]",
+              "bg-transparent border-0 rounded-2xl px-4 py-3 focus-visible:ring-0 focus-visible:ring-offset-0 w-full outline-none resize-none min-h-[120px]",
+              textColor,
               className
             )}
             onFocus={(e) => { setIsFocused(true); props.onFocus?.(e); }}
@@ -61,7 +70,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           
           {/* Bottom border always visible */}
           <motion.div
-            className="absolute bottom-0 left-0 right-0 h-[1px] bg-white/20"
+            className={cn("absolute bottom-0 left-0 right-0 h-[1px]", borderColor)}
           />
           
           {animated && (
@@ -69,15 +78,15 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
               {(isFocused || hasValue) && (
                 <>
                   <motion.div
-                    className="absolute bottom-0 left-0 w-[1px] h-full bg-[rgb(243,198,173)]"
+                    className={cn("absolute bottom-0 left-0 w-[1px] h-full", accentColor)}
                     {...inputAnimations.borderLeft}
                   />
                   <motion.div
-                    className="absolute top-0 left-0 right-0 h-[1px] bg-[rgb(243,198,173)]"
+                    className={cn("absolute top-0 left-0 right-0 h-[1px]", accentColor)}
                     {...inputAnimations.borderTop}
                   />
                   <motion.div
-                    className="absolute top-0 right-0 w-[1px] h-full bg-[rgb(243,198,173)]"
+                    className={cn("absolute top-0 right-0 w-[1px] h-full", accentColor)}
                     {...inputAnimations.borderRight}
                   />
                 </>

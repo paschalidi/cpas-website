@@ -4,6 +4,9 @@ import { ArrowRight, CheckCircle } from 'lucide-react';
 import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { sendContactEmail } from '../services/email';
+import { AuroraBackground } from './AuroraBackground';
+import { Navbar } from './Navbar';
+import { Footer } from './Footer';
 
 type FormData = {
   firstName: string;
@@ -85,16 +88,11 @@ export function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* Subtle background gradient */}
-      <div 
-        className="absolute top-0 left-0 right-0 h-[60vh] pointer-events-none"
-        style={{
-          background: 'radial-gradient(ellipse at 30% 20%, rgb(243 198 173 / 0.08) 0%, transparent 60%)',
-        }}
-      />
-
-      <div className="relative max-w-5xl mx-auto px-6 md:px-12 py-24 md:py-32">
+    <div className="relative min-h-screen text-[#0d2418] overflow-hidden">
+      <AuroraBackground />
+      <Navbar />
+      
+      <div className="relative z-10 max-w-5xl mx-auto px-6 md:px-12 py-32 md:py-40">
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -102,14 +100,14 @@ export function ContactPage() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="mb-16 md:mb-24"
         >
-          <p className="text-sm font-medium text-[rgb(243,198,173)] tracking-widest uppercase mb-4">
-            GET IN TOUCH
+          <p className="text-sm font-medium mb-4 text-[#0d2418]/60">
+            Get in touch
           </p>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6">
-            LET&apos;S GET<br />
-            <span className="text-[rgb(243,198,173)]">THE BALL</span> ROLLING
+          <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6">
+            Let&apos;s get<br />
+            <span className="font-semibold">the ball</span> rolling
           </h1>
-          <p className="text-lg md:text-xl text-white/50 max-w-lg leading-relaxed">
+          <p className="text-lg md:text-xl text-[#0d2418]/60 max-w-lg leading-relaxed">
             Have a project in mind? Need help with architecture, AI, or fullstack development? 
             Let&apos;s talk.
           </p>
@@ -123,18 +121,18 @@ export function ContactPage() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.5 }}
-              className="flex flex-col items-center justify-center py-16 border border-white/10 rounded-3xl bg-white/[0.02]"
+              className="flex flex-col items-center justify-center py-16 border border-[#0d2418]/10 rounded-3xl bg-white/50 backdrop-blur-sm"
             >
-              <div className="text-[rgb(243,198,173)] mb-6">
+              <div className="text-[#0d2418] mb-6">
                 <CheckCircle size={64} />
               </div>
               <h3 className="text-3xl font-semibold mb-3">Message Sent!</h3>
-              <p className="text-white/50 text-center max-w-md mb-8">
+              <p className="text-[#0d2418]/60 text-center max-w-md mb-8">
                 Thanks for reaching out. I&apos;ll get back to you within 24 hours.
               </p>
               <button
                 onClick={() => setIsSuccess(false)}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 text-white hover:bg-white/20 hover:-translate-y-0.5 transition-all duration-300"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0d2418] text-white hover:bg-[#0d2418]/80 hover:-translate-y-0.5 transition-all duration-300"
                 style={{ cursor: 'none' }}
               >
                 Send Another Message
@@ -155,8 +153,8 @@ export function ContactPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
-                <h2 className="text-xl md:text-2xl mb-6 text-white/80 font-medium">
-                  I AM INTERESTED IN:
+                <h2 className="text-xl md:text-2xl mb-6 text-[#0d2418]/80 font-medium">
+                  I am interested in:
                 </h2>
                 <div className="flex flex-wrap gap-3">
                   {interestOptions.map((option) => (
@@ -168,13 +166,13 @@ export function ContactPage() {
                       onClick={() => toggleInterest(option.id)}
                       className={`border rounded-full px-5 py-2.5 text-sm transition-all duration-300 flex items-center gap-2 ${
                         formData.interests.includes(option.id)
-                          ? 'bg-white/10 border-[rgb(243,198,173)] text-[rgb(243,198,173)]'
-                          : 'border-white/20 text-white/50 hover:border-white/40 hover:text-white/80'
+                          ? 'bg-[#0d2418] border-[#0d2418] text-white'
+                          : 'border-[#0d2418]/20 text-[#0d2418]/60 hover:border-[#0d2418]/40 hover:text-[#0d2418]'
                       }`}
                       style={{ cursor: 'none' }}
                     >
                       {formData.interests.includes(option.id) && (
-                        <span className="inline-block w-1.5 h-1.5 bg-[rgb(243,198,173)] rounded-full" />
+                        <span className="inline-block w-1.5 h-1.5 bg-white rounded-full" />
                       )}
                       {option.label}
                     </motion.button>
@@ -191,13 +189,14 @@ export function ContactPage() {
                     transition={{ duration: 0.5, delay: 0.3 }}
                   >
                     <Input
+                      variant="light"
                       label="First name *"
                       value={formData.firstName}
                       onChange={(e) => updateField('firstName', e.target.value)}
                       placeholder="John"
                     />
                     {errors.firstName && (
-                      <p className="text-red-400 text-sm mt-2">{errors.firstName}</p>
+                      <p className="text-red-600 text-sm mt-2">{errors.firstName}</p>
                     )}
                   </motion.div>
 
@@ -207,13 +206,14 @@ export function ContactPage() {
                     transition={{ duration: 0.5, delay: 0.4 }}
                   >
                     <Input
+                      variant="light"
                       label="Last name *"
                       value={formData.lastName}
                       onChange={(e) => updateField('lastName', e.target.value)}
                       placeholder="Doe"
                     />
                     {errors.lastName && (
-                      <p className="text-red-400 text-sm mt-2">{errors.lastName}</p>
+                      <p className="text-red-600 text-sm mt-2">{errors.lastName}</p>
                     )}
                   </motion.div>
                 </div>
@@ -224,6 +224,7 @@ export function ContactPage() {
                   transition={{ duration: 0.5, delay: 0.5 }}
                 >
                   <Input
+                    variant="light"
                     label="Email *"
                     type="email"
                     value={formData.email}
@@ -231,7 +232,7 @@ export function ContactPage() {
                     placeholder="john@example.com"
                   />
                   {errors.email && (
-                    <p className="text-red-400 text-sm mt-2">{errors.email}</p>
+                    <p className="text-red-600 text-sm mt-2">{errors.email}</p>
                   )}
                 </motion.div>
 
@@ -241,13 +242,14 @@ export function ContactPage() {
                   transition={{ duration: 0.5, delay: 0.6 }}
                 >
                   <Textarea
+                    variant="light"
                     label="Message *"
                     value={formData.message}
                     onChange={(e) => updateField('message', e.target.value)}
                     placeholder="Tell me about your project..."
                   />
                   {errors.message && (
-                    <p className="text-red-400 text-sm mt-2">{errors.message}</p>
+                    <p className="text-red-600 text-sm mt-2">{errors.message}</p>
                   )}
                 </motion.div>
               </div>
@@ -264,7 +266,7 @@ export function ContactPage() {
                   disabled={isSubmitting}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white/10 text-white hover:bg-white/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#0d2418] text-white hover:bg-[#0d2418]/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                   style={{ cursor: 'none' }}
                 >
                   {isSubmitting ? (
@@ -284,6 +286,8 @@ export function ContactPage() {
           )}
         </AnimatePresence>
       </div>
+
+      <Footer />
     </div>
   );
 }

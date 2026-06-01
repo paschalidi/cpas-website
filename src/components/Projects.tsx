@@ -19,7 +19,7 @@ const CardWrapper = ({
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="block transition-transform duration-300 hover:-translate-y-1"
+        className="block"
       >
         {children}
       </a>
