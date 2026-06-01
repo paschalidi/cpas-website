@@ -6,6 +6,28 @@ const BADGE_BG = '#fef0e6';
 const BADGE_TEXT = '#0d2418';
 
 
+const CardWrapper = ({
+  url,
+  children,
+}: {
+  url?: string;
+  children: React.ReactNode;
+}) => {
+  if (url) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block transition-transform duration-300 hover:-translate-y-1"
+      >
+        {children}
+      </a>
+    );
+  }
+  return <>{children}</>;
+};
+
 export const ProjectCard = ({
   title,
   src,
@@ -21,24 +43,8 @@ export const ProjectCard = ({
   technologies: string[];
   url?: string;
 }) => {
-  const CardWrapper = ({ children }: { children: React.ReactNode }) => {
-    if (url) {
-      return (
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block transition-transform duration-300 hover:-translate-y-1"
-        >
-          {children}
-        </a>
-      );
-    }
-    return <>{children}</>;
-  };
-
   return (
-    <CardWrapper>
+    <CardWrapper url={url}>
       <Card
         className="group bg-white border border-[#f5a885]/15 backdrop-blur-sm transition-all duration-300 hover:shadow-xl hover:shadow-[#f5a885]/10 rounded-[2rem] overflow-hidden"
         style={{ cursor: 'none' }}
@@ -71,6 +77,7 @@ export const ProjectCard = ({
     </CardWrapper>
   );
 };
+
 
 export function Projects() {
   const projects = [

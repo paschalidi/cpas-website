@@ -12,7 +12,7 @@ const navLinks: NavLink[] = [
   { label: 'About', href: '/#hero', hash: '#hero' },
   { label: 'Work', href: '/#work', hash: '#work' },
   { label: 'Blog', href: '/blog' },
-  { label: 'Contact', href: '/#contact', hash: '#contact' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export function Navbar() {

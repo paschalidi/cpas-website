@@ -7,6 +7,7 @@ import { Projects } from './components/Projects';
 import { Footer } from './components/Footer';
 import { BlogList } from './components/BlogList';
 import { BlogPost } from './components/BlogPost';
+import { ContactPage } from './components/ContactPage';
 
 function Home() {
   return (
@@ -63,6 +64,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/blog" element={<BlogList />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/contact" element={<ContactPage />} />
       </Routes>
     </div>
   );
