@@ -101,7 +101,7 @@ export function Navbar() {
             className="md:hidden px-5 py-2.5 text-sm font-medium text-white"
             style={{ cursor: 'none' }}
           >
-            Christos
+            Top
           </a>
         ) : (
           <Link
@@ -109,7 +109,7 @@ export function Navbar() {
             className="md:hidden px-5 py-2.5 text-sm font-medium text-white"
             style={{ cursor: 'none' }}
           >
-            Christos
+            Top
           </Link>
         )}
 
