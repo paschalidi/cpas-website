@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Cursor } from './components/Cursor';
 import { Navbar } from './components/Navbar';
@@ -11,7 +11,7 @@ import { BlogPost } from './components/BlogPost';
 function Home() {
   return (
     <div className="flex flex-col">
-      <section id="hero" className="sticky top-0 z-10">
+      <section id="hero" className="sticky top-0 z-10 will-change-transform">
         <Hero />
       </section>
       <section id="work" className="relative z-20">
@@ -26,24 +26,28 @@ function Home() {
 
 function ScrollToRouteTarget() {
   const { pathname, hash } = useLocation();
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
-    const scrollToTarget = () => {
-      if (pathname === '/' && hash) {
-        if (hash === '#hero') {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-          return;
-        }
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
 
-        document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
+    if (pathname === '/' && hash) {
+      if (hash === '#hero') {
+        window.scrollTo({ top: 0, behavior: 'instant' });
         return;
       }
 
-      window.scrollTo({ top: 0, behavior: 'auto' });
-    };
+      const target = document.getElementById(hash.slice(1));
+      if (target) {
+        target.scrollIntoView({ behavior: 'instant' });
+      }
+      return;
+    }
 
-    const animationFrame = window.requestAnimationFrame(scrollToTarget);
-    return () => window.cancelAnimationFrame(animationFrame);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   }, [pathname, hash]);
 
   return null;
