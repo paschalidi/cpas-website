@@ -38,29 +38,11 @@ export function Footer() {
       className="relative w-full cursor-none"
     >
       <div className="relative overflow-hidden rounded-t-[3rem] md:rounded-t-[5rem] bg-forest-950">
-        {/* Warm top edge glow — peach/coral gradient line */}
+        {/* Sunrise glow from the bottom center */}
         <div
-          className="absolute top-0 left-0 right-0 h-[4px]"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[40vh] pointer-events-none"
           style={{
-            background: 'linear-gradient(90deg, transparent, rgb(var(--color-peach-300) / 1), rgb(var(--color-cream-50) / 0.9), rgb(var(--color-peach-200) / 1), rgb(var(--color-cream-50) / 0.9), rgb(var(--color-peach-300) / 1), transparent)',
-            boxShadow: '0 0 30px rgb(var(--color-peach-300) / 0.5), 0 0 60px rgb(var(--color-peach-300) / 0.2)',
-          }}
-        />
-
-        {/* Subtle warm ambient glow at bottom */}
-        <div
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60rem] h-[20rem] rounded-full opacity-20 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse at center, rgb(var(--color-peach-300) / 0.15) 0%, transparent 70%)',
-          }}
-        />
-
-        {/* Shining line at bottom — a beacon of light */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-[3px]"
-          style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgb(var(--color-peach-300) / 1) 15%, rgb(var(--color-cream-50) / 1) 50%, rgb(var(--color-peach-300) / 1) 85%, transparent 100%)',
-            boxShadow: '0 0 25px rgb(var(--color-peach-300) / 0.4), 0 0 50px rgb(var(--color-peach-300) / 0.15)',
+            background: 'radial-gradient(ellipse 60% 100% at 50% 100%, rgb(var(--color-peach-300) / 0.12) 0%, transparent 70%)',
           }}
         />
 

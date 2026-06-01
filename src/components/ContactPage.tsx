@@ -89,7 +89,7 @@ export function ContactPage() {
   };
 
   return (
-    <div className="relative text-[#0d2418]">
+    <div className="relative text-forest-700">
       <div className="fixed inset-0">
         <AuroraBackground />
       </div>
@@ -100,7 +100,7 @@ export function ContactPage() {
         <div className="max-w-5xl mx-auto px-6 md:px-12 py-32 md:py-40">
           {/* Header Section */}
           <div className="mb-16 md:mb-24 relative">
-            <p className="text-sm font-medium mb-4 text-[#0d2418]/60">
+            <p className="text-sm font-medium mb-4 text-forest-700/60">
               Get in touch
             </p>
             <div className="relative overflow-visible">
@@ -116,7 +116,7 @@ export function ContactPage() {
                 ✻
               </span>
             </div>
-            <p className="text-lg md:text-xl text-[#0d2418]/60 max-w-lg leading-relaxed">
+            <p className="text-lg md:text-xl text-forest-700/60 max-w-lg leading-relaxed">
               Have a project in mind? Need help with architecture, AI, or fullstack development? 
               Let&apos;s talk.
             </p>
@@ -124,17 +124,17 @@ export function ContactPage() {
 
           <AnimatePresence mode="wait">
             {isSuccess ? (
-              <div className="flex flex-col items-center justify-center py-16 border border-[#0d2418]/10 rounded-3xl bg-white/50 backdrop-blur-sm">
-                <div className="text-[#0d2418] mb-6">
+              <div className="flex flex-col items-center justify-center py-16 border border-forest-700/10 rounded-3xl bg-white/50 backdrop-blur-sm">
+                <div className="text-forest-700 mb-6">
                   <CheckCircle size={64} />
                 </div>
                 <h3 className="text-3xl font-semibold mb-3">Message Sent!</h3>
-                <p className="text-[#0d2418]/60 text-center max-w-md mb-8">
+                <p className="text-forest-700/60 text-center max-w-md mb-8">
                   Thanks for reaching out. I&apos;ll get back to you within 24 hours.
                 </p>
                 <button
                   onClick={() => setIsSuccess(false)}
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#0d2418] text-white hover:bg-[#0d2418]/80 hover:-translate-y-0.5 transition-all duration-300"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-forest-700 text-white hover:bg-forest-700/80 hover:-translate-y-0.5 transition-all duration-300"
                   style={{ cursor: 'none' }}
                 >
                   Send Another Message
@@ -144,7 +144,7 @@ export function ContactPage() {
               <form onSubmit={handleSubmit} className="space-y-12">
                 {/* Interest Section */}
                 <div>
-                  <h2 className="text-xl md:text-2xl mb-6 text-[#0d2418]/80 font-medium">
+                  <h2 className="text-xl md:text-2xl mb-6 text-forest-700/80 font-medium">
                     I am interested in:
                   </h2>
                   <div className="flex flex-wrap gap-3">
@@ -155,8 +155,8 @@ export function ContactPage() {
                         onClick={() => toggleInterest(option.id)}
                         className={`rounded-full px-5 py-2.5 text-sm transition-all duration-300 flex items-center gap-2 backdrop-blur-md ${
                           formData.interests.includes(option.id)
-                            ? 'bg-[#0d2418]/90 border border-[#0d2418] text-white shadow-lg'
-                            : 'bg-white/50 border border-white/60 text-[#0d2418]/80 hover:bg-white/70 hover:border-white/80 hover:text-[#0d2418] shadow-sm'
+                            ? 'bg-forest-700/90 border border-forest-700 text-white shadow-lg'
+                            : 'bg-white/50 border border-white/60 text-forest-700/80 hover:bg-white/70 hover:border-white/80 hover:text-forest-700 shadow-sm'
                         }`}
                         style={{ cursor: 'none' }}
                       >
@@ -232,7 +232,7 @@ export function ContactPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-[#0d2418] text-white hover:bg-[#0d2418]/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                    className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-forest-700 text-white hover:bg-forest-700/80 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
                     style={{ cursor: 'none' }}
                   >
                     {isSubmitting ? (

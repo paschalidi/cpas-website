@@ -13,7 +13,7 @@ interface DoodleUnderlineProps {
 export const DoodleUnderline: React.FC<DoodleUnderlineProps> = ({
   children,
   className = '',
-  color = '#0d2418',
+  color = 'rgb(var(--color-forest-700))',
 }) => {
   const pathD = "M1 5 Q8 2, 15 5 T30 5 T45 4 T60 5 T75 4 T90 5";
   const pathLength = 120;

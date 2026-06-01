@@ -5,8 +5,13 @@ import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 export function BlogList() {
   return (
     <div className="min-h-screen bg-blog-background text-blog-text">
-      {/* Atmospheric glow at top */}
-      <div className="absolute top-0 left-0 right-0 h-[42vh] bg-gradient-to-b from-blog-text/5 via-blog-background/80 to-transparent pointer-events-none" />
+      {/* Sunrise glow from the top center */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[40vh] pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse 60% 100% at 50% 0%, rgb(var(--color-peach-300) / 0.12) 0%, transparent 70%)',
+        }}
+      />
 
       <div className="relative max-w-5xl mx-auto px-6 md:px-12 py-24 md:py-32">
         {/* Header */}

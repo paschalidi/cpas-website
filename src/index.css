@@ -17,6 +17,7 @@ body {
     --color-forest-950: 2 10 5;
     --color-forest-900: 12 42 23;
     --color-forest-800: 33 52 37;
+    --color-forest-700: 13 36 24;
 
     --color-peach-300: 243 198 173;
     --color-peach-200: 247 217 204;
@@ -30,12 +31,10 @@ body {
     --color-blog-muted: var(--color-cream-50);
     --color-blog-accent: var(--color-peach-300);
     --color-blog-accent-muted: var(--color-peach-200);
-
-    --color-text-heading: 13 36 24;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    color: rgb(var(--color-text-heading));
+    color: rgb(var(--color-forest-700));
   }
 }
 

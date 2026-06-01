@@ -13,6 +13,7 @@ export default {
           950: 'rgb(var(--color-forest-950) / <alpha-value>)',
           900: 'rgb(var(--color-forest-900) / <alpha-value>)',
           800: 'rgb(var(--color-forest-800) / <alpha-value>)',
+          700: 'rgb(var(--color-forest-700) / <alpha-value>)',
         },
         peach: {
           300: 'rgb(var(--color-peach-300) / <alpha-value>)',
