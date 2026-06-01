@@ -40,9 +40,10 @@ export function Footer() {
       <div className="relative overflow-hidden rounded-t-[3rem] md:rounded-t-[5rem] bg-forest-950">
         {/* Warm top edge glow — peach/coral gradient line */}
         <div
-          className="absolute top-0 left-0 right-0 h-[2px]"
+          className="absolute top-0 left-0 right-0 h-[3px]"
           style={{
-            background: 'linear-gradient(90deg, transparent, rgb(var(--color-peach-300) / 0.6), rgb(var(--color-peach-200) / 0.4), rgb(var(--color-peach-300) / 0.6), transparent)',
+            background: 'linear-gradient(90deg, transparent, rgb(var(--color-peach-300) / 0.9), rgb(var(--color-peach-200) / 0.7), rgb(var(--color-cream-50) / 0.8), rgb(var(--color-peach-200) / 0.7), rgb(var(--color-peach-300) / 0.9), transparent)',
+            boxShadow: '0 0 20px rgb(var(--color-peach-300) / 0.3)',
           }}
         />
 
@@ -54,11 +55,12 @@ export function Footer() {
           }}
         />
 
-        {/* Thin shining line at bottom — a hint of light, a reason to scroll back up */}
+        {/* Shining line at bottom — a beacon of light */}
         <div
-          className="absolute bottom-0 left-0 right-0 h-[1px]"
+          className="absolute bottom-0 left-0 right-0 h-[2px]"
           style={{
-            background: 'linear-gradient(90deg, transparent 0%, rgb(var(--color-peach-300) / 0.4) 20%, rgb(var(--color-cream-50) / 0.6) 50%, rgb(var(--color-peach-300) / 0.4) 80%, transparent 100%)',
+            background: 'linear-gradient(90deg, transparent 0%, rgb(var(--color-peach-300) / 0.7) 15%, rgb(var(--color-cream-50) / 0.9) 50%, rgb(var(--color-peach-300) / 0.7) 85%, transparent 100%)',
+            boxShadow: '0 0 15px rgb(var(--color-peach-300) / 0.2)',
           }}
         />
 

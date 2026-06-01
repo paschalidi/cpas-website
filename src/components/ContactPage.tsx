@@ -115,16 +115,17 @@ export function ContactPage() {
             </h1>
             {/* Rolling asterisk */}
             <motion.span
-              className="absolute bottom-2 left-[280px] md:left-[420px] lg:left-[520px] text-[rgb(243,198,173)] text-4xl md:text-6xl lg:text-7xl font-light select-none"
+              className="absolute bottom-2 left-[280px] md:left-[420px] lg:left-[520px] text-blog-surface text-5xl md:text-7xl lg:text-8xl font-light select-none"
               style={{ lineHeight: 1 }}
               animate={{
-                x: [0, 100, 0],
-                rotate: [0, 360, 720],
+                x: [0, 200, 0],
+                rotate: [0, 360, 0],
               }}
               transition={{
-                duration: 16,
-                ease: "linear",
+                duration: 3,
+                ease: "easeInOut",
                 repeat: Infinity,
+                repeatType: "loop",
               }}
             >
               ✻
