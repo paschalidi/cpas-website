@@ -8,6 +8,7 @@ import { Footer } from './components/Footer';
 import { BlogList } from './components/BlogList';
 import { BlogPost } from './components/BlogPost';
 import { ContactPage } from './components/ContactPage';
+import { Analytics } from '@vercel/analytics/react';
 
 function Home() {
   return (
@@ -66,6 +67,7 @@ function App() {
         <Route path="/blog/:slug" element={<BlogPost />} />
         <Route path="/contact" element={<ContactPage />} />
       </Routes>
+      <Analytics />
     </div>
   );
 }
