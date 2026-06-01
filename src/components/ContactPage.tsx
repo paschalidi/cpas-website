@@ -7,7 +7,7 @@ import { sendContactEmail } from '../services/email';
 import { AuroraBackground } from './AuroraBackground';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
-import { AnimatedRollingSymbol } from './AnimatedRollingSymbol';
+
 
 type FormData = {
   firstName: string;
@@ -103,22 +103,38 @@ export function ContactPage() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mb-16 md:mb-24"
+          className="mb-16 md:mb-24 relative"
         >
           <p className="text-sm font-medium mb-4 text-[#0d2418]/60">
             Get in touch
           </p>
-          <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6">
-            Let&apos;s get<br />
-            <span className="font-semibold">the ball</span> rolling
-          </h1>
+          <div className="relative overflow-visible">
+            <h1 className="font-sans text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[1.05] mb-6 pr-16 md:pr-24">
+              Let&apos;s get<br />
+              <span className="font-semibold">the ball</span> rolling
+            </h1>
+            {/* Rolling asterisk */}
+            <motion.span
+              className="absolute bottom-2 left-[280px] md:left-[420px] lg:left-[520px] text-[rgb(243,198,173)] text-4xl md:text-6xl lg:text-7xl font-light select-none"
+              style={{ lineHeight: 1 }}
+              animate={{
+                x: [0, 100, 0],
+                rotate: [0, 360, 720],
+              }}
+              transition={{
+                duration: 16,
+                ease: "linear",
+                repeat: Infinity,
+              }}
+            >
+              ✻
+            </motion.span>
+          </div>
           <p className="text-lg md:text-xl text-[#0d2418]/60 max-w-lg leading-relaxed">
             Have a project in mind? Need help with architecture, AI, or fullstack development? 
             Let&apos;s talk.
           </p>
         </motion.div>
-
-        <AnimatedRollingSymbol />
 
         <AnimatePresence mode="wait">
           {isSuccess ? (
