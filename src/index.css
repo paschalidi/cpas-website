@@ -152,22 +152,50 @@ body {
   }
 }
 
-/* Mermaid diagrams */
+/* Mermaid diagrams — override .blog-content pre terminal styling */
+.blog-content pre.mermaid,
 .mermaid {
+  position: relative !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   background: rgb(1 6 3) !important;
   border: 1px solid rgb(var(--color-forest-800) / 0.7) !important;
   border-radius: 0.875rem !important;
-  padding: 1.5rem !important;
+  padding: 2rem 1.5rem !important;
+  padding-top: 2rem !important;
   margin: 2rem 0 !important;
   box-shadow:
     0 0 0 1px rgb(var(--color-forest-900) / 0.4),
     0 8px 32px rgb(0 0 0 / 0.5) !important;
   overflow-x: auto !important;
+  font-family: inherit !important;
+  color: inherit !important;
+  text-align: center !important;
+  white-space: normal !important;
+  min-height: 4rem !important;
+}
+
+/* Suppress the terminal header bar + dots for mermaid blocks */
+.blog-content pre.mermaid::before,
+.blog-content pre.mermaid::after,
+.mermaid::before,
+.mermaid::after {
+  content: none !important;
+  display: none !important;
 }
 
 .mermaid svg {
   max-width: 100% !important;
   height: auto !important;
+  display: block !important;
+  margin: 0 auto !important;
+}
+
+/* Hide the raw mermaid source until mermaid.run() replaces it with an SVG */
+.mermaid:not([data-processed="true"]) {
+  color: transparent !important;
+  user-select: none !important;
 }
 
 /* Selection styling */

@@ -107,6 +107,43 @@ const value = useMemo(() => ({
 
 REST provides the history. WebSocket provides the real-time updates. Both feed into the same array.
 
+### Where things went wrong: the dual-send problem
+
+The `MessageInput` component sends every message twice:
+
+```tsx
+// First: WebSocket for instant delivery
+ws.send(JSON.stringify(data));
+
+// Second: REST API for persistent storage
+await postMessage({ apiKey, organizationId, message: data });
+```
+
+This is the problem. Two network requests for one message. If the REST API fails, the message is live in the chat but lost from history. The user sees it, but it disappears on refresh.
+
+**Why I did it:** The WebSocket handler (`sockets.rs`) only publishes to Redis. It does not save to the database. I split the responsibility: WebSocket for real-time, REST for persistence. It seemed clean. It was not.
+
+**What I should have done:** Send the message via WebSocket only. Have the server-side WebSocket handler save to the database before broadcasting to Redis. One path. One source of truth.
+
+```rust
+// In sockets.rs, when a message arrives:
+async fn handle_socket_message(msg: ClientMessage, state: AppState) {
+    // 1. Save to PostgreSQL
+    let saved = db.insert_message(&msg).await;
+    
+    // 2. Broadcast to Redis
+    if saved.is_ok() {
+        redis.publish(&channel, &msg).await;
+    }
+}
+```
+
+This is simpler. The client sends once. The server guarantees persistence before broadcast. If the save fails, the message does not appear in the chat.
+
+The trade-off: the WebSocket handler now needs database access. But it already has the `state` object with `db`, `redis`, and `stripe`. The connection is there. I just did not use it.
+
+**The real mistake:** I built the WebSocket as a "dumb pipe" and made the frontend handle complexity. The frontend should be simple. The backend should be smart.
+
 ### Publishing to npm
 
 I published `@rechat-sdk/react` to npm. Built with `tsup` for fast bundling. Dual CJS/ESM output. Type declarations included.
@@ -123,7 +160,8 @@ Peer dependencies for React. I knew this from the start — don't bundle React i
 
 ### What I'd add next
 
-- Reconnection with exponential backoff
-- Optimistic UI for message sending
-- Infinite scroll for message history
-- Typing indicators via WebSocket
+- **Reconnection with exponential backoff** — currently, if the WebSocket drops, the user must refresh.
+- **Optimistic UI for message sending** — show the message immediately, roll back if the server fails.
+- **Server-side persistence** — the most important fix. The WebSocket handler should save to the database before broadcasting. This eliminates the dual-send problem entirely.
+- **Infinite scroll for message history** — pagination for large channels.
+- **Typing indicators via WebSocket** — show when other users are typing.

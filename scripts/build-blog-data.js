@@ -3,14 +3,16 @@ import path from 'node:path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
-const renderer = new marked.Renderer();
-const originalCodeRenderer = renderer.code.bind(renderer);
-renderer.code = function(code, language, escaped) {
-  if (language === 'mermaid') {
-    return `<pre class="mermaid">${code}</pre>`;
-  }
-  return originalCodeRenderer(code, language, escaped);
-};
+marked.use({
+  renderer: {
+    code({ text, lang }) {
+      if (lang === 'mermaid') {
+        return `<pre class="mermaid">${text}</pre>\n`;
+      }
+      return false;
+    },
+  },
+});
 
 const rootDir = process.cwd();
 const postsDir = path.join(rootDir, 'src/blog/posts');
