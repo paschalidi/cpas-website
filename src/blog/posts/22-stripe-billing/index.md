@@ -74,3 +74,10 @@ Add a soft limit notification at 80% usage. Warn users before they hit the wall.
 I added this in the code. The threshold check is there — it logs a warning when an organization hits 80% of their limit. But I never implemented the actual notification. No emails, no Slack messages, no in-app alerts. It was aspirational. I knew it would reduce support tickets, but I never finished it. The TODO is still in the code.
 
 Also: I used Stripe's test mode during development. I did not accidentally create a real subscription. I am not that reckless.
+
+## What I learned
+
+- Stripe test mode is your friend. Use it.
+- Webhooks need idempotency. Always store processed event IDs.
+- Graceful degradation is harder than strict enforcement. It requires thinking about every failure path.
+- The billing system is a product, not a feature. It needs its own UX, notifications, and error messages.

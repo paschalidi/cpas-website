@@ -1,27 +1,27 @@
 ---
 title: "Watch the replay. Read the data."
 author: Christos Paschalidis
-date: 2025-06-15
-excerpt: "Every Friday I watch Sentry session replays for an hour. I have caught more bugs from watching users click around than from any test suite."
+date: 2025-03-15
+excerpt: "Every Friday I watched Sentry session replays for an hour. I caught more bugs from watching users click around than from any test suite."
 ---
 
 # Watch the replay. Read the data.
 
-Every Friday I block an hour. I open Sentry. I watch session replays. Not the errors — the sessions. I pick five random users and I watch what they actually did.
+Every Friday I blocked an hour. I opened Sentry. I watched session replays. Not the errors — the sessions. I picked five random users and I watched what they actually did.
 
-I have caught more bugs this way than from any test suite.
+I caught more bugs this way than from any test suite.
 
-## What you see
+## What I saw
 
-Users do not report bugs. They leave. They click a button that does nothing, wait three seconds, and close the tab. They fill out a form, hit submit, get no feedback, and assume it worked. They rage-click a loading spinner that is never going to finish because the API call failed silently.
+Users did not report bugs. They left. They clicked a button that did nothing, waited three seconds, and closed the tab. They filled out a form, hit submit, got no feedback, and assumed it worked. They rage-clicked a loading spinner that was never going to finish because the API call failed silently.
 
-Sentry replays show you this. Not the exception stack trace. The human in front of the screen. The pause. The confusion. The back-button.
+Sentry replays showed me this. Not the exception stack trace. The human in front of the screen. The pause. The confusion. The back-button.
 
-Last month I watched a user try to reserve a vehicle. They clicked "Reserve," got a loading state, waited 12 seconds, and refreshed the page. The reservation went through twice. Two holds on the same car. Two agents calling the same buyer. We had no test for "user refreshes during API call." The replay found it in ten minutes.
+Last week I watched a user try to reserve a vehicle. They clicked "Reserve," got a loading state, waited 12 seconds, and refreshed the page. The reservation went through twice. Two holds on the same car. Two agents calling the same buyer. We had no test for "user refreshes during API call." The replay found it in ten minutes.
 
-## PostHog: the numbers that lie
+## PostHog: the numbers that lied
 
-Sentry shows you the individual. PostHog shows you the aggregate. I read the funnel every Monday. Where do users drop off?
+Sentry showed me the individual. PostHog showed me the aggregate. I read the funnel every Monday. Where did users drop off?
 
 The checkout flow I thought was a 5-step wizard? PostHog said 40% of users dropped between step 2 and step 3. I assumed step 3 was the problem — identity verification is friction.
 
@@ -33,9 +33,9 @@ You need both. PostHog tells you where. Sentry replays tell you why.
 
 Friday: five replays, no matter what. Pick any session. Not the errors. Not the crashes. Just a user using your product. Watch them get confused. Watch them succeed. Watch them do something you did not know was possible.
 
-Monday: read the PostHog funnel. Compare it to what you saw Friday. The numbers will make more sense.
+Monday: read the PostHog funnel. Compare it to what you saw Friday. The numbers made more sense.
 
-This is the cheapest user research you can do. No interviews. No surveys. Just watching.
+This was the cheapest user research I did. No interviews. No surveys. Just watching.
 
 ## For founding engineers
 

@@ -62,7 +62,7 @@ The server has three layers:
 - **WebSocket handlers** for real-time messaging
 - **Custom middleware extractors** for auth, usage tracking, and limiting
 
-The middleware is the interesting part. Axum's `FromRequestParts` trait lets you extract anything from the request. I built:
+The middleware is the interesting part. Axum's `FromRequestParts` trait lets me extract anything from the request. I built:
 - `ApiKeyAuthorizer` — validates the API key and resolves the organization
 - `UsageTracker` — increments the message counter in Redis
 - `UsageLimiter` — checks if the organization has exceeded their tier limit

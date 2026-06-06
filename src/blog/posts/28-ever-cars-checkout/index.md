@@ -1,17 +1,17 @@
 ---
-title: "Designing a checkout flow: what we stole from Carvana, Tesla, and a Swedish EV startup"
+title: "Designing a checkout flow: what we learned from Carvana, Tesla, and a Swedish EV startup"
 author: Christos Paschalidis
 date: 2024-08-01
 excerpt: "We benchmarked Carvana, Tesla, and Carla. Then we built a checkout flow where users reserved an EV, verified their identity, picked insurance, and a human agent closed the sale. Here's what worked."
 ---
 
-# Designing a checkout flow: what we stole from Carvana, Tesla, and a Swedish EV startup
+# Designing a checkout flow: what we learned from Carvana, Tesla, and a Swedish EV startup
 
 We were rebranding an electrical vehicle platform. The old checkout was a contact form. Name, email, phone number, "we will get back to you." It converted badly. We did not know the exact number — the analytics were broken or non-existent — but we knew it was low because the sales team was manually calling every lead and most of them were not serious.
 
 I led the redesign as tech lead. I worked with our designer, another frontend engineer, and occasionally the CTO and CEO who advised on direction. The team was small. We moved fast. Everyone was hyped to build the best experience.
 
-## What we stole
+## What we learned
 
 **From Carvana:** the vehicle reservation step. You browse, you find a car you like, you put down a small hold. The vehicle is taken off the market for 24 hours. No other buyer can reserve it. This creates urgency without pressure. The user is not committing to a purchase. They are committing to a conversation.
 

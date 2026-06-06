@@ -1,23 +1,25 @@
 ---
-title: "Migrating from Algolia to OpenSearch: why we ditched the $1,000/mo search that leaked our keys"
+title: "Migrating from Algolia to OpenSearch: ditching the search bill that kept growing"
 author: Christos Paschalidis
 date: 2024-12-01
-excerpt: "Algolia was $1,000/month, leaked our public search key, and had no Go SDK. We moved to AWS OpenSearch, cut costs to the minimum, and built a faster search UI. The catch: we now had to maintain data in two places."
+excerpt: "Algolia was costing us over $1,000/month, our public key was exposed in the frontend, and there was no Go SDK. We moved to AWS OpenSearch."
 ---
 
-# Migrating from Algolia to OpenSearch: why we ditched the $1,000/mo search that leaked our keys
+# Migrating from Algolia to OpenSearch: ditching the search bill that kept growing
 
-We started with Algolia. It took a day to integrate. The search was fast. The UI was responsive. The bill was $1,000 per month.
+We started with Algolia. It took about three days to get the first version running — backend indexing, frontend integration, and the React components for the search UI. The search was fast. The UI was responsive. The bill was above $1,000 per month.
 
-Then someone found our public search API key in the frontend JavaScript. They used it to run searches outside our application. We had to rotate the key, update all clients, and accept that a public key in the browser is always a liability.
+The pricing scaled with query count and record count. At our volume, it was predictable until it was not. One traffic spike and the bill jumped. We started watching it closely.
 
-We decided to move. Not to another SaaS search provider. To AWS OpenSearch, self-hosted in our own account.
+There was also the key problem. Algolia requires a public search API key in the frontend JavaScript. We had one. Anyone who inspected our page could see it. We do not know if anyone actually used it to run searches outside our application, but the possibility was there. A public key in the browser is always a liability. We rotated it once, updated all clients, and accepted that this was a recurring risk.
+
+We moved. Not to another SaaS search provider. To AWS OpenSearch, self-hosted in our own account.
 
 ## The cost math
 
-Algolia: ~$1,000/month at our volume. Scales with query count and record count. The pricing is predictable until it is not — one traffic spike and the bill jumps.
+Algolia was over $1,000/month at our volume. It scaled with query count and record count. The pricing was predictable until it was not.
 
-OpenSearch on AWS: a small managed cluster costs a fraction of that. At our scale — a few hundred thousand vehicle records, a few thousand searches per day — we paid for the instance, not per query. The monthly cost dropped by an order of magnitude.
+OpenSearch on AWS: a small managed cluster cost a fraction of that. At our scale — a few hundred thousand vehicle records, a few thousand searches per day — we paid for the instance, not per query. The monthly cost dropped significantly.
 
 But cost was not the only reason. We wanted control. We wanted our search index in the same AWS account as our database, our API, our everything. No third-party network calls. No third-party rate limits. No third-party keys in the frontend.
 
@@ -25,9 +27,9 @@ But cost was not the only reason. We wanted control. We wanted our search index 
 
 We had a PostgreSQL database with vehicle listings. Make, model, year, mileage, price, location, features, images. Algolia indexed this automatically via their API. We wrote the record, Algolia picked it up.
 
-OpenSearch does not pick up anything. You have to write the indexing code yourself.
+OpenSearch does not pick up anything. We had to write the indexing code ourselves.
 
-We built a sync layer. Every create, update, or delete on a vehicle record triggered an async job to update the OpenSearch index. This sounds simple. It was not.
+A backend engineer on the team built the sync layer. I was leading the project, so I reviewed the design, but the implementation was theirs. Every create, update, or delete on a vehicle record triggered an async job to update the OpenSearch index. This sounds simple. It was not.
 
 ## The filter problem
 
@@ -37,7 +39,7 @@ The "available for reservation" filter depends on the reservation state. Which i
 
 Algolia handles this with their "query rules" and "filtering" API. You send them parameters, they return results. The complexity is hidden.
 
-OpenSearch requires you to write the query. And Go — our backend language — has no official OpenSearch SDK.
+OpenSearch requires us to write the query. And Go — our backend language — had no official OpenSearch SDK at the time.
 
 ## Writing Go queries for OpenSearch
 
@@ -45,21 +47,21 @@ We had to construct OpenSearch DSL queries by hand. JSON nested five levels deep
 
 The dependency between filters made this harder. If a user filters by price and range and availability, the query has to handle all three in a single bool query. If they add a fourth filter, the structure changes. We ended up building a query builder in Go — a small DSL that translated our filter parameters into OpenSearch JSON.
 
-This was the most complex code in our backend. Not the checkout. Not the reservation logic. The search query builder.
+This was some of the most tedious code in our backend. Not the most complex necessarily, but the most finicky. Nested JSON structures, subtle boolean logic, and the fact that one missing field would break the entire query. It worked, but it was not elegant.
 
-But it worked. The search was faster than Algolia. The filters were instant. The UI felt snappy because the round-trip was within our own AWS network, not to Algolia's servers across the internet.
+The search was faster than Algolia. The filters were instant. The UI felt snappy because the round-trip was within our own AWS network, not to Algolia's servers across the internet.
 
 ## The dual-write problem
 
 Every time a vehicle record changed in PostgreSQL, we had to update the OpenSearch index. This created two sources of truth.
 
-The specific bug that made this real: a user updated their listing price. The database updated. The async indexing job failed — a network timeout, a transient error, a deploy that restarted the worker before it finished. The OpenSearch index now had the old price. A buyer searched, saw the old price, reserved the vehicle, and called an agent to confirm. The agent saw the new price in the admin dashboard. Confusion. Anger. A support ticket.
+It happened a couple of times. A user updated their listing price. The database updated. The async indexing job failed — a network timeout, a transient error, a deploy that restarted the worker before it finished. The OpenSearch index now had the old price. A buyer searched, saw the old price, reserved the vehicle, and called an agent to confirm. The agent saw the new price in the admin dashboard. Confusion. Anger. A support ticket.
 
 We fixed this by adding retry logic, idempotency keys, and a nightly reconciliation job that compared the DB to the index and fixed discrepancies. But the fundamental problem remained: two data stores means two failure modes. You cannot avoid it. You can only monitor it.
 
-## What I would do differently
+## What we would do differently
 
-OpenSearch was the right call for cost and control. But if I were doing it again, I would consider using OpenSearch's Zero-ETL integration with PostgreSQL from the start, rather than writing our own sync layer. AWS has since made this easier. In 2024, we did it the hard way.
+OpenSearch was the right call for cost and control. But if we were doing it again, we would consider using OpenSearch's Zero-ETL integration with PostgreSQL from the start, rather than writing our own sync layer. AWS has since made this easier. In 2024, we did it the hard way.
 
 I would also have spent more time on the query builder design. Our first version was a mess of nested if-statements. The second version used a builder pattern. The third version was readable. It took three iterations to get clean.
 
@@ -71,4 +73,4 @@ The migration saved us thousands per month. It also gave us a search system we f
 
 The trade-off is real. There is no free search. There is only expensive SaaS search or cheap self-hosted search that costs engineering time instead of dollars.
 
-We chose engineering time. For a startup with more engineers than revenue, it was the right choice.
+We chose self-hosted. For a startup with more engineers than revenue, it was the right call.
