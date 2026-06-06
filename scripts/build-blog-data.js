@@ -3,6 +3,15 @@ import path from 'node:path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
+const renderer = new marked.Renderer();
+const originalCodeRenderer = renderer.code.bind(renderer);
+renderer.code = function(code, language, escaped) {
+  if (language === 'mermaid') {
+    return `<pre class="mermaid">${code}</pre>`;
+  }
+  return originalCodeRenderer(code, language, escaped);
+};
+
 const rootDir = process.cwd();
 const postsDir = path.join(rootDir, 'src/blog/posts');
 const outputPath = path.join(rootDir, 'src/blog/posts.json');

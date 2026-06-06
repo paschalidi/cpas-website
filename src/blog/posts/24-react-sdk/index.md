@@ -1,11 +1,11 @@
 ---
-title: Building a react SDK for your backend
+title: Building a react SDK for my backend
 author: Christos Paschalidis
 date: 2023-11-20
-excerpt: Packaging components, WebSocket reconnection, and TypeScript types
+excerpt: "Packaging components, WebSocket reconnection, and TypeScript types"
 ---
 
-# Building a react SDK for your backend
+# Building a react SDK for my backend
 
 A chat backend is useless without a client. I built a React SDK so developers can add chat to their app in minutes.
 
@@ -109,21 +109,9 @@ REST provides the history. WebSocket provides the real-time updates. Both feed i
 
 ### Publishing to npm
 
-```json
-{
-  "name": "@rechat-sdk/react",
-  "version": "0.1.8",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "files": ["dist"],
-  "peerDependencies": {
-    "react": "^18.0.0"
-  }
-}
-```
+I published `@rechat-sdk/react` to npm. Built with `tsup` for fast bundling. Dual CJS/ESM output. Type declarations included.
 
-Built with `tsup` for fast bundling. Dual CJS/ESM output. Type declarations included.
+Peer dependencies for React. I knew this from the start — don't bundle React into the SDK. I had read enough SDK documentation to know this is standard practice.
 
 ### What I learned
 

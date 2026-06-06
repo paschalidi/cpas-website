@@ -2,7 +2,7 @@
 title: Learning rust — day 2
 author: Christos Paschalidis
 date: 2023-06-17
-excerpt: Structs, enums, Result, and building a small HTTP server
+excerpt: "Structs, enums, Result, and building a small HTTP server"
 ---
 
 # Learning rust — day 2
@@ -40,7 +40,7 @@ fn divide(a: f64, b: f64) -> Result<f64, String> {
 
 No exceptions. Every possible error is in the type signature. The compiler forces you to handle it.
 
-This is the thing I wish every language had. When a database query fails in a chat handler, what do you do? In Rust, the type system makes you decide before the code compiles. In JavaScript, you find out in production.
+This is the thing I wish every language had. I once spent a whole day debugging a swallowed exception in a JavaScript try/catch block. The error was there, but the catch block was empty. The promise resolved successfully. I only found it in production. In Rust, the type system makes you decide before the code compiles. No empty catch blocks. No silent failures.
 
 ## Building a small HTTP server
 
@@ -57,7 +57,7 @@ One line and you have a server. But the compiler checks every route, every handl
 
 Understanding when to use `String` vs `&str`. `String` is owned. `&str` is borrowed. For function arguments, `&str` is usually better. For struct fields, `String` because they need to own the data.
 
-I spent 30 minutes on this. It will make sense eventually.
+I spent 30 minutes on a return type issue. A function was returning `String` where the caller expected `&str`. The compiler was right. I was wrong.
 
 ## What I learned
 

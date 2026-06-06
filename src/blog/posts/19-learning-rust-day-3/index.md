@@ -2,7 +2,7 @@
 title: Learning rust — day 3
 author: Christos Paschalidis
 date: 2023-06-24
-excerpt: Async/await with tokio, building a websocket echo server
+excerpt: "Async/await with tokio, building a websocket echo server"
 ---
 
 # Learning rust — day 3
@@ -12,8 +12,6 @@ Today: WebSockets. I need them for the chat service. Rust async is different fro
 ## Tokio basics
 
 `tokio::join!` runs multiple futures concurrently. `tokio::spawn` runs them on separate tasks. This is the runtime that will handle thousands of WebSocket connections.
-
-I wrote a small echo server first. Upgrade HTTP to WebSocket, keep the connection open, echo every message back. It worked on the first try, which surprised me.
 
 ## WebSocket echo server
 
@@ -37,7 +35,7 @@ async fn handle_socket(mut socket: WebSocket) {
 }
 ```
 
-Simple. But I know this will get complicated when I need to broadcast to multiple clients, handle disconnections, and scale across servers.
+It took a few tries to get working. The first compile failed because I forgot to import the right types. The second because I was mixing `async` and `sync` code. Third try worked. Simple, but I know this will get complicated when I need to broadcast to multiple clients, handle disconnections, and scale across servers.
 
 ## Broadcasting with channels
 
@@ -54,7 +52,7 @@ The problem: every WebSocket handler needs access to the broadcaster. I wrapped 
 
 Lifetime errors when passing the broadcast sender between handlers. The fix was wrapping it in `std::sync::Arc`. `Arc` is reference counting for shared ownership across async tasks.
 
-This took an hour. In Go, you would just pass a channel around. In Rust, the compiler makes you prove it is safe.
+This took an hour. In other languages, you would just pass a reference around. In Rust, the compiler makes you prove it is safe.
 
 ## What I learned
 

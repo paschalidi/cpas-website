@@ -1,11 +1,11 @@
 ---
-title: How we handle real-time messages across multiple servers
+title: How I handle real-time messages across multiple servers
 author: Christos Paschalidis
 date: 2023-07-15
-excerpt: WebSockets for client connections, Redis for server-to-server broadcast
+excerpt: "WebSockets for client connections, Redis for server-to-server broadcast"
 ---
 
-# How we handle real-time messages across multiple servers
+# How I handle real-time messages across multiple servers
 
 A single server can only handle so many WebSocket connections. When you need to scale, you have multiple servers. The problem: a user connected to server A sends a message, but the recipient is on server B. How does server B know?
 
@@ -53,12 +53,14 @@ Redis pub/sub handles the cross-server broadcast without custom infrastructure. 
 
 ## What did not
 
-Redis pub/sub does not persist messages. If a server restarts, it misses messages sent between restart and client reconnect. For our use case (customer support chat), this is acceptable. Users see history via the REST API when they reconnect. The WebSocket only carries live messages.
+Redis pub/sub does not persist messages. If a server restarts, it misses messages sent between restart and client reconnect. For my use case (customer support chat), this is acceptable. Users see history via the REST API when they reconnect. The WebSocket only carries live messages.
 
 If I needed guaranteed delivery (financial trading, medical alerts), I would use Redis Streams instead. Streams persist messages and support consumer groups for acknowledgment and redelivery.
 
 ## The result
 
-Three Axum servers behind a load balancer. Any user can connect to any server and talk to anyone in the same room. Redis handles the cross-server coordination. No custom message broker needed.
+This is designed for three Axum servers behind a load balancer. Any user can connect to any server and talk to anyone in the same room. Redis handles the cross-server coordination. No custom message broker needed.
+
+I did not actually deploy three servers. This is theoretical. I ran one server locally and tested the Redis pub/sub logic. But the architecture is sound. If I ever need to scale, I know what to do.
 
 This is good enough for a learning project. It is not good enough for a real product. But that was never the goal.

@@ -2,7 +2,7 @@
 title: Deploying rust to kubernetes on digitalocean
 author: Christos Paschalidis
 date: 2023-10-05
-excerpt: Distroless images, Helm charts, and fast startup times
+excerpt: "Distroless images, Helm charts, and fast startup times"
 ---
 
 # Deploying rust to kubernetes on digitalocean
@@ -103,7 +103,7 @@ WebSocket connections are long-lived. During a rolling update, old pods terminat
 
 Clients reconnect to new pods automatically. The WebSocket handshake is fast. Redis Pub/Sub ensures they still receive messages sent to the room.
 
-But: messages sent during the reconnect window are lost. For our use case (customer support chat), this is acceptable. For financial trading, it would not be.
+But: messages sent during the reconnect window are lost. For my use case (customer support chat), this is acceptable. For financial trading, it would not be.
 
 The fix if needed: Redis Streams with consumer groups. Clients acknowledge messages. Unacknowledged messages are redelivered after reconnect.
 
@@ -116,7 +116,7 @@ The fix if needed: Redis Streams with consumer groups. Clients acknowledge messa
 
 ## Fast startup
 
-Rust binaries start in milliseconds. No JVM warmup, no Python import time. Kubernetes health checks pass immediately. Rolling deployments are fast because the new pod is ready before the old one is terminated.
+Rust binaries start in milliseconds. A 5MB Rust binary starts in under 100ms. No JVM warmup, no Python import time. Kubernetes health checks pass immediately. Rolling deployments are fast because the new pod is ready before the old one is terminated.
 
 ## What I learned
 

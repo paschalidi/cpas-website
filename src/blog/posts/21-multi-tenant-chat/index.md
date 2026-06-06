@@ -2,146 +2,44 @@
 title: Designing a multi-tenant chat API with API keys and usage limits
 author: Christos Paschalidis
 date: 2023-09-10
-excerpt: Organization isolation, API key auth, rate limiting, and Stripe billing
+excerpt: "Organization isolation, API key auth, rate limiting, and Stripe billing"
 ---
 
 # Designing a multi-tenant chat API with API keys and usage limits
 
-Chat-as-a-service means multiple organizations sharing one backend. Each org needs isolation, authentication, and billing. Here is how we built it.
+Chat-as-a-service means multiple organizations sharing one backend. Each org needs isolation, authentication, and billing. Here is how I built it.
 
 ## Data model
 
-```
-organizations
-├── users
-├── channels
-├── messages
-└── api_keys (with monthly usage tracking)
-```
-
 Every table has `organization_id`. No cross-org queries. No accidental data leaks.
+
+Organizations have users, channels, messages, and api_keys. The api_keys table tracks monthly usage. Simple enough.
 
 ## API key authentication
 
-Axum custom extractor pattern:
+I used Axum's custom extractor pattern. The `ApiKeyAuthorizer` validates the key and resolves the organization. The `_auth` parameter in the handler forces the middleware to run. No annotation needed. Axum extracts it automatically.
 
-```rust
-#[derive(Debug, Clone)]
-pub struct ApiKeyAuthorizer {
-    pub key_type: ApiKeyType,
-}
-
-#[async_trait]
-impl FromRequestParts<AppState> for ApiKeyAuthorizer {
-    type Rejection = MiddlewareError;
-
-    async fn from_request_parts(
-        parts: &mut Parts,
-        state: &AppState,
-    ) -> Result<Self, Self::Rejection> {
-        let org_id = extract_organization_id(parts, state).await?;
-        let api_key = extract_api_key(parts)?;
-        let key = find_and_validate_key(&api_key, &org_id, &state.db.connection).await?;
-        
-        Ok(Self { key_type: key.key_type })
-    }
-}
-```
-
-Usage in handlers:
-
-```rust
-pub async fn create_channel(
-    _auth: ApiKeyAuthorizer,
-    State(state): State<AppState>,
-    Json(body): Json<CreateChannelRequest>,
-) -> Result<Json<ChannelResponse>, ApiError> {
-    // Only reaches here if API key is valid
-}
-```
-
-The `_auth` parameter forces the middleware to run. No annotation needed. Axum extracts it automatically.
-
-## The middleware pipeline
-
-```
-Request → ApiKeyAuthorizer → UsageTracker → UsageLimiter → Handler
-             (Validate)      (Count)         (Enforce)
-```
-
-Each middleware is a custom extractor. They compose naturally in Axum.
+This is powerful. Auth, rate limiting, usage tracking — all reusable extractors that compose naturally.
 
 ## Usage limiting with tiers
 
-```rust
-#[async_trait]
-impl FromRequestParts<AppState> for UsageLimiter {
-    type Rejection = MiddlewareError;
+The middleware pipeline: Request → ApiKeyAuthorizer → UsageTracker → UsageLimiter → Handler.
 
-    async fn from_request_parts(
-        parts: &mut Parts,
-        state: &AppState,
-    ) -> Result<Self, Self::Rejection> {
-        let org_id = extract_organization_id(parts, state).await?;
-        let usage = check_usage(&state, &org_id).await?;
-        let tier = OrganizationTiers::find_by_id(org_id)
-            .one(&state.db.connection).await?;
-        
-        if usage >= tier.monthly_request_limit {
-            return Err(MiddlewareError::UsageLimitExceeded(
-                "Usage limit exceeded. Please upgrade your subscription.".to_string()
-            ));
-        }
-        
-        // Track the request
-        increment_usage(&state, &org_id).await?;
-        
-        Ok(Self)
-    }
-}
-```
+Each step is a custom extractor. If the API key is invalid, the request fails early. If usage is over the limit, it returns 402. Otherwise, it hits the handler.
 
 ## Graceful degradation
 
-The difficult decision: what happens when usage tracking fails? If the database is slow, do we block all requests?
+The difficult decision: what happens when usage tracking fails? If the database is slow, do I block all requests?
 
-Answer: No. If we cannot check usage, we let the request through. Only block if we can confirm the limit is exceeded.
+Answer: No. If I cannot check usage, I let the request through. Only block if I can confirm the limit is exceeded.
 
-```rust
-let usage = match check_usage(&state, &org_id).await {
-    Ok(u) => u,
-    Err(e) => {
-        tracing::error!("Failed to check usage: {}", e);
-        return Ok(Self); // Let it through
-    }
-};
-```
-
-This is a product decision, not a technical one. Better to serve a slightly over-limit request than to block everything during a DB hiccup.
+This is a product decision, not a technical one. Better to serve a slightly over-limit request than to block everything during a DB hiccup. I see this in my code: every failure path in the usage limiter returns `Ok(Self)` and lets the request through. Only when usage is confirmed over the limit does it block.
 
 ## Stripe integration
 
-```rust
-use async_stripe::{Client, CreateSubscription, Subscription};
+I used Stripe for billing. Organizations get a Stripe customer record and a subscription. The subscription is tied to a price ID that defines the tier. I store the `subscription_id` on the organization row.
 
-pub async fn create_subscription(
-    customer_id: &str,
-    price_id: &str,
-) -> Result<Subscription, StripeError> {
-    let client = Client::new("sk_live_...");
-    
-    let subscription = CreateSubscription::new()
-        .customer(customer_id)
-        .add_item(CreateSubscriptionItems {
-            price: price_id.to_string(),
-            ..Default::default()
-        });
-    
-    Subscription::create(&client, subscription).await
-}
-```
-
-Stripe handles billing. We store the `subscription_id` on the organization. Webhooks update the tier when payment succeeds or fails.
+Stripe handles payments. I handle counting. Webhooks update the tier when payment succeeds or fails.
 
 ## What I learned
 

@@ -2,7 +2,7 @@
 title: Why exposing API keys in the frontend killed the project
 author: Christos Paschalidis
 date: 2023-12-01
-excerpt: I shipped a chat SDK that required users to paste their API key in React props. It took me two weeks to realize why this was wrong. Then I shut it down.
+excerpt: "I shipped a chat SDK that required users to paste their API key in React props. It took me two weeks to realize why this was wrong. Then I shut it down."
 ---
 
 # Why exposing API keys in the frontend killed the project
@@ -83,7 +83,7 @@ Then I got the bill.
 
 ## Why the project died
 
-DigitalOcean Kubernetes: $120 per month. Managed PostgreSQL: $60 per month. Managed Redis: $40 per month. Domain, registry, load balancer. $250 per month for a side project with zero users.
+DigitalOcean Kubernetes: $120 per month. Managed PostgreSQL: $60 per month. Managed Redis: $40 per month. Domain, registry, load balancer. $150 per month for a side project with zero users.
 
 I could have run it cheaper. Docker Compose on a single droplet. Self-hosted Postgres. Self-hosted Redis. But I wanted to learn Kubernetes. I wanted to do it "the right way." The right way was expensive.
 
@@ -97,4 +97,4 @@ I should have thought about auth before I wrote the first line of the SDK. Not a
 
 Public/private key pairs are the answer. Secret stays on the backend. Public key goes everywhere. Signature proves the request is real. No proxy, no token server, no expiration logic.
 
-And $250 a month is stupid for a learning project. Next time: one VPS, Docker Compose, $20 budget. Done.
+And $150 a month is stupid for a learning project. Next time: one VPS, Docker Compose, $20 budget. Done.

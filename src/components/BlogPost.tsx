@@ -2,6 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { getPostBySlug } from '../blog/loader';
 import { ArrowLeft, ArrowUp, Clock } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
+import mermaid from 'mermaid';
 
 function estimateReadingTime(html: string): number {
   const wordsPerMinute = 200;
@@ -37,6 +38,36 @@ export function BlogPost() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (post && post.html.includes('mermaid')) {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          primaryColor: '#1a1a2e',
+          primaryTextColor: '#e0e0e0',
+          primaryBorderColor: '#4a4a6a',
+          lineColor: '#6a6a8a',
+          secondaryColor: '#16213e',
+          tertiaryColor: '#0f3460',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+          fontSize: '14px',
+        },
+        flowchart: {
+          useMaxWidth: true,
+          htmlLabels: true,
+          curve: 'basis',
+        },
+        sequence: {
+          useMaxWidth: true,
+        },
+      });
+      mermaid.run({
+        querySelector: '.mermaid',
+      });
+    }
+  }, [post]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
