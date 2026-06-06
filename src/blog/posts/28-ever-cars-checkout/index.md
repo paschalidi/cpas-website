@@ -7,9 +7,9 @@ excerpt: "We benchmarked Carvana, Tesla, and Carla. Then we built a checkout flo
 
 # Designing a checkout flow: what we stole from Carvana, Tesla, and a Swedish EV startup
 
-We were rebranding an electrical vehicle platform. The old checkout was a contact form. Name, email, phone number, "we will get back to you." It converted at roughly zero.
+We were rebranding an electrical vehicle platform. The old checkout was a contact form. Name, email, phone number, "we will get back to you." It converted badly. We did not know the exact number — the analytics were broken or non-existent — but we knew it was low because the sales team was manually calling every lead and most of them were not serious.
 
-I led the redesign end-to-end. I worked with our designer. We looked at every EV checkout flow we could find. Carvana in the US. Tesla's direct buy. And Carla, a Swedish startup that had figured out something interesting: they let you buy a used EV entirely online, with home delivery in 72 hours.
+I led the redesign as tech lead. I worked with our designer, another frontend engineer, and occasionally the CTO and CEO who advised on direction. The team was small. We moved fast. Everyone was hyped to build the best experience.
 
 ## What we stole
 
@@ -29,7 +29,7 @@ Step 3: Address and delivery. User enters their address. We calculate delivery c
 
 Step 4: Identity verification. We integrated Persona. Document + selfie check. The user completes it in under two minutes. We get a verified identity record. This was for compliance and fraud prevention — you cannot sell a $40,000 vehicle to an anonymous email address.
 
-Step 5: Insurance. Three tiers: basic liability, comprehensive, premium with zero deductible. Prices calculated in real-time based on vehicle value, user age, and location. Users could skip this step.
+Step 5: Insurance. Three tiers: basic liability, comprehensive, premium with zero deductible. Prices were not calculated in real-time — we used a lookup table based on vehicle value and user-provided age. Simple, fast, and accurate enough. Users could skip this step.
 
 Step 6: Submit. The user has reserved the vehicle, verified their identity, and optionally chosen insurance. Their information goes to a human agent.
 
@@ -41,17 +41,21 @@ Humans closed the sale. Not a chatbot. Not a form. A person who could say "yes, 
 
 We debated whether to collect payment online. Stripe was integrated. We could have charged the full amount or a deposit.
 
-We chose not to.
-
-The average transaction was $35,000. Nobody buys a $35,000 car without asking questions. Forcing online payment would have reduced conversions to the people who already knew they wanted the car — a tiny subset. Letting the agent handle payment meant we captured everyone who was interested but not yet certain.
+The CEO and CTO decided not to. The average transaction was roughly $35,000. Nobody buys a $35,000 car without asking questions. Forcing online payment would have reduced conversions to the people who already knew they wanted the car — a tiny subset. Letting the agent handle payment meant we captured everyone who was interested but not yet certain.
 
 The trade-off: we needed a call center. We needed trained agents. We needed phone infrastructure. But the conversion rate justified it. The online flow captured intent. The human closed the deal.
 
 ## What we got wrong
 
-We initially included a trade-in estimator in the flow. Enter your VIN, get an instant estimate. It added complexity — vehicle condition, mileage, photos. It slowed down the checkout. Users who were not trading in had to skip it. Users who were trading in got a number that our agents often had to revise downward.
+The CTO initially included a trade-in estimator in the flow. Enter your VIN, get an instant estimate. It added complexity — vehicle condition, mileage, photos. It slowed down the checkout. Users who were not trading in had to skip it. Users who were trading in got a number that our agents often had to revise downward.
 
-We removed it. Trade-in became a separate feature, not part of checkout. The checkout flow got faster. Conversions went up.
+We removed it. Trade-in became a separate feature, not part of checkout. Instead of trade-in, we later built a marketplace where users could sell and buy vehicles from each other. The checkout flow got faster. Conversions went up.
+
+## The numbers
+
+I do not have the exact conversion rates. The analytics were not reliable when we started. But after the redesign, the checkout converted significantly better — we also had a stronger sales team and more marketing budget, so it was not just the flow. The combination of a better checkout, more traffic, and trained agents made the difference.
+
+What I know: the reservation step alone changed the psychology. Users went from "I am browsing" to "I am holding this car for 24 hours." That commitment was worth more than any feature we added.
 
 ## What I learned
 
