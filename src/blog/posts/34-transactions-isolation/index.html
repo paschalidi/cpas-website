@@ -100,16 +100,21 @@ h2{
 .t-bug{color:var(--rose)}
 .t-fix{color:var(--teal)}
 .t-tool{color:var(--amber)}
-h3{font-family:'Fraunces',serif;font-weight:600;font-size:1.5rem;color:var(--paper);letter-spacing:-.01em}
+h3{font-family:'Fraunces',serif;font-weight:600;font-size:1.5rem;color:var(--paper);letter-spacing:-.01em;margin:0}
+.card h3{margin:0}
+h4{margin:0}
+p{margin:0}
+ul,ol{margin:0;padding:0}
+code{font-family:'Spline Sans Mono',monospace}
 .aka{font-family:'Spline Sans Mono',monospace;font-size:.76rem;color:var(--muted);margin-top:3px}
-.desc{margin-top:14px;color:var(--cream-dim);max-width:62ch}
+.desc{margin-top:14px;color:var(--cream-dim);max-width:62ch;line-height:1.6}
 
 /* ---------- Transaction stage (the animation canvas) ---------- */
 .stage{
   margin-top:24px;background:#0c0c0b;border:1px solid var(--line);border-radius:12px;
   padding:22px 20px 18px;position:relative;
 }
-.tracks{display:grid;grid-template-columns:1fr 56px 1fr;gap:0;align-items:stretch}
+.tracks{display:grid;grid-template-columns:1fr 80px 1fr;gap:0;align-items:stretch}
 .track{position:relative;min-height:248px}
 .track-label{
   font-family:'Spline Sans Mono',monospace;font-size:.74rem;letter-spacing:.05em;
@@ -127,7 +132,8 @@ h3{font-family:'Fraunces',serif;font-weight:600;font-size:1.5rem;color:var(--pap
 }
 .db{
   position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:46px;height:58px;border:2px solid var(--line);border-radius:8px;
+  min-width:70px;padding:8px 12px;height:58px;
+  border:2px solid var(--line);border-radius:8px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:var(--slate-2);transition:.4s;
 }
@@ -234,7 +240,8 @@ tr:last-child td{border-bottom:none}
 .scard:hover{border-color:var(--amber-deep);transform:translateY(-3px)}
 .scard h4{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--paper);margin-bottom:4px;display:flex;align-items:center;gap:9px}
 .scard .ic{font-family:'Spline Sans Mono',monospace;color:var(--amber);font-size:.95rem}
-.scard p{color:var(--cream-dim);font-size:.92rem;margin-top:8px}
+.scard p{color:var(--cream-dim);font-size:.92rem;margin-top:8px;line-height:1.55}
+.scol p{font-size:.9rem;color:var(--cream-dim);line-height:1.55}
 .scard code{
   font-family:'Spline Sans Mono',monospace;font-size:.78rem;background:#0c0c0b;
   border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--teal);
@@ -256,8 +263,9 @@ tr:last-child td{border-bottom:none}
 
 /* footer */
 footer{padding:60px 0 80px;border-top:1px solid var(--line);margin-top:40px}
-.foot-note{color:var(--muted);font-size:.86rem;max-width:640px}
+.foot-note{color:var(--muted);font-size:.86rem;max-width:640px;line-height:1.65}
 .foot-note b{color:var(--cream-dim)}
+.foot-note code{font-family:'Spline Sans Mono',monospace;color:var(--teal)}
 
 /* TOC nav */
 .toc{

@@ -167,7 +167,10 @@ export function BlogPost() {
 
         {/* Content */}
         <div
-          className="blog-content prose prose-invert max-w-none
+          className={
+            post.styles
+              ? 'blog-content-html'
+              : `blog-content prose prose-invert max-w-none
             prose-headings:font-normal prose-headings:tracking-tight prose-headings:text-blog-text
             prose-h1:text-3xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:leading-tight
             prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-14 prose-h2:leading-tight prose-h2:border-b prose-h2:border-blog-border/10 prose-h2:pb-3
@@ -184,8 +187,8 @@ export function BlogPost() {
             prose-ol:my-6 prose-ol:pl-5
             prose-li:text-blog-muted/60 prose-li:mb-3 prose-li:leading-relaxed
             prose-li:marker:text-blog-accent/60
-            prose-hr:border-blog-border/10 prose-hr:my-12
-          "
+            prose-hr:border-blog-border/10 prose-hr:my-12`
+          }
         >
           {post.styles && <style>{post.styles}</style>}
           <div ref={contentRef} dangerouslySetInnerHTML={{ __html: post.html }} />
