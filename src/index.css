@@ -26,7 +26,7 @@ body {
     --color-cream-50: 248 247 244;
 
     --color-blog-background: var(--color-forest-950);
-    --color-blog-surface: var(--color-forest-900);
+    --color-blog-surface: var(--color-forest-950);
     --color-blog-border: var(--color-cream-50);
     --color-blog-text: var(--color-cream-50);
     --color-blog-muted: var(--color-cream-50);
