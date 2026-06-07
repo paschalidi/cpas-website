@@ -18,7 +18,6 @@ const rootDir = process.cwd();
 const postsDir = path.join(rootDir, 'src/blog/posts');
 const outputPath = path.join(rootDir, 'src/blog/posts.json');
 const publicImagesDir = path.join(rootDir, 'public/blog/images');
-const publicHtmlDir = path.join(rootDir, 'public/blog/html');
 
 function findPostFiles() {
   return fs
@@ -36,7 +35,6 @@ function normalizeDate(date) {
   if (date instanceof Date) {
     return date.toISOString().slice(0, 10);
   }
-
   return String(date ?? '');
 }
 
@@ -45,22 +43,57 @@ function copyPostImages(slug) {
   if (!fs.existsSync(sourceImagesDir)) {
     return;
   }
-
   const targetImagesDir = path.join(publicImagesDir, slug);
   fs.mkdirSync(targetImagesDir, { recursive: true });
   fs.cpSync(sourceImagesDir, targetImagesDir, { recursive: true });
 }
 
-function copyPostHtml(slug) {
-  const sourceHtml = path.join(postsDir, slug, 'index.html');
-  if (!fs.existsSync(sourceHtml)) {
-    return false;
+/**
+ * Parse a standalone HTML post: extract inline styles and body content,
+ * stripping the page shell (<nav class="toc">, <header>) so only the
+ * interactive sections remain.
+ */
+function parseHtmlPost(slug) {
+  const htmlPath = path.join(postsDir, slug, 'index.html');
+  if (!fs.existsSync(htmlPath)) {
+    return null;
   }
 
-  const targetDir = path.join(publicHtmlDir, slug);
-  fs.mkdirSync(targetDir, { recursive: true });
-  fs.copyFileSync(sourceHtml, path.join(targetDir, 'index.html'));
-  return true;
+  const raw = fs.readFileSync(htmlPath, 'utf8');
+
+  // Extract all <style> blocks from <head>
+  const styleRegex = /<style[^>]*>([\s\S]*?)<\/style>/g;
+  let styleMatch;
+  const styleBlocks = [];
+  while ((styleMatch = styleRegex.exec(raw)) !== null) {
+    styleBlocks.push(styleMatch[1]);
+  }
+  const rawStyles = styleBlocks.join('\n');
+
+  // Filter out selectors that target the page shell (body, html, universal)
+  const filteredStyles = rawStyles
+    .replace(/\*\{[^}]*\}/g, '')
+    .replace(/html\{[^}]*\}/g, '')
+    .replace(/body(::?[a-z-]*)?\{[^}]*\}/g, '');
+
+  // Extract everything inside <body> … </body>
+  const bodyMatch = raw.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  if (!bodyMatch) {
+    return null;
+  }
+
+  let bodyHtml = bodyMatch[1];
+
+  // Remove the TOC nav (floating sidebar — not needed inline)
+  bodyHtml = bodyHtml.replace(/<nav[^>]*class="toc"[^>]*>[\s\S]*?<\/nav>/i, '');
+
+  // Remove the <header> (title/kicker — BlogPost.tsx handles that)
+  bodyHtml = bodyHtml.replace(/<header[^>]*>[\s\S]*?<\/header>/i, '');
+
+  return {
+    html: bodyHtml.trim(),
+    styles: filteredStyles.trim(),
+  };
 }
 
 function buildPost(filePath) {
@@ -73,18 +106,23 @@ function buildPost(filePath) {
   }
 
   copyPostImages(slug);
-  const hasHtml = copyPostHtml(slug);
+  const htmlPost = parseHtmlPost(slug);
 
-  return {
+  const post = {
     slug,
     title: String(data.title),
     author: String(data.author ?? 'Christos Paschalidis'),
     date: normalizeDate(data.date),
     ...(data.hero ? { hero: String(data.hero) } : {}),
     excerpt: String(data.excerpt ?? ''),
-    ...(hasHtml ? { htmlPage: true } : {}),
-    html: marked.parse(content),
+    html: htmlPost ? htmlPost.html : marked.parse(content),
   };
+
+  if (htmlPost && htmlPost.styles) {
+    post.styles = htmlPost.styles;
+  }
+
+  return post;
 }
 
 function sortByNewest(posts) {

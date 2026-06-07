@@ -8,7 +8,7 @@ export interface BlogPost {
   hero?: string;
   excerpt: string;
   html: string;
-  htmlPage?: boolean;
+  styles?: string;
 }
 
 export const allPosts: BlogPost[] = postsData as BlogPost[];
