@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How We Route Events Between Services — A Pub/Sub Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Spline+Sans+Mono:wght@400;500;600&family=Spline+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#10100f;
+  --slate:#161614;
+  --slate-2:#1e1e1b;
+  --line:#322f29;
+  --cream:#ece4d3;
+  --cream-dim:#b6ad9a;
+  --muted:#7c766a;
+  --paper:#f3ecdc;
+  --amber:#e8a33d;
+  --amber-deep:#b9791f;
+  --amber-glow:rgba(232,163,61,.15);
+  --teal:#4cc4a0;
+  --teal-deep:#1f8d6e;
+  --teal-glow:rgba(76,196,160,.15);
+  --rose:#e8654f;
+  --rose-deep:#b23b29;
+  --blue:#6fa8e0;
+  --blue-deep:#3a73b0;
+  --blue-glow:rgba(111,168,224,.15);
+  --violet:#a78bd6;
+  --r:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--cream);
+  font-family:'Spline Sans',sans-serif;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(1200px 600px at 80% -5%, rgba(232,163,61,.08), transparent 60%),
+    radial-gradient(900px 500px at 10% 15%, rgba(76,196,160,.05), transparent 55%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.02;
+  background-image:radial-gradient(var(--cream) 1px, transparent 1px);
+  background-size:4px 4px;
+}
+.wrap{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 24px}
+
+/* ---------- HERO ---------- */
+.hero{padding:88px 0 30px}
+.badge{
+  display:inline-flex;align-items:center;gap:9px;font-family:'Spline Sans Mono',monospace;
+  font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);
+  border:1px solid var(--line);border-radius:100px;padding:7px 15px;margin-bottom:28px;
+}
+.badge .live{width:7px;height:7px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 0 var(--amber);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(232,163,61,.6)}70%{box-shadow:0 0 0 8px rgba(232,163,61,0)}100%{box-shadow:0 0 0 0 rgba(232,163,61,0)}}
+h1{
+  font-family:'Fraunces',serif;font-weight:900;font-size:clamp(2.6rem,6.5vw,5rem);
+  line-height:1;letter-spacing:-.03em;color:var(--paper);
+}
+h1 .em{background:linear-gradient(100deg,var(--amber),var(--teal));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{margin-top:24px;max-width:660px;font-size:1.12rem;color:var(--cream-dim)}
+.repo-tags{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap}
+.repo-tag{
+  font-family:'Spline Sans Mono',monospace;font-size:.76rem;color:var(--cream);
+  background:var(--slate);border:1px solid var(--line);border-radius:8px;padding:9px 14px;
+  display:flex;align-items:center;gap:9px;
+}
+.repo-tag b{color:var(--teal)}
+.repo-tag .ico{width:8px;height:8px;border-radius:2px}
+
+/* ---------- PIPELINE (the centerpiece) ---------- */
+.pipeline-wrap{margin:40px 0 20px}
+.stage-board{
+  background:linear-gradient(180deg,var(--slate),var(--ink));
+  border:1px solid var(--line);border-radius:18px;padding:30px 26px 24px;
+  position:relative;overflow:hidden;
+}
+.board-label{
+  position:absolute;top:14px;right:18px;font-family:'Spline Sans Mono',monospace;
+  font-size:.64rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;
+}
+svg.pipe{width:100%;height:auto;display:block;overflow:visible}
+
+/* node styling inside svg via classes */
+.n-box{fill:var(--slate-2);stroke:var(--line);stroke-width:1.5;transition:.3s}
+.n-box.active{stroke:var(--amber);filter:drop-shadow(0 0 10px rgba(232,163,61,.5))}
+.n-box.done{stroke:var(--teal-deep)}
+.n-title{fill:var(--paper);font-family:'Fraunces',serif;font-weight:600;font-size:14px}
+.n-sub{fill:var(--muted);font-family:'Spline Sans Mono',monospace;font-size:9.5px;letter-spacing:.04em}
+.n-zone{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:5 5;rx:14}
+.zone-label{fill:var(--muted);font-family:'Spline Sans Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase}
+.flow-line{fill:none;stroke:var(--line);stroke-width:2}
+.flow-line.lit{stroke:var(--amber);filter:drop-shadow(0 0 5px rgba(232,163,61,.6))}
+.pkt{fill:var(--amber);filter:drop-shadow(0 0 8px rgba(232,163,61,.9))}
+.pkt-ring{fill:none;stroke:var(--teal);stroke-width:1.5;opacity:.7}
+
+/* caption that narrates the current stage */
+.narrator{
+  margin-top:22px;min-height:80px;background:linear-gradient(180deg,var(--slate),var(--ink));
+  border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;
+  display:flex;gap:16px;align-items:flex-start;
+}
+.narrator .step-num{
+  font-family:'Spline Sans Mono',monospace;font-size:.8rem;font-weight:700;color:var(--ink);
+  background:var(--amber);border-radius:7px;padding:5px 10px;flex:none;letter-spacing:.05em;
+}
+.narrator .step-num.idle{background:var(--line);color:var(--muted)}
+.narrator h4{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--paper);margin-bottom:3px;font-weight:600}
+.narrator p{font-size:.92rem;color:var(--cream-dim)}
+.narrator code{font-family:'Spline Sans Mono',monospace;font-size:.82rem;color:var(--teal);background:var(--slate-2);padding:1px 6px;border-radius:5px}
+
+/* controls */
+.controls{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
+.btn{
+  font-family:'Spline Sans Mono',monospace;font-size:.78rem;letter-spacing:.04em;
+  padding:10px 18px;border-radius:100px;border:1px solid var(--line);
+  background:var(--slate-2);color:var(--cream);cursor:pointer;transition:.2s;
+  display:flex;align-items:center;gap:8px;
+}
+.btn:hover{border-color:var(--amber);color:var(--paper);background:#26241f}
+.btn.play{border-color:var(--amber-deep);color:var(--amber)}
+.btn:active{transform:scale(.97)}
+.progress{flex:1;min-width:120px;height:4px;background:var(--line);border-radius:100px;overflow:hidden}
+.progress > span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--teal));transition:width .3s linear}
+.step-count{font-family:'Spline Sans Mono',monospace;font-size:.72rem;color:var(--muted);white-space:nowrap}
+
+/* ---------- SECTIONS ---------- */
+section{padding:50px 0;position:relative}
+.eyebrow{font-family:'Spline Sans Mono',monospace;font-size:.7rem;letter-spacing:.26em;text-transform:uppercase;color:var(--teal);margin-bottom:13px}
+h2{font-family:'Fraunces',serif;font-weight:700;font-size:clamp(1.8rem,4vw,2.6rem);color:var(--paper);letter-spacing:-.02em;margin-bottom:10px}
+.lede{max-width:680px;color:var(--cream-dim);font-size:1.05rem}
+
+/* three acts */
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-top:32px}
+.act{
+  background:linear-gradient(180deg,var(--slate),var(--ink));border:1px solid var(--line);
+  border-radius:14px;padding:26px;position:relative;overflow:hidden;transition:.25s;
+}
+.act:hover{border-color:var(--line);transform:translateY(-3px)}
+.act-num{font-family:'Spline Sans Mono',monospace;font-size:.72rem;letter-spacing:.2em;color:var(--amber);margin-bottom:14px}
+.act h3{font-family:'Fraunces',serif;font-size:1.3rem;color:var(--paper);margin-bottom:10px;font-weight:600}
+.act p{font-size:.92rem;color:var(--cream-dim)}
+.act .mini-stage{height:90px;margin-top:18px;border-radius:10px;background:var(--ink);border:1px solid var(--line);position:relative;overflow:hidden}
+.act code{font-family:'Spline Sans Mono',monospace;font-size:.78rem;color:var(--teal)}
+
+/* split-brain repo diagram */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:32px}
+@media(max-width:680px){.split{grid-template-columns:1fr}}
+.repo-card{background:linear-gradient(180deg,var(--slate),var(--ink));border:1px solid var(--line);border-radius:14px;padding:26px;border-top:3px solid}
+.repo-card.mono{border-top-color:var(--teal)}
+.repo-card.infra{border-top-color:var(--amber)}
+.repo-card .rtype{font-family:'Spline Sans Mono',monospace;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.repo-card h3{font-family:'Spline Sans Mono',monospace;font-size:1.15rem;color:var(--paper);margin-bottom:6px}
+.repo-card .role{font-size:.92rem;color:var(--cream-dim);margin-bottom:14px}
+.repo-card ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.repo-card li{font-size:.86rem;color:var(--cream);padding-left:18px;position:relative}
+.repo-card li::before{content:"▸";position:absolute;left:0;color:var(--teal)}
+.repo-card code{font-family:'Spline Sans Mono',monospace;font-size:.8rem;color:var(--amber)}
+
+/* files table */
+.files{margin-top:30px;border:1px solid var(--line);border-radius:12px;overflow:hidden;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:540px}
+th,td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);font-size:.88rem}
+th{font-family:'Spline Sans Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--slate)}
+td:first-child{font-family:'Spline Sans Mono',monospace;font-size:.8rem;color:var(--teal)}
+td{color:var(--cream-dim)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(76,196,160,.03)}
+
+/* step list (walkthrough) */
+.steps{list-style:none;padding:0;margin:0}
+.steps li{counter-increment:step;padding:14px 0 14px 46px;position:relative;border-bottom:1px solid var(--line);color:var(--cream-dim);font-size:.92rem;line-height:1.6}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(step);position:absolute;left:0;top:14px;width:28px;height:28px;border-radius:7px;background:var(--slate-2);border:1px solid var(--line);color:var(--amber);font-family:'Spline Sans Mono',monospace;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.steps li strong{color:var(--paper)}
+.steps li code{font-family:'Spline Sans Mono',monospace;font-size:.82rem;color:var(--teal);background:var(--slate-2);padding:1px 6px;border-radius:5px}
+.steps{ counter-reset: step; }
+
+/* code blocks */
+.code-block{
+  background:#0c0c0b;border:1px solid var(--line);border-radius:12px;
+  padding:20px 22px;margin-top:20px;overflow-x:auto;
+  font-family:'Spline Sans Mono',monospace;font-size:.82rem;line-height:1.6;
+  color:var(--cream-dim);
+  white-space:pre;
+}
+.code-block .kw{color:var(--violet)}
+.code-block .cls{color:var(--amber)}
+.code-block .fn{color:var(--teal)}
+.code-block .str{color:var(--rose)}
+.code-block .cm{color:var(--muted);font-style:italic}
+.code-block .num{color:var(--blue)}
+
+/* debugging tips */
+.tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:30px}
+.tip{background:var(--slate);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:0 12px 12px 0;padding:20px}
+.tip h4{font-family:'Fraunces',serif;font-size:1rem;color:var(--paper);margin-bottom:8px;font-weight:600}
+.tip p{font-size:.86rem;color:var(--cream-dim)}
+.tip code{font-family:'Spline Sans Mono',monospace;font-size:.78rem;color:var(--teal)}
+
+/* yaml preview */
+.yaml-preview{
+  background:var(--slate);border:1px solid var(--line);border-radius:12px;
+  padding:20px;font-family:'Spline Sans Mono',monospace;font-size:.78rem;
+  line-height:1.7;color:var(--cream-dim);margin-top:20px;white-space:pre;
+}
+.yaml-preview .y-key{color:var(--teal)}
+.yaml-preview .y-val{color:var(--amber)}
+.yaml-preview .y-str{color:var(--rose)}
+.yaml-preview .y-punct{color:var(--muted)}
+.yaml-preview .y-num{color:var(--blue)}
+
+/* verdict */
+.verdict{
+  margin-top:18px;padding:13px 16px;border-radius:10px;font-size:.92rem;
+  display:flex;gap:11px;align-items:flex-start;opacity:0;transform:translateY(6px);
+  transition:.45s;font-family:'Spline Sans',sans-serif;
+}
+.verdict.show{opacity:1;transform:translateY(0)}
+.verdict.good{background:rgba(76,196,160,.10);border:1px solid var(--teal-deep);color:#a7e6d2}
+.verdict .vi{font-family:'Spline Sans Mono',monospace;font-weight:600;flex:none}
+
+/* cards */
+.card{
+  background:linear-gradient(180deg,var(--slate),var(--ink));
+  border:1px solid var(--line);border-radius:var(--r);
+  padding:30px;margin-top:30px;position:relative;overflow:hidden;
+}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.tag{
+  font-family:'Spline Sans Mono',monospace;font-size:.66rem;letter-spacing:.2em;
+  text-transform:uppercase;padding:5px 11px;border-radius:100px;white-space:nowrap;
+  border:1px solid currentColor;
+}
+.t-stage{color:var(--teal)}
+.t-pattern{color:var(--amber)}
+.t-trade{color:var(--rose)}
+.t-fix{color:var(--blue)}
+h3{font-family:'Fraunces',serif;font-weight:600;font-size:1.5rem;color:var(--paper);letter-spacing:-.01em;margin:0}
+.card h3{margin:0}
+h4{margin:0;font-family:'Fraunces',serif;font-weight:600;font-size:1.25rem;color:var(--paper);margin-bottom:6px}
+.desc{margin-top:14px;color:var(--cream-dim);max-width:62ch;line-height:1.6}
+.aka{font-family:'Spline Sans Mono',monospace;font-size:.76rem;color:var(--muted);margin-top:3px}
+
+/* sgrid */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-top:30px}
+.scol{
+  background:var(--slate);border:1px solid var(--line);border-radius:12px;padding:24px;
+  border-top:3px solid;transition:.25s;position:relative;overflow:hidden;
+}
+.scol:hover{transform:translateY(-3px)}
+.scol.s1{border-top-color:var(--teal)}
+.scol.s2{border-top-color:var(--amber)}
+.scol.s3{border-top-color:var(--rose)}
+.scol.s4{border-top-color:var(--blue)}
+.scol p{font-size:.92rem;color:var(--cream-dim);margin-top:8px;line-height:1.55}
+.scol .tradeoff{margin-top:14px;font-size:.82rem;padding-top:12px;border-top:1px solid var(--line);color:var(--cream-dim)}
+.scol .tradeoff b{color:var(--amber);font-family:'Spline Sans Mono',monospace;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:3px}
+
+/* footer */
+footer{padding:50px 0 80px;border-top:1px solid var(--line);margin-top:40px}
+.foot-note{color:var(--muted);font-size:.86rem;max-width:680px}
+.foot-note b{color:var(--cream-dim)}
+.foot-note code{font-family:'Spline Sans Mono',monospace;color:var(--teal)}
+
+/* TOC nav */
+.toc{
+  position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:50;
+  display:flex;flex-direction:column;gap:11px;
+}
+.toc a{
+  width:11px;height:11px;border-radius:50%;border:1px solid var(--muted);
+  background:transparent;transition:.2s;position:relative;
+}
+.toc a:hover,.toc a.active{background:var(--amber);border-color:var(--amber);transform:scale(1.3)}
+.toc a span{
+  position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;
+  font-family:'Spline Sans Mono',monospace;font-size:.66rem;color:var(--cream-dim);
+  background:var(--slate-2);padding:4px 9px;border-radius:6px;border:1px solid var(--line);
+  opacity:0;pointer-events:none;transition:.2s;
+}
+.toc a:hover span{opacity:1}
+@media(max-width:900px){.toc{display:none}}
+@media(max-width:560px){header{padding:54px 0 20px}.stage-board{padding:20px 14px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.001s!important;transition-duration:.001s!important}}
+</style>
+</head>
+<body>
+
+<nav class="toc" aria-label="Section navigation">
+  <a href="#top"><span>Top</span></a>
+  <a href="#publish"><span>Publish</span></a>
+  <a href="#route"><span>Route</span></a>
+  <a href="#receive"><span>Receive</span></a>
+  <a href="#tradeoffs"><span>Tradeoffs</span></a>
+</nav>
+
+<div class="wrap" id="top">
+
+<!-- ============ THE LIVE PIPELINE ============ -->
+<div class="pipeline-wrap">
+  <div class="stage-board">
+    <div class="board-label">// event flow monitor</div>
+    <svg class="pipe" viewBox="0 0 980 440" xmlns="http://www.w3.org/2000/svg" aria-label="Animated event pipeline">
+      <!-- ZONES -->
+      <rect class="n-zone" x="20" y="60" width="300" height="230" rx="14"/>
+      <text class="zone-label" x="34" y="80">App · publish side</text>
+
+      <rect class="n-zone" x="392" y="120" width="196" height="110" rx="14"/>
+      <text class="zone-label" x="406" y="140">Google Cloud</text>
+
+      <rect class="n-zone" x="660" y="60" width="300" height="320" rx="14"/>
+      <text class="zone-label" x="674" y="80">App · receive side</text>
+
+      <!-- FLOW LINES (drawn first, behind nodes) -->
+      <path id="l1" class="flow-line" d="M 170 175 L 170 215"/>
+      <path id="l2" class="flow-line" d="M 170 270 L 170 305 L 170 305"/>
+      <path id="l3" class="flow-line" d="M 250 330 L 460 330 L 460 232"/>
+      <path id="l4" class="flow-line" d="M 490 175 L 490 120 L 810 120 L 810 150"/>
+      <path id="l5" class="flow-line" d="M 810 205 L 810 245"/>
+      <path id="l6" class="flow-line" d="M 810 300 L 810 335"/>
+
+      <!-- NODES: publish side -->
+      <g id="n-app">
+        <rect class="n-box" x="60" y="120" width="220" height="55" rx="10"/>
+        <text class="n-title" x="80" y="145">App code</text>
+        <text class="n-sub" x="80" y="162">"appointment created"</text>
+      </g>
+      <g id="n-proc">
+        <rect class="n-box" x="60" y="215" width="220" height="55" rx="10"/>
+        <text class="n-title" x="80" y="240">Task queue</text>
+        <text class="n-sub" x="80" y="257">event_publish.py · deferred</text>
+      </g>
+      <g id="n-es">
+        <rect class="n-box" x="60" y="305" width="220" height="50" rx="10"/>
+        <text class="n-title" x="80" y="328">events-system</text>
+        <text class="n-sub" x="80" y="344">wraps Pub/Sub publish()</text>
+      </g>
+
+      <!-- NODE: pubsub -->
+      <g id="n-pubsub">
+        <rect class="n-box" x="410" y="150" width="160" height="58" rx="10"/>
+        <text class="n-title" x="430" y="175">Pub/Sub</text>
+        <text class="n-sub" x="430" y="193">topic · push subscription</text>
+      </g>
+
+      <!-- routing registry callout -->
+      <g id="n-yml">
+        <rect class="n-box" x="392" y="270" width="196" height="50" rx="10" style="stroke:var(--amber-deep)"/>
+        <text class="n-title" x="412" y="293" style="fill:var(--amber)">events.yml</text>
+        <text class="n-sub" x="412" y="309">routing registry · infra repo</text>
+      </g>
+      <path class="flow-line" d="M 490 270 L 490 232" style="stroke:var(--amber-deep);stroke-dasharray:4 4"/>
+
+      <!-- NODES: receive side -->
+      <g id="n-endpoint">
+        <rect class="n-box" x="700" y="150" width="220" height="55" rx="10"/>
+        <text class="n-title" x="720" y="175">Ninja endpoint</text>
+        <text class="n-sub" x="720" y="192">/events/&lt;topic&gt;/</text>
+      </g>
+      <g id="n-handler">
+        <rect class="n-box" x="700" y="245" width="220" height="55" rx="10"/>
+        <text class="n-title" x="720" y="270">@event_handler</text>
+        <text class="n-sub" x="720" y="287">verify JWT · deserialize</text>
+      </g>
+      <g id="n-processor">
+        <rect class="n-box" x="700" y="335" width="220" height="45" rx="10"/>
+        <text class="n-title" x="720" y="362">EventProcessor → domain</text>
+      </g>
+
+      <!-- the travelling packet -->
+      <g id="packet" opacity="0">
+        <circle class="pkt-ring" r="11"/>
+        <circle class="pkt" r="5"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="narrator" id="narrator">
+    <span class="step-num idle" id="stepnum">—</span>
+    <div>
+      <h4 id="narr-title">Ready when you are</h4>
+      <p id="narr-body">Hit <b>Play the journey</b> to watch an event travel from the moment it's emitted, through the async queue and Pub/Sub, all the way to the domain handler that acts on it.</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn play" id="play">▶ Play the journey</button>
+    <button class="btn" id="step">Step ›</button>
+    <button class="btn" id="reset">↺ Reset</button>
+    <div class="progress"><span id="prog"></span></div>
+    <div class="step-count" id="count">0 / 8</div>
+  </div>
+</div>
+
+<!-- ============ WHY ============ -->
+<section id="publish">
+  <div class="eyebrow">The idea</div>
+  <h2>Announce a fact. Walk away.</h2>
+  <p class="lede">Something happens — an appointment is created, a customer is updated. The code that triggered it does <em>not</em> call the next service. It does not wait for a response. It publishes a fact to a <strong>topic</strong>, and any service with a <strong>subscription</strong> receives a copy — independently, asynchronously, without the publisher knowing who they are.</p>
+  <p class="lede" style="margin-top:12px">This gives you three kinds of decoupling. <strong>Temporal</strong>: the consumer does not need to be running when the event is published — Pub/Sub holds it until they are ready. <strong>Spatial</strong>: the publisher does not know the consumer's address or even its existence — the broker handles that. <strong>Flow</strong>: the HTTP request is not blocked by downstream processing — <code>EventPublisher.publish()</code> writes to a queue and returns immediately, so the user gets a response in milliseconds, not seconds. The rest of this article shows how we built each piece.</p>
+</section>
+
+<!-- ============ PUBLISH SECTION ============ -->
+<section>
+  <div class="eyebrow">Stage 1</div>
+  <h2>Publish</h2>
+  <p class="lede">The app emits events. An event is a dataclass: data and topic. The app does not call Pub/Sub directly. It defers to a background job.</p>
+  <div class="divider"></div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h3>EventPublisher</h3>
+        <div class="aka">// core/services/event_publisher/operations.py</div>
+      </div>
+      <div class="tag t-stage">Stage 1</div>
+    </div>
+    <p class="desc">The app wraps an event in a dataclass and passes it to the publisher. The publisher does not touch the network. It serializes the payload and writes to a task queue — Procrastinate, in our case (alternatives include Celery, RQ, or Django Q).</p>
+    <div class="code-block">
+<span class="cm"># An event is just data + topic</span>
+<span class="kw">@dataclass</span>(frozen=True, slots=True)
+<span class="kw">class</span> <span class="cls">Event</span>(Generic[T]):
+<span>    data: T</span>
+<span>    topic: <span class="cls">str</span></span>
+
+<span class="kw">class</span> <span class="cls">EventPublisher</span>:
+<span>    <span class="kw">@classmethod</span></span>
+<span>    <span class="kw">def</span> <span class="fn">publish</span>(cls, event: Event[Any]) -> <span class="cls">None</span>:</span>
+<span>        event_data = json.loads(json.dumps(event.data, cls=EventEncoder))</span>
+<span>        event_publish_task.<span class="fn">defer</span>(event_data=event_data, topic=event.topic)</span>
+    </div>
+    <p class="desc" style="margin-top:16px">The EventEncoder handles UUIDs, dates, enums, nested dataclasses. The <code>defer</code> call is the key: the HTTP request that triggered this event returns immediately. The event ships in the background.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h3>event_publish_task</h3>
+        <div class="aka">// app/task_queue/event_publish.py</div>
+      </div>
+      <div class="tag t-stage">Stage 2</div>
+    </div>
+    <p class="desc">The background task has aggressive retry logic. Twelve attempts. Exponential backoff. It retries for over three days before giving up.</p>
+    <div class="code-block">
+<span class="kw">@app</span>.task(
+<span>    retry=RetryStrategy(max_attempts=<span class="num">12</span>, exponential_wait=<span class="num">3</span>),</span>
+<span>    pass_context=<span class="cls">True</span>,</span>
+<span>)</span>
+<span class="kw">def</span> <span class="fn">event_publish_task</span>(
+<span>    job_context: JobContext, topic: <span class="cls">str</span>, event_data: <span class="cls">dict</span>[<span class="cls">str</span>, Any]</span>
+<span>) -> <span class="cls">None</span>:</span>
+<span>    <span class="kw">try</span>:</span>
+<span>        <span class="fn">publish</span>(topic_id=topic, event_data=event_data)</span>
+<span>    <span class="kw">except</span> <span class="cls">Exception</span> <span class="kw">as</span> e:</span>
+<span>        <span class="fn">log_error_if_exhausted_retries</span>(topic, str(event_data.get(<span class="str">"id"</span>)), job_context, e)</span>
+<span>        <span class="kw">raise</span></span>
+    </div>
+    <p class="desc" style="margin-top:16px">The task calls <code>events_system.django_publisher.publish()</code> — the private PyPI package that wraps the actual Pub/Sub client. The retry policy means a transient outage does not lose the event. The cost is queue pressure.</p>
+  </div>
+</section>
+
+<!-- ============ TWO REPOS ============ -->
+<section id="route">
+  <div class="eyebrow">The split</div>
+  <h2>Two repositories, one contract</h2>
+  <p class="lede">The most important structural fact: the code that publishes an event and the configuration that routes it live in different repositories. This is deliberate — it's also your fastest debugging heuristic.</p>
+  <div class="split">
+    <div class="repo-card mono">
+      <div class="rtype">Application</div>
+      <h3>application</h3>
+      <p class="role">The main application. Where events are born and where they land.</p>
+      <ul>
+        <li>Emits events from app code</li>
+        <li>Receives them on Ninja endpoints</li>
+        <li>Does <b>not</b> decide where events go</li>
+      </ul>
+    </div>
+    <div class="repo-card infra">
+      <div class="rtype">Infrastructure-as-code</div>
+      <h3>infra</h3>
+      <p class="role">Owns the routing contract for the whole system.</p>
+      <ul>
+        <li>Holds <code>events/events.yml</code></li>
+        <li>Declares event names, publishers, subscribers</li>
+        <li>Sets endpoints &amp; retry policies</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h3>events.yml</h3>
+        <div class="aka">// infra/events/events.yml</div>
+      </div>
+      <div class="tag t-pattern">The Contract</div>
+    </div>
+    <p class="desc">This is the canonical routing registry. It declares the event name, who may publish it, and who must receive it. The platform team owns this file.</p>
+    <div class="yaml-preview">
+<span class="y-punct">-</span> <span class="y-key">event</span><span class="y-punct">:</span> <span class="y-str">customer-created</span>
+  <span class="y-key">description</span><span class="y-punct">:</span> <span class="y-str">"A new customer was registered"</span>
+  <span class="y-key">publishers</span><span class="y-punct">:</span> <span class="y-punct">[</span><span class="y-val">auth</span><span class="y-punct">,</span> <span class="y-val">billing</span><span class="y-punct">]</span>
+  <span class="y-key">subscribers</span><span class="y-punct">:</span>
+    <span class="y-punct">-</span> <span class="y-key">name</span><span class="y-punct">:</span> <span class="y-val">orchestrator</span>
+      <span class="y-key">max_attempts</span><span class="y-punct">:</span> <span class="y-num">15</span>
+      <span class="y-key">endpoint</span><span class="y-punct">:</span> <span class="y-str">/events/customer-created/</span>
+    <span class="y-punct">-</span> <span class="y-key">name</span><span class="y-punct">:</span> <span class="y-val">auth</span>
+      <span class="y-key">max_attempts</span><span class="y-punct">:</span> <span class="y-num">10</span>
+      <span class="y-key">endpoint</span><span class="y-punct">:</span> <span class="y-str">/events/customer-created/</span>
+    </div>
+    <p class="desc" style="margin-top:16px">The deployment pipeline reads this file and configures Google Pub/Sub: one topic per event, one push subscription per subscriber, each with its own endpoint and retry policy. When the app publishes, Pub/Sub POSTs the message to every endpoint simultaneously. The app is decoupled from the routing graph.</p>
+  </div>
+</section>
+
+<!-- ============ THREE ACTS ============ -->
+<section id="receive">
+  <div class="eyebrow">The mechanism</div>
+  <h2>Three acts</h2>
+  <p class="lede">Every event lives the same three-act life. Each card animates its own slice of the journey.</p>
+  <div class="acts">
+    <div class="act">
+      <div class="act-num">ACT 01 — PUBLISH</div>
+      <h3>Deferred, not blocking</h3>
+      <p>App code hands the event to a <b>task queue</b> (Procrastinate in our case; Celery, RQ, and Django Q are alternatives) instead of publishing inline, so the HTTP request returns fast. The task then publishes through <code>events-system</code>, the shared wrapper over Pub/Sub. A few call sites publish directly — the exception, not the rule.</p>
+      <div class="mini-stage" data-anim="publish"></div>
+    </div>
+      <div class="act">
+        <div class="act-num">ACT 02 — ROUTE</div>
+        <h3>Config decides destiny</h3>
+        <p>Once in Pub/Sub, the app is out of the picture. <code>events.yml</code> declares who subscribes to what. The deployment tooling reads that file and creates a <b>push subscription</b> for each subscriber. Push means the broker delivers the event by POSTing to an endpoint — the receiver never polls or holds a long-lived connection. The tradeoff: the endpoint must be reachable and reply within 10 seconds, or Pub/Sub retries.</p>
+        <div class="mini-stage" data-anim="route"></div>
+      </div>
+    <div class="act">
+      <div class="act-num">ACT 03 — RECEIVE</div>
+      <h3>Verify, then act</h3>
+      <p>Delivery lands on a Ninja endpoint at <code>/events/&lt;topic&gt;/</code>. The <code>@event_handler</code> decorator verifies the Google JWT and deserializes the payload <i>before</i> any logic runs. Then <code>EventProcessor</code> routes by topic to the right domain handler.</p>
+      <div class="mini-stage" data-anim="receive"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RECEIVE SECTION ============ -->
+<section>
+  <div class="eyebrow">Stage 4</div>
+  <h2>Receive</h2>
+  <p class="lede">The app exposes Ninja endpoints. The <code>@event_handler</code> decorator verifies the JWT and deserializes the payload. Then <code>EventProcessor</code> routes by topic.</p>
+  <p class="lede" style="margin-top:12px">Pub/Sub delivers <strong>at least once</strong>. If the broker does not receive an acknowledgement in time, it sends the event again. That means the same event can arrive twice. Every handler in this system is designed to be <strong>idempotent</strong> — processing the same event twice produces the same result. This is not a bug; it is the contract of at-least-once delivery.</p>
+  <div class="divider"></div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h3>event_receiver</h3>
+        <div class="aka">// core/ninja/views/events.py</div>
+      </div>
+      <div class="tag t-stage">Stage 4</div>
+    </div>
+    <p class="desc">The endpoint is decorated with <code>@event_handler</code> from the events-system package. It verifies the JWT (the request comes from Google Pub/Sub) and deserializes the push payload.</p>
+    <div class="code-block">
+<span class="kw">@router</span>.post(<span class="str">"/<str:topic>/"</span>, auth=<span class="cls">None</span>)
+<span class="kw">@event_handler</span>(
+<span>    audience=CORE_AUDIENCE,</span>
+<span>    schema=EventData,</span>
+<span>)</span>
+<span class="kw">def</span> <span class="fn">event_receiver</span>(
+<span>    _request: HttpRequest,</span>
+<span>    _data: EventData,</span>
+<span>    event: EventIn,</span>
+<span>    path_parameters: <span class="cls">dict</span>[<span class="cls">str</span>, Any],</span>
+<span>) -> <span class="cls">tuple</span>[<span class="cls">int</span>, <span class="cls">None</span>]:</span>
+<span>    core_user = <span class="fn">get_user_by_token</span>(settings.CORE_SERVICE_USER_TOKEN)</span>
+<span>    topic = <span class="cls">str</span>(path_parameters.get(<span class="str">"topic"</span>))</span>
+<span></span>
+<span>    EventProcessor.<span class="fn">process</span>(</span>
+<span>        context=CoreCallContext(user=core_user, origin=<span class="str">f"event:{topic}"</span>),</span>
+<span>        topic=topic,</span>
+<span>        data=event.message.data,</span>
+<span>        meta=EventMeta(event_timestamp=event.message.publish_time),</span>
+<span>    )</span>
+<span>    <span class="kw">return</span> <span class="num">200</span>, <span class="cls">None</span></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div>
+        <h3>EventProcessor</h3>
+        <div class="aka">// core/services/events/processor.py</div>
+      </div>
+      <div class="tag t-stage">Dispatch</div>
+    </div>
+    <p class="desc">A simple dict routes events to handlers. If no handler is found, <code>EventHandlerNotFound</code> is raised. The handler is a plain class with a <code>process()</code> method.</p>
+    <div class="code-block">
+<span class="kw">class</span> <span class="cls">EventProcessor</span>:
+<span>    <span class="kw">@classmethod</span></span>
+<span>    <span class="kw">def</span> <span class="fn">process</span>(cls, context, topic, data, meta=<span class="cls">None</span>):</span>
+<span>        handler = event_handlers.get(topic)</span>
+<span>        <span class="kw">if</span> <span class="kw">not</span> handler:</span>
+<span>            <span class="kw">raise</span> errors.EventHandlerNotFound(topic=topic)</span>
+<span>        handler.<span class="fn">process</span>(context=context, data=data, meta=meta)</span>
+
+<span class="cm"># The handler map is manual</span>
+<span>event_handlers = {</span>
+<span>    <span class="str">"customer-created"</span>: CustomerUpsertHandler,</span>
+<span>    <span class="str">"customer-updated"</span>: CustomerUpsertHandler,</span>
+<span>}</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WALKTHROUGH ============ -->
+<section>
+  <div class="eyebrow">In action</div>
+  <h2>Trace one event through</h2>
+  <p class="lede">Here is what happens, step by step, when a customer signs up and the auth service publishes <code>customer-created</code>.</p>
+  <div class="card">
+    <ol class="steps">
+      <li><strong>App code</strong> creates an <code>Event</code> dataclass with topic <code>"customer-created"</code> and calls <code>EventPublisher.publish()</code>. No network — just serialization and a queue write.</li>
+      <li>The <strong>task queue worker</strong> wakes, calls the <code>events-system</code> package, which POSTs the message to the Pub/Sub topic.</li>
+      <li><strong>Pub/Sub</strong> receives the message and checks the push subscriptions configured from <code>events.yml</code>. Three subscribers need this event.</li>
+      <li><strong>Push delivery</strong> POSTs the event to each subscriber's endpoint simultaneously. The orchestrator, auth, and analytics each get their own HTTP request — one event, three deliveries.</li>
+      <li><strong>Ninja endpoint</strong> receives the POST. The <code>@event_handler</code> decorator verifies the JWT — if the request is not from Google Pub/Sub, it is rejected before any code runs.</li>
+      <li><strong>EventProcessor</strong> looks up <code>"customer-created"</code> in its handler map, finds <code>CustomerUpsertHandler</code>, and delegates to domain code. The customer record is created.</li>
+    </ol>
+    <p class="desc" style="margin-top:16px">Six steps. Six responsibilities. No step knows what the next step does — only what data to pass along. That is the pattern.</p>
+  </div>
+</section>
+
+<!-- ============ TRADEOFFS ============ -->
+<section id="tradeoffs">
+  <div class="eyebrow">The design</div>
+  <h2>Tradeoffs</h2>
+  <p class="lede">Why the routing registry is external, and what you gain and lose.</p>
+  <div class="divider"></div>
+
+  <div class="sgrid">
+    <div class="scol s1">
+      <h4>✓ True decoupling</h4>
+      <p>A team can add a new subscriber without touching the publisher's code. They add a line to <code>events.yml</code>. The infra repo deploys. The subscriber receives messages. No app deploy required.</p>
+    </div>
+    <div class="scol s2">
+      <h4>✓ Centralized observability</h4>
+      <p>The retry policies, endpoint health, and subscription metrics are all visible in one place. The platform team can see the full graph without grepping through Python code.</p>
+    </div>
+    <div class="scol s3">
+      <h4>✗ Two repositories to touch</h4>
+      <p>To add a new event type, you must write the publisher in the app, add the entry in <code>events.yml</code>, and add the handler. More work than a single PR, but the publisher does not need to know about the receiver.</p>
+    </div>
+    <div class="scol s4">
+      <h4>✗ No subscriber validation at test time</h4>
+      <p>Because the subscriber list is not in the app, you cannot write a unit test that asserts "when I publish <code>customer-created</code>, the orchestrator receives it." That belongs to infra tests.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:30px">
+    <div class="card-head">
+      <div>
+        <h3>Why the routing registry is external</h3>
+        <div class="aka">// three reasons we don't define subscribers in code</div>
+      </div>
+      <div class="tag t-pattern">Design</div>
+    </div>
+    <p class="desc"><b>1. The app should not know about the graph.</b> An app that publishes <code>customer-created</code> should not know that the orchestrator, and the analytics pipeline all consume it. That knowledge is operational, not domain. It changes when we add a new subscriber. If the graph lived in the app, every new subscriber would require a code change and a deploy.</p>
+    <p class="desc"><b>2. The platform team owns the topics.</b> The <code>events.yml</code> file is the contract. The infra repository is the natural place for that contract. It declares what topics exist, who may publish, and who must receive. This is the same pattern as a Terraform module or a Kubernetes manifest: the platform owns the wiring, not the application.</p>
+    <p class="desc"><b>3. The app is not the only publisher.</b> Some services outside the app publish events. They also need to comply with the same routing registry. A central file in the infra repo is the single source of truth for all publishers.</p>
+  </div>
+</section>
+
+<!-- ============ SUMMARY ============ -->
+<section id="summary">
+  <div class="eyebrow">The throughline</div>
+  <h2>The architecture</h2>
+  <p class="lede">A bet on decoupling. The app publishes without knowing who consumes. The routing graph lives in infra. The background queue handles the network. The decorator handles the auth.</p>
+  <div class="divider"></div>
+
+  <div class="card">
+    <p class="desc">The result is that a developer can add a new event type by writing three files:</p>
+    <ol class="steps">
+      <li>A publisher call in their app</li>
+      <li>An entry in <code>events.yml</code></li>
+      <li>A handler in the receiving app</li>
+    </ol>
+    <p class="desc" style="margin-top:16px">They do not need to know about the other subscribers. They do not need to redeploy the publisher when a new subscriber is added. The graph is external, the contracts are explicit, and the system is boring in the way that good infrastructure is boring.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="padding:0">
+    <p class="foot-note">
+      <b>The throughline.</b> Weak coupling is popular because it is fast to iterate — but it quietly moves the burden of knowing the system onto the developer. An external routing registry moves that burden back into the platform. The whole architecture is an argument about where that burden should live.
+      <br><br>
+      <span style="color:var(--muted);font-size:.8rem">Built in production. The code is real, the patterns are reusable, the tradeoffs are yours to evaluate.</span>
+    </p>
+  </div>
+</footer>
+
+</div>
+
+<script>
+/* =========================================================
+   MAIN PIPELINE ANIMATION
+   A packet travels a fixed path of segments. Each step lights
+   the destination node, narrates it, and slides the packet
+   along the connecting line.
+   ========================================================= */
+const svg = document.querySelector('svg.pipe');
+const packet = document.getElementById('packet');
+const stepnum = document.getElementById('stepnum');
+const narrTitle = document.getElementById('narr-title');
+const narrBody = document.getElementById('narr-body');
+
+const STEPS = [
+  {node:'n-app', line:null, at:[170,147], title:'1 · App code emits a fact',
+   body:'Something happens — say an appointment is created. The app doesn\'t call any downstream service. It just produces an event object describing what occurred.'},
+  {node:'n-proc', line:'l1', at:[170,242], title:'2 · Handed to task queue',
+   body:'Rather than publish inline, the app defers to a background task in <code>event_publish.py</code>. The HTTP request can now return immediately — the user never waits on Pub/Sub.'},
+  {node:'n-es', line:'l2', at:[170,330], title:'3 · Published via events-system',
+   body:'The background task serializes the event and pushes it through <code>events-system</code>, the shared package that wraps Google Cloud Pub/Sub. App code never touches Google\'s SDK directly.'},
+  {node:'n-pubsub', line:'l3', at:[490,179], title:'4 · Lands in Pub/Sub',
+   body:'The event is now a message on a Pub/Sub topic. The app\'s job is done — from here, routing is entirely Google\'s concern, governed by external config.'},
+  {node:'n-yml', line:null, at:[490,295], title:'5 · events.yml decides the destinations',
+   body:'The <code>events.yml</code> registry in the infra repo declares who subscribes to this topic, with what endpoint and retry policy. Push subscriptions are configured from it.', amber:true},
+  {node:'n-endpoint', line:'l4', at:[810,177], title:'6 · Pushed to a Ninja endpoint',
+   body:'Pub/Sub actively POSTs the event to <code>/events/&lt;topic&gt;/</code> in the app. No polling — the delivery is a push, driven by the subscription config.'},
+  {node:'n-handler', line:'l5', at:[810,272], title:'7 · Verified and deserialized',
+   body:'Before any logic runs, <code>@event_handler</code> verifies the Google service-account JWT (proving it really came from Pub/Sub) and deserializes the push payload.'},
+  {node:'n-processor', line:'l6', at:[810,357], title:'8 · Routed to a domain handler',
+   body:'<code>EventProcessor</code> inspects the topic and dispatches to the matching domain handler — the code that finally does the work the event was meant to trigger. Journey complete.'},
+];
+
+let cursor = 0, playing = false, timer = null, speed = 1000;
+
+function setPacket(x,y,show){
+  packet.setAttribute('transform',`translate(${x},${y})`);
+  packet.setAttribute('opacity', show?1:0);
+}
+function clearActive(){
+  svg.querySelectorAll('.n-box.active').forEach(b=>b.classList.remove('active'));
+  svg.querySelectorAll('.flow-line.lit').forEach(l=>l.classList.remove('lit'));
+}
+function markDone(nodeId){
+  const b = document.querySelector('#'+nodeId+' .n-box');
+  if(b){ b.classList.remove('active'); b.classList.add('done'); }
+}
+
+function reset(){
+  clearTimeout(timer); playing=false; cursor=0;
+  clearActive();
+  svg.querySelectorAll('.n-box.done').forEach(b=>b.classList.remove('done'));
+  setPacket(170,147,false);
+  document.getElementById('play').innerHTML='▶ Play the journey';
+  stepnum.textContent='—'; stepnum.classList.add('idle');
+  narrTitle.textContent='Ready when you are';
+  narrBody.innerHTML='Hit <b>Play the journey</b> to watch an event travel from the moment it\'s emitted, through the async queue and Pub/Sub, all the way to the domain handler that acts on it.';
+  document.getElementById('prog').style.width='0%';
+  document.getElementById('count').textContent='0 / '+STEPS.length;
+}
+
+function applyStep(i){
+  const s = STEPS[i];
+  if(i>0) markDone(STEPS[i-1].node);
+  clearActive();
+  if(s.line){ const l=document.getElementById(s.line); if(l) l.classList.add('lit'); }
+  setPacket(s.at[0], s.at[1], true);
+  const box = document.querySelector('#'+s.node+' .n-box');
+  if(box) box.classList.add('active');
+  stepnum.textContent = (i+1);
+  stepnum.classList.remove('idle');
+  stepnum.style.background = s.amber? 'var(--amber)' : 'var(--teal)';
+  narrTitle.textContent = s.title;
+  narrBody.innerHTML = s.body;
+}
+
+function advance(){
+  if(cursor>=STEPS.length) return false;
+  applyStep(cursor);
+  cursor++;
+  document.getElementById('prog').style.width = (cursor/STEPS.length*100)+'%';
+  document.getElementById('count').textContent=cursor+' / '+STEPS.length;
+  if(cursor>=STEPS.length){
+    setTimeout(()=>{ markDone(STEPS[STEPS.length-1].node); }, speed*0.6);
+    return false;
+  }
+  return true;
+}
+
+function play(){
+  if(playing){ clearTimeout(timer); playing=false; document.getElementById('play').innerHTML='▶ Resume'; return; }
+  if(cursor>=STEPS.length) reset();
+  playing=true; document.getElementById('play').innerHTML='❚❚ Pause';
+  const tick=()=>{
+    const more=advance();
+    if(more && playing){ timer=setTimeout(tick, speed); }
+    else { playing=false; document.getElementById('play').innerHTML='↺ Replay'; }
+  };
+  tick();
+}
+
+document.getElementById('play').addEventListener('click', play);
+document.getElementById('step').addEventListener('click', ()=>{
+  if(playing){ clearTimeout(timer); playing=false; document.getElementById('play').innerHTML='▶ Resume'; }
+  if(cursor>=STEPS.length) reset();
+  advance();
+});
+document.getElementById('reset').addEventListener('click', reset);
+packet.style.transition='transform .55s cubic-bezier(.45,0,.25,1)';
+
+const io=new IntersectionObserver((es)=>{
+  es.forEach(e=>{ if(e.isIntersecting && !document.body.dataset.seen){ document.body.dataset.seen='1'; setTimeout(play,500);} });
+},{threshold:.45});
+io.observe(document.querySelector('.stage-board'));
+
+/* =========================================================
+   MINI ANIMATIONS inside the three Act cards
+   ========================================================= */
+const NS='http://www.w3.org/2000/svg';
+function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function tween(node,attr,from,to,dur,delay,done){
+  setTimeout(()=>{const t0=performance.now();
+    (function f(now){const p=Math.min((now-t0)/dur,1);const e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+      node.setAttribute(attr,from+(to-from)*e);
+      if(p<1)requestAnimationFrame(f);else if(done)done();})(performance.now());
+  },delay||0);
+}
+
+document.querySelectorAll('.mini-stage').forEach(m=>buildMini(m,m.dataset.anim));
+
+function buildMini(host, kind){
+  const svg=el('svg',{viewBox:'0 0 320 90',width:'100%',height:'90'});
+  host.appendChild(svg);
+  const txt=(x,y,s,fill,size,anchor)=>el('text',{x,y,fill,'font-family':'Spline Sans Mono, monospace','font-size':size||9,'text-anchor':anchor||'middle'});
+  const addtxt=(x,y,s,fill,size,anchor)=>{const t=txt(x,y,s,fill,size,anchor);t.textContent=s;svg.appendChild(t);return t;};
+
+  if(kind==='publish'){
+    const req=el('rect',{x:18,y:30,width:70,height:30,rx:6,fill:'var(--slate-2)',stroke:'var(--line)'});
+    svg.appendChild(req); addtxt(53,49,'request','var(--cream)',9);
+    const queue=el('rect',{x:130,y:30,width:60,height:30,rx:6,fill:'var(--slate-2)',stroke:'var(--teal-deep)'});
+    svg.appendChild(queue); addtxt(160,44,'queue','var(--teal)',8); addtxt(160,55,'task queue','var(--muted)',6.5);
+    const pubsub=el('circle',{cx:280,cy:45,r:18,fill:'var(--slate-2)',stroke:'var(--blue-deep)'});
+    svg.appendChild(pubsub); addtxt(280,48,'P/S','var(--blue)',9);
+    const dot=el('circle',{cx:53,cy:45,r:5,fill:'var(--amber)',opacity:0});
+    svg.appendChild(dot);
+    const check=addtxt(53,20,'✓ 200 OK','var(--teal)',8); check.setAttribute('opacity',0);
+    function loop(){
+      dot.setAttribute('opacity',1); dot.setAttribute('cx',53); dot.setAttribute('cy',45); check.setAttribute('opacity',0);
+      tween(dot,'cx',53,160,500,200,()=>{
+        check.setAttribute('opacity',1);
+        tween(dot,'cx',160,280,650,400,()=>{ dot.setAttribute('opacity',0); setTimeout(loop,700); });
+      });
+    }
+    loop();
+  }
+  else if(kind==='route'){
+    const ps=el('circle',{cx:45,cy:45,r:17,fill:'var(--slate-2)',stroke:'var(--blue-deep)'});
+    svg.appendChild(ps); addtxt(45,48,'P/S','var(--blue)',9);
+    const ys=[20,45,70];
+    const targets=ys.map(y=>{const r=el('rect',{x:250,y:y-11,width:55,height:22,rx:5,fill:'var(--slate-2)',stroke:'var(--line)'});svg.appendChild(r);return r;});
+    addtxt(277,24,'/events','var(--muted)',7);addtxt(277,49,'/events','var(--muted)',7);addtxt(277,74,'/events','var(--muted)',7);
+    addtxt(150,12,'events.yml','var(--amber)',7.5);
+    function loop(){
+      ys.forEach((y,i)=>{
+        const d=el('circle',{cx:45,cy:45,r:4,fill:'var(--amber)',opacity:0});svg.appendChild(d);
+        d.setAttribute('opacity',1);
+        tween(d,'cx',45,250,600,i*180,()=>{});
+        tween(d,'cy',45,y,600,i*180,()=>{ targets[i].setAttribute('stroke','var(--amber)'); setTimeout(()=>{targets[i].setAttribute('stroke','var(--line)');d.remove();},400); });
+      });
+      setTimeout(loop,2200);
+    }
+    loop();
+  }
+  else if(kind==='receive'){
+    addtxt(40,20,'event','var(--teal)',8);
+    const dot=el('circle',{cx:20,cy:50,r:5,fill:'var(--amber)'});svg.appendChild(dot);
+    const gate=el('rect',{x:120,y:32,width:50,height:36,rx:6,fill:'var(--slate-2)',stroke:'var(--amber-deep)'});
+    svg.appendChild(gate); addtxt(145,49,'JWT','var(--amber)',8); addtxt(145,60,'verify','var(--muted)',6.5);
+    const handler=el('rect',{x:240,y:32,width:60,height:36,rx:6,fill:'var(--slate-2)',stroke:'var(--line)'});
+    svg.appendChild(handler); addtxt(270,49,'domain','var(--cream)',8); addtxt(270,60,'handler','var(--muted)',6.5);
+    const stamp=addtxt(145,26,'✓','var(--teal)',12); stamp.setAttribute('opacity',0);
+    function loop(){
+      dot.setAttribute('cx',20); dot.setAttribute('opacity',1); stamp.setAttribute('opacity',0);
+      gate.setAttribute('stroke','var(--amber-deep)'); handler.setAttribute('stroke','var(--line)');
+      tween(dot,'cx',20,145,550,200,()=>{
+        stamp.setAttribute('opacity',1); gate.setAttribute('stroke','var(--teal)');
+        setTimeout(()=>{
+          tween(dot,'cx',145,270,550,150,()=>{ handler.setAttribute('stroke','var(--teal)'); dot.setAttribute('opacity',0); setTimeout(loop,900); });
+        },400);
+      });
+    }
+    loop();
+  }
+}
+
+/* ============================================================
+   TOC active-state on scroll
+   ============================================================ */
+const tocLinks=[...document.querySelectorAll('.toc a')];
+const secs=tocLinks.map(a=>document.querySelector(a.getAttribute('href')));
+const tocIO=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const id='#'+e.target.id;
+      tocLinks.forEach(a=>a.classList.toggle('active', a.getAttribute('href')===id));
+    }
+  });
+},{rootMargin:'-40% 0px -55% 0px'});
+secs.forEach(s=>{ if(s) tocIO.observe(s); });
+</script>
+</body>
+</html>
