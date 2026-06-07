@@ -144,28 +144,39 @@ export function BlogPost() {
         <div className="h-px bg-gradient-to-r from-blog-border/10 via-blog-border/5 to-transparent mb-12" />
 
         {/* Content */}
-        <div
-          className="blog-content prose prose-invert max-w-none
-            prose-headings:font-normal prose-headings:tracking-tight prose-headings:text-blog-text
-            prose-h1:text-3xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:leading-tight
-            prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-14 prose-h2:leading-tight prose-h2:border-b prose-h2:border-blog-border/10 prose-h2:pb-3
-            prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-10 prose-h3:leading-snug
-            prose-p:text-blog-muted/60 prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-base
-            prose-a:text-blog-accent prose-a:no-underline prose-a:border-b prose-a:border-blog-accent/30 hover:prose-a:border-blog-accent/80 prose-a:transition-colors prose-a:pb-0.5
-            prose-strong:text-blog-text prose-strong:font-medium
-            prose-code:text-peach-200 prose-code:bg-blog-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:font-normal prose-code:before:content-none prose-code:after:content-none
-            prose-pre:bg-blog-surface prose-pre:border prose-pre:border-blog-border/10 prose-pre:rounded-xl prose-pre:p-6 prose-pre:my-8 prose-pre:shadow-inner
-            prose-pre:shadow-black/20
-            prose-blockquote:border-l-2 prose-blockquote:border-blog-accent/40 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-blog-muted/60 prose-blockquote:bg-blog-surface/50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-xl prose-blockquote:my-8
-            prose-img:rounded-xl prose-img:my-10 prose-img:shadow-lg prose-img:shadow-black/30
-            prose-ul:my-6 prose-ul:pl-5 prose-ul:list-none
-            prose-ol:my-6 prose-ol:pl-5
-            prose-li:text-blog-muted/60 prose-li:mb-3 prose-li:leading-relaxed
-            prose-li:marker:text-blog-accent/60
-            prose-hr:border-blog-border/10 prose-hr:my-12
-          "
-          dangerouslySetInnerHTML={{ __html: post.html }}
-        />
+        {post.htmlPage ? (
+          <div className="-mx-6 md:-mx-12 -mb-32">
+            <iframe
+              src={`/blog/html/${post.slug}/index.html`}
+              className="w-full h-screen border-0"
+              title={post.title}
+              sandbox="allow-scripts allow-same-origin"
+            />
+          </div>
+        ) : (
+          <div
+            className="blog-content prose prose-invert max-w-none
+              prose-headings:font-normal prose-headings:tracking-tight prose-headings:text-blog-text
+              prose-h1:text-3xl prose-h1:mb-8 prose-h1:mt-12 prose-h1:leading-tight
+              prose-h2:text-2xl prose-h2:mb-6 prose-h2:mt-14 prose-h2:leading-tight prose-h2:border-b prose-h2:border-blog-border/10 prose-h2:pb-3
+              prose-h3:text-xl prose-h3:mb-4 prose-h3:mt-10 prose-h3:leading-snug
+              prose-p:text-blog-muted/60 prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-base
+              prose-a:text-blog-accent prose-a:no-underline prose-a:border-b prose-a:border-blog-accent/30 hover:prose-a:border-blog-accent/80 prose-a:transition-colors prose-a:pb-0.5
+              prose-strong:text-blog-text prose-strong:font-medium
+              prose-code:text-peach-200 prose-code:bg-blog-surface prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:font-normal prose-code:before:content-none prose-code:after:content-none
+              prose-pre:bg-blog-surface prose-pre:border prose-pre:border-blog-border/10 prose-pre:rounded-xl prose-pre:p-6 prose-pre:my-8 prose-pre:shadow-inner
+              prose-pre:shadow-black/20
+              prose-blockquote:border-l-2 prose-blockquote:border-blog-accent/40 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-blog-muted/60 prose-blockquote:bg-blog-surface/50 prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-xl prose-blockquote:my-8
+              prose-img:rounded-xl prose-img:my-10 prose-img:shadow-lg prose-img:shadow-black/30
+              prose-ul:my-6 prose-ul:pl-5 prose-ul:list-none
+              prose-ol:my-6 prose-ol:pl-5
+              prose-li:text-blog-muted/60 prose-li:mb-3 prose-li:leading-relaxed
+              prose-li:marker:text-blog-accent/60
+              prose-hr:border-blog-border/10 prose-hr:my-12
+            "
+            dangerouslySetInnerHTML={{ __html: post.html }}
+          />
+        )}
 
 
       </article>

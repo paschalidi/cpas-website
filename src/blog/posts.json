@@ -1,5 +1,14 @@
 [
   {
+    "slug": "34-transactions-isolation",
+    "title": "Transactions & Isolation — A Visual Field Guide",
+    "author": "Christos Paschalidis",
+    "date": "2026-01-15",
+    "excerpt": "A visual field guide to every database isolation anomaly. Interactive race conditions, lost updates, and the tools to prevent them.",
+    "htmlPage": true,
+    "html": "<p>A visual field guide to every database isolation anomaly. Interactive race conditions, lost updates, and the tools to prevent them.</p>\n"
+  },
+  {
     "slug": "32-hiring-ai",
     "title": "We hired two engineers. Then we fired three.",
     "author": "Christos Paschalidis",

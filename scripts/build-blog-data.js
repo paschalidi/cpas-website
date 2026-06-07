@@ -18,6 +18,7 @@ const rootDir = process.cwd();
 const postsDir = path.join(rootDir, 'src/blog/posts');
 const outputPath = path.join(rootDir, 'src/blog/posts.json');
 const publicImagesDir = path.join(rootDir, 'public/blog/images');
+const publicHtmlDir = path.join(rootDir, 'public/blog/html');
 
 function findPostFiles() {
   return fs
@@ -50,6 +51,18 @@ function copyPostImages(slug) {
   fs.cpSync(sourceImagesDir, targetImagesDir, { recursive: true });
 }
 
+function copyPostHtml(slug) {
+  const sourceHtml = path.join(postsDir, slug, 'index.html');
+  if (!fs.existsSync(sourceHtml)) {
+    return false;
+  }
+
+  const targetDir = path.join(publicHtmlDir, slug);
+  fs.mkdirSync(targetDir, { recursive: true });
+  fs.copyFileSync(sourceHtml, path.join(targetDir, 'index.html'));
+  return true;
+}
+
 function buildPost(filePath) {
   const slug = path.basename(path.dirname(filePath));
   const source = fs.readFileSync(filePath, 'utf8');
@@ -60,6 +73,7 @@ function buildPost(filePath) {
   }
 
   copyPostImages(slug);
+  const hasHtml = copyPostHtml(slug);
 
   return {
     slug,
@@ -68,6 +82,7 @@ function buildPost(filePath) {
     date: normalizeDate(data.date),
     ...(data.hero ? { hero: String(data.hero) } : {}),
     excerpt: String(data.excerpt ?? ''),
+    ...(hasHtml ? { htmlPage: true } : {}),
     html: marked.parse(content),
   };
 }
