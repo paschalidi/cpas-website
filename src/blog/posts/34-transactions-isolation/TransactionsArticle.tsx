@@ -42,7 +42,7 @@ export default function TransactionsArticle() {
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-6">
           The anomalies
         </h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-0">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-0">
           Each scene runs two transactions against a single value. When they interleave badly,
           something the application assumed turns out to be false. These are the named failure modes.
         </p>
@@ -64,7 +64,7 @@ export default function TransactionsArticle() {
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-6">
           The isolation ladder
         </h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-6">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-6">
           Isolation levels are defined by which anomalies they forbid. Climb the ladder and each rung
           outlaws more — at the cost of more contention. A filled square means "this bug cannot
           happen."
@@ -166,12 +166,12 @@ export default function TransactionsArticle() {
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-6">
           Preventing lost updates
         </h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-6">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-6">
           When the isolation level isn't enough, the chapter hands you a menu. Each one is a
           different way to stop two read-modify-write cycles from clobbering each other.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
           {solutions.map((sol) => (
             <div
               key={sol.ic}
@@ -181,7 +181,7 @@ export default function TransactionsArticle() {
                 <span className="font-mono text-peach-300 text-sm">{sol.ic}</span>
                 {sol.name}
               </h4>
-              <p className="text-blog-muted/70 text-sm leading-relaxed mt-2">{sol.text}</p>
+              <p className="text-blog-muted/70 text-base leading-relaxed mt-2">{sol.text}</p>
               <code className="font-mono text-xs bg-[#0c0c0b] border border-blog-border/15 rounded-md px-1.5 py-0.5 text-green-400 inline-block mt-1">
                 {sol.code}
               </code>
@@ -203,7 +203,7 @@ export default function TransactionsArticle() {
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-6">
           Achieving serializability
         </h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-6">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-6">
           The strongest guarantee: the result is identical to running transactions one-at-a-time, in{' '}
           <em>some</em> order. Every anomaly above becomes impossible. Three ways databases pull it off.
         </p>
@@ -257,7 +257,7 @@ export default function TransactionsArticle() {
           FOOTER
       ════════════════════════════════════ */}
       <footer className="mt-20 pt-10 border-t border-blog-border/15 pb-16">
-        <p className="text-blog-muted/60 text-sm leading-relaxed max-w-[640px]">
+        <p className="text-blog-muted/60 text-base leading-relaxed max-w-[640px]">
           <strong className="text-blog-muted/80">The throughline.</strong> Weak isolation levels are popular
           because they're fast — but they quietly move the burden of preventing these anomalies onto you,
           the developer. Getting every <code className="text-green-400">SELECT … FOR UPDATE</code> and
@@ -265,7 +265,7 @@ export default function TransactionsArticle() {
           Serializability moves that burden back into the database. The whole chapter is an argument about
           where that burden should live.
           <br /><br />
-          <span className="text-blog-muted/40 text-xs">
+          <span className="text-blog-muted/40 text-sm">
             A visual companion to Chapter 8 of <em>Designing Data-Intensive Applications</em> by Martin
             Kleppmann. Built to be read, replayed, and remembered.
           </span>

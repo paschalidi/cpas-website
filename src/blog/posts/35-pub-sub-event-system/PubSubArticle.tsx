@@ -336,24 +336,24 @@ function PipelineAnimation() {
           {allDone ? '✓' : stepNum}
         </span>
         <div>
-          <h4 className="text-base font-semibold text-[#f2fafc] mb-1">
+          <h4 className="text-lg font-semibold text-[#f2fafc] mb-1">
             {allDone ? 'Full round-trip complete' : (current?.title ?? 'Ready when you are')}
           </h4>
           {allDone ? (
-            <p style={{ color: colors.fog }} className="text-sm">
+            <p style={{ color: colors.fog }} className="text-base leading-relaxed">
               The event travelled from producer through broker to consumer, passing every stage.
               Each of the eight steps below is a decision you make about this path.
             </p>
           ) : current ? (
             <>
-              <p className="text-sm" style={{ color: colors.fog }} dangerouslySetInnerHTML={{ __html: current.body }} />
-              <div className="mt-2 text-xs border-l-2 border-peach-300/40 pl-3 text-blog-muted/60">
-                <b className="font-mono text-[0.65rem] tracking-[0.08em] uppercase text-peach-300">why</b>
+              <p className="text-base leading-relaxed" style={{ color: colors.fog }} dangerouslySetInnerHTML={{ __html: current.body }} />
+              <div className="mt-2 text-sm leading-relaxed border-l-2 border-peach-300/40 pl-3 text-blog-muted/60">
+                <b className="font-mono text-[0.7rem] tracking-[0.08em] uppercase text-peach-300">why</b>
                 {' '}{current.why}
               </div>
             </>
           ) : (
-            <p className="text-sm" style={{ color: colors.fog }}>
+            <p className="text-base leading-relaxed" style={{ color: colors.fog }}>
               Hit <b>Play</b> to watch one event travel the full round-trip. Each step pairs what happens with the <b>why</b> a staff engineer would give.
             </p>
           )}
@@ -434,7 +434,7 @@ export default function PubSubArticle() {
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">
           Events · Staff-Level Map
         </div>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-0">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-0">
           The happy path is easy: emit a fact, a broker delivers it, a handler runs. The <strong className="text-blog-text font-medium">staff-level</strong> work is everything that path hides — delivery semantics, ordering, the log-vs-queue choice, failure modes, and how a contract evolves when producer and consumer ship independently. Below: the round-trip animated, then each hard decision framed with what it actually costs.
         </p>
 
@@ -445,7 +445,7 @@ export default function PubSubArticle() {
       <section id="delivery" className="mt-16">
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">Decision 1</div>
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-2">Delivery semantics</h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-0">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-0">
           The first thing a staff interview probes. The trap is the phrase &ldquo;exactly-once&rdquo; — say it without qualification and you have failed the question.
         </p>
         <DecisionCard
@@ -465,7 +465,7 @@ export default function PubSubArticle() {
       <section id="dualwrite" className="mt-16">
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">Decision 2</div>
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-2">The dual-write trap</h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-0">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-0">
           The single most common correctness bug in event systems, and a favourite follow-up. It is the reason that <code className="text-green-400">async dispatch</code> in the animation is not just a &ldquo;go faster&rdquo; optimisation.
         </p>
         <DecisionCard
@@ -485,7 +485,7 @@ export default function PubSubArticle() {
       <section id="model" className="mt-16">
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">Decision 3</div>
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-2">Log vs. queue — the deeper fork</h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-0">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-0">
           More fundamental than push vs. pull. It decides whether you can replay history, how fan-out works, and what &ldquo;consumed&rdquo; even means.
         </p>
 
@@ -541,7 +541,7 @@ export default function PubSubArticle() {
       <section id="delivery-model" className="mt-16">
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">Decision 4</div>
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-2">Push vs. pull</h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-0">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-0">
           A real fork, but a level below log-vs-queue. It mostly decides who controls the rate and whether you expose an inbound door.
         </p>
         <DecisionCard
@@ -560,7 +560,7 @@ export default function PubSubArticle() {
       <section id="ordering" className="mt-16">
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">Decision 5</div>
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-2">Ordering</h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-0">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-0">
           The question behind the question: &ldquo;global ordering&rdquo; is almost never what you want, because it serialises everything. The art is ordering exactly where it matters and nowhere else.
         </p>
         <DecisionCard
@@ -580,7 +580,7 @@ export default function PubSubArticle() {
       <section id="failure" className="mt-16">
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">Decision 6</div>
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-2">Failure modes</h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-6">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-6">
           Retries are easy to say and easy to get catastrophically wrong. Four failures every staff engineer names before being asked.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -603,7 +603,7 @@ export default function PubSubArticle() {
       <section id="schema" className="mt-16">
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">Decision 7</div>
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-2">Schema evolution</h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-0">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-0">
           The one that bites in year two, not week one. Producer and consumer deploy independently — so the event contract must change without a coordinated release. Miss this and you have described a system that works only on launch day.
         </p>
         <DecisionCard
@@ -623,7 +623,7 @@ export default function PubSubArticle() {
       <section id="design" className="mt-16">
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">Decision 8</div>
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-2">Event design &amp; observability</h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-0">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-0">
           What goes <em>in</em> the event, and how you trace it across the async gap.
         </p>
         <DecisionCard
@@ -642,7 +642,7 @@ export default function PubSubArticle() {
       <section id="checklist" className="mt-16">
         <div className="font-mono text-[0.7rem] tracking-[0.22em] uppercase text-blog-accent mb-4">The recall card</div>
         <h2 className="text-2xl md:text-3xl font-light tracking-tight text-blog-text mb-2">The interview checklist</h2>
-        <p className="text-blog-muted/60 text-base leading-[1.8] mb-6">
+        <p className="text-blog-muted/60 text-lg leading-[1.8] mb-6">
           If you can speak to each of these as a <em>decision with a tradeoff</em> — not a single right answer — you are covering the surface a staff interview expects.
         </p>
         <div className="bg-gradient-to-b from-[#0e171c] to-[#0b1216] border border-[#1c2f37] rounded-xl p-5 md:p-6">
@@ -659,7 +659,7 @@ export default function PubSubArticle() {
 
       {/* ───── FOOTER ───── */}
       <footer className="mt-16 pt-10 border-t border-forest-800/30 pb-16">
-        <p className="text-blog-muted/50 text-sm leading-relaxed max-w-[640px]">
+        <p className="text-blog-muted/50 text-base leading-relaxed max-w-[640px]">
           <strong className="text-blog-muted/80 font-medium">What &ldquo;staff-level&rdquo; actually means here.</strong>
           {' '}Not knowing more facts — knowing that almost none of these have a single right answer. The mid-level answer is &ldquo;use at-least-once and idempotency.&rdquo; The staff answer is the same sentence followed by &ldquo;&hellip;because exactly-once delivery is impossible over a network, here is the dual-write problem it implies, here is the outbox that solves it, and here is what I would measure to know it is working.&rdquo; The depth is in the <strong className="text-blog-muted/80 font-medium">because</strong> and the <strong className="text-blog-muted/80 font-medium">what I would measure</strong>.
         </p>

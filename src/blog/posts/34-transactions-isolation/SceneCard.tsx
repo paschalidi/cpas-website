@@ -282,7 +282,7 @@ export default function SceneCard({ scene }: { scene: SceneData }) {
           </span>
         )}
       </div>
-      <p className="text-blog-muted/80 mt-3.5 max-w-[62ch] leading-relaxed">{scene.desc}</p>
+      <p className="text-blog-muted/80 text-base mt-3.5 max-w-[62ch] leading-relaxed">{scene.desc}</p>
 
       {/* Stage */}
       <div ref={stageRef} className="mt-6 bg-[#0c0c0b] border border-blog-border/15 rounded-xl p-5 pb-4 relative">
@@ -351,7 +351,7 @@ export default function SceneCard({ scene }: { scene: SceneData }) {
         {/* Verdict */}
         {showVerdict && (
           <div
-            className={`mt-4 px-4 py-3 rounded-lg text-sm flex gap-3 items-start animate-fadeIn
+            className={`mt-4 px-4 py-3 rounded-lg text-base leading-relaxed flex gap-3 items-start animate-fadeIn
               ${scene.verdict.type === 'bad' ? 'bg-red-900/10 border border-red-500/40 text-red-200' : 'bg-green-900/10 border border-green-500/40 text-green-200'}
             `}
           >

@@ -36,35 +36,35 @@ export default function DecisionCard({
         {eyebrow}
       </div>
       <h3 className="text-xl md:text-2xl font-semibold text-blog-text mb-3 leading-snug">{title}</h3>
-      <p className="text-blog-muted/70 text-sm md:text-base leading-relaxed max-w-[80ch] mb-6" dangerouslySetInnerHTML={{ __html: frame }} />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      <p className="text-blog-muted/70 text-base md:text-lg leading-relaxed max-w-[80ch] mb-6" dangerouslySetInnerHTML={{ __html: frame }} />
+      <div className="flex flex-col gap-3.5">
         {options.map((o) => (
-          <div key={o.name} className="bg-[#070b0d] border border-forest-800/30 rounded-xl p-4">
-            <div className="flex items-center gap-2 mb-2.5">
+          <div key={o.name} className="bg-[#070b0d] border border-forest-800/30 rounded-xl p-5">
+            <div className="flex items-center gap-2 mb-3">
               <span
-                className="w-2 h-2 rounded-[3px] shrink-0"
+                className="w-2.5 h-2.5 rounded-[3px] shrink-0"
                 style={{ background: o.color }}
               />
-              <span className="text-blog-text font-semibold text-sm">{o.name}</span>
+              <span className="text-blog-text font-semibold text-base">{o.name}</span>
             </div>
-            <div className="space-y-1.5">
-              <div className="flex gap-2 text-xs leading-relaxed">
-                <span className="shrink-0 w-[34px] font-mono text-[0.6rem] tracking-[0.08em] uppercase text-green-500">pro</span>
+            <div className="space-y-2">
+              <div className="flex gap-3 text-sm leading-relaxed">
+                <span className="shrink-0 w-[40px] font-mono text-[0.65rem] tracking-[0.08em] uppercase text-green-500 pt-0.5">pro</span>
                 <span className="text-blog-muted/70">{o.pro}</span>
               </div>
-              <div className="flex gap-2 text-xs leading-relaxed">
-                <span className="shrink-0 w-[34px] font-mono text-[0.6rem] tracking-[0.08em] uppercase text-red-400">con</span>
+              <div className="flex gap-3 text-sm leading-relaxed">
+                <span className="shrink-0 w-[40px] font-mono text-[0.65rem] tracking-[0.08em] uppercase text-red-400 pt-0.5">con</span>
                 <span className="text-blog-muted/70">{o.con}</span>
               </div>
-              <div className="flex gap-2 text-xs leading-relaxed">
-                <span className="shrink-0 w-[34px] font-mono text-[0.6rem] tracking-[0.08em] uppercase text-peach-300">use</span>
+              <div className="flex gap-3 text-sm leading-relaxed">
+                <span className="shrink-0 w-[40px] font-mono text-[0.65rem] tracking-[0.08em] uppercase text-peach-300 pt-0.5">use</span>
                 <span className="text-blog-muted/70">{o.use}</span>
               </div>
             </div>
           </div>
         ))}
       </div>
-      <div className="mt-4 p-3.5 rounded-xl border border-blog-accent/20 text-sm leading-relaxed" style={{ background: 'rgba(243,198,173,0.06)' }}>
+      <div className="mt-4 p-4 rounded-xl border border-blog-accent/20 text-base leading-relaxed" style={{ background: 'rgba(243,198,173,0.06)' }}>
         <b className="block font-mono text-[0.68rem] tracking-[0.1em] uppercase mb-1 text-blog-accent">
           the staff answer
         </b>
