@@ -19,6 +19,11 @@ COMPONENT_REGISTRY['34-transactions-isolation'] = TransactionsArticle;
 const PubSubArticle = React.lazy(() => import('../posts/35-pub-sub-event-system/PubSubArticle') as any);
 COMPONENT_REGISTRY['35-pub-sub-event-system'] = PubSubArticle;
 
+// Article 36 — Caching
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const CachingArticle = React.lazy(() => import('../posts/36-caching/CachingArticle') as any);
+COMPONENT_REGISTRY['36-caching'] = CachingArticle;
+
 export function getArticleComponent(
   slug: string,
 ): React.LazyExoticComponent<React.ComponentType> | null {
