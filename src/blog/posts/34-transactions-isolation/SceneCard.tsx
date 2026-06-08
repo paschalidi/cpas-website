@@ -231,7 +231,7 @@ export default function SceneCard({ scene }: { scene: SceneData }) {
     if (isNote) {
       cls += 'bg-transparent border-none text-blog-muted italic not-italic font-sans text-xs';
     } else {
-      cls += `bg-forest-900/60 text-blog-muted ${kindColors[st.kind] || 'border-forest-800/30'}`;
+      cls += `bg-forest-925/60 text-blog-muted ${kindColors[st.kind] || 'border-blog-border/15'}`;
     }
     if (st.t === 'A') cls += ' left-0';
     else cls += ' right-0';
@@ -285,7 +285,7 @@ export default function SceneCard({ scene }: { scene: SceneData }) {
       <p className="text-blog-muted/80 mt-3.5 max-w-[62ch] leading-relaxed">{scene.desc}</p>
 
       {/* Stage */}
-      <div ref={stageRef} className="mt-6 bg-[#0c0c0b] border border-forest-800/30 rounded-xl p-5 pb-4 relative">
+      <div ref={stageRef} className="mt-6 bg-[#0c0c0b] border border-blog-border/15 rounded-xl p-5 pb-4 relative">
         {/* Tracks grid */}
         <div className="grid grid-cols-[1fr_80px_1fr] gap-0 items-stretch">
           {/* Track A */}
@@ -304,7 +304,7 @@ export default function SceneCard({ scene }: { scene: SceneData }) {
           <div className="relative flex flex-col items-center">
             <div
               ref={dbRef}
-              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-[70px] px-3 py-2 h-14 border-2 rounded-lg flex flex-col items-center justify-center bg-forest-900/60 transition-all duration-400
+              className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 min-w-[70px] px-3 py-2 h-14 border-2 rounded-lg flex flex-col items-center justify-center bg-forest-925/60 transition-all duration-400
                 ${dbFlashClass === 'flash' ? 'border-peach-300/70 shadow-[0_0_0_4px_rgba(232,163,61,0.14)]' : ''}
                 ${dbFlashClass === 'bad' ? 'border-red-500/70 shadow-[0_0_0_4px_rgba(232,101,79,0.16)]' : ''}
                 ${dbFlashClass === 'good' ? 'border-green-500/70 shadow-[0_0_0_4px_rgba(76,196,160,0.16)]' : ''}
@@ -365,29 +365,29 @@ export default function SceneCard({ scene }: { scene: SceneData }) {
       <div className="flex items-center gap-3.5 mt-4 flex-wrap">
         <button
           onClick={playing ? () => { clearTimer(); setPlaying(false); } : play}
-          className="font-mono text-xs tracking-wider px-4 py-2.5 rounded-full border border-forest-800/30 bg-forest-900/60 text-blog-text hover:border-peach-300/50 hover:bg-forest-800/60 active:scale-97 transition-all duration-200 flex items-center gap-2"
-          style={playing ? { borderColor: '#e8a33d', color: '#e8a33d' } : {}}
+          className="font-mono text-xs tracking-wider px-4 py-2.5 rounded-full border border-blog-border/15 bg-forest-925/60 text-blog-text hover:border-peach-300/50 hover:bg-forest-800/60 active:scale-97 transition-all duration-200 flex items-center gap-2"
+          style={playing ? { borderColor: '#f3c6ad', color: '#f3c6ad' } : {}}
         >
-          {playing ? '\u275A\u275A Pause' : '\u25B6 Play'}
+          {playing ? '❚❚ Pause' : '▶ Play'}
         </button>
         <button
           onClick={handleStep}
-          className="font-mono text-xs tracking-wider px-4 py-2.5 rounded-full border border-forest-800/30 bg-forest-900/60 text-blog-text hover:border-peach-300/50 hover:bg-forest-800/60 active:scale-97 transition-all duration-200"
+          className="font-mono text-xs tracking-wider px-4 py-2.5 rounded-full border border-blog-border/15 bg-forest-925/60 text-blog-text hover:border-peach-300/50 hover:bg-forest-800/60 active:scale-97 transition-all duration-200"
         >
-          Step \u203A
+          Step ›
         </button>
         <button
           onClick={handleReset}
-          className="font-mono text-xs tracking-wider px-4 py-2.5 rounded-full border border-forest-800/30 bg-forest-900/60 text-blog-text hover:border-peach-300/50 hover:bg-forest-800/60 active:scale-97 transition-all duration-200"
+          className="font-mono text-xs tracking-wider px-4 py-2.5 rounded-full border border-blog-border/15 bg-forest-925/60 text-blog-text hover:border-peach-300/50 hover:bg-forest-800/60 active:scale-97 transition-all duration-200"
         >
-          \u21BA Reset
+          ↺ Reset
         </button>
         <div className="flex-1 min-w-[120px] h-1 bg-forest-800/40 rounded-full overflow-hidden">
           <span
             className="block h-full rounded-full transition-all duration-300"
             style={{
               width: `${progressPct}%`,
-              background: 'linear-gradient(90deg, #e8a33d, #4cc4a0)',
+              background: 'linear-gradient(90deg, #f3c6ad, #c9a58e)',
             }}
           ></span>
         </div>

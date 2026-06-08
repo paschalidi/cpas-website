@@ -16,6 +16,7 @@ body {
 @layer base {
   :root {
     --color-forest-950: 2 10 5;
+    --color-forest-925: 4 16 9;
     --color-forest-900: 12 42 23;
     --color-forest-800: 33 52 37;
     --color-forest-700: 13 36 24;
@@ -23,11 +24,12 @@ body {
     --color-peach-300: 243 198 173;
     --color-peach-200: 247 217 204;
     --color-sand-300: 201 165 142;
+    --color-cream-200: 228 220 204;
     --color-cream-50: 248 247 244;
 
     --color-blog-background: var(--color-forest-950);
-    --color-blog-surface: var(--color-forest-950);
-    --color-blog-border: var(--color-cream-50);
+    --color-blog-surface: var(--color-forest-925);
+    --color-blog-border: var(--color-cream-200);
     --color-blog-text: var(--color-cream-50);
     --color-blog-muted: var(--color-cream-50);
     --color-blog-accent: var(--color-peach-300);

@@ -108,13 +108,13 @@ const MiniLock = () => {
     function loop() {
       if (!running) return;
       $box.setAttribute('stroke', '#b9791f');
-      $lock.textContent = '\uD83D\uDD12';
+      $lock.textContent = '🔒';
       $wait.textContent = 'wait';
       $wait.setAttribute('opacity', '1');
       setTimeout(() => {
         if (!running) return;
         $box.setAttribute('stroke', '#1f8d6e');
-        $lock.textContent = '\u2713';
+        $lock.textContent = '✓';
         $wait.setAttribute('opacity', '0');
       }, 1400);
       setTimeout(() => {
@@ -128,7 +128,7 @@ const MiniLock = () => {
   return (
     <svg viewBox="0 0 300 60" width="100%" height="60">
       <rect ref={boxRef} x={120} y={16} width={60} height={28} rx={6} fill="#1e1e1b" stroke="#322f29" />
-      <text ref={lockRef} x={150} y={35} fill="#e8a33d" fontSize={16} textAnchor="middle" fontFamily="JetBrains Mono, monospace">\uD83D\uDD12</text>
+      <text ref={lockRef} x={150} y={35} fill="#e8a33d" fontSize={16} textAnchor="middle" fontFamily="JetBrains Mono, monospace">🔒</text>
       <text x={40} y={34} fill="#e8a33d" fontSize={12} textAnchor="middle" fontFamily="JetBrains Mono, monospace">A</text>
       <text x={260} y={34} fill="#c9a58e" fontSize={12} textAnchor="middle" fontFamily="JetBrains Mono, monospace">B</text>
       <text ref={waitRef} x={260} y={50} fill="#a78bd6" fontSize={8} textAnchor="middle" fontFamily="JetBrains Mono, monospace">wait</text>
@@ -165,20 +165,20 @@ const MiniDetect = () => {
       }, 700);
       setTimeout(() => {
         if (!running) return;
-        $flag.textContent = '\u2717 abort';
+        $flag.textContent = '✗ abort';
         $flag.setAttribute('font-size', '10');
         $box.setAttribute('stroke', '#b23b29');
       }, 1500);
       setTimeout(() => {
         if (!running) return;
-        $flag.textContent = '\u21BA retry';
+        $flag.textContent = '↺ retry';
         $flag.setAttribute('fill', '#a78bd6');
       }, 2300);
       setTimeout(() => {
         if (!running) return;
         $val.textContent = '12';
         $box.setAttribute('stroke', '#1f8d6e');
-        $flag.textContent = '\u2713';
+        $flag.textContent = '✓';
         $flag.setAttribute('fill', '#4cc4a0');
         $flag.setAttribute('font-size', '14');
       }, 3100);
@@ -222,7 +222,7 @@ const MiniCAS = () => {
       $res.textContent = '';
       setTimeout(() => {
         if (!running) return;
-        $res.textContent = '\u2713 set';
+        $res.textContent = '✓ set';
         $res.setAttribute('fill', '#4cc4a0');
         $box.setAttribute('stroke', '#1f8d6e');
         $val.textContent = 'v = 11';
@@ -234,7 +234,7 @@ const MiniCAS = () => {
       }, 2000);
       setTimeout(() => {
         if (!running) return;
-        $res.textContent = '\u2717 no-op';
+        $res.textContent = '✗ no-op';
         $res.setAttribute('fill', '#e8654f');
         $box.setAttribute('stroke', '#b23b29');
       }, 2600);
