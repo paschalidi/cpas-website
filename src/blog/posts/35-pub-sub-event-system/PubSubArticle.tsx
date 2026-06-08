@@ -459,6 +459,28 @@ export default function PubSubArticle() {
           ]}
           verdict='&ldquo;At-least-once delivery, exactly-once processing via idempotency.&rdquo; Then explain how: a dedup key on the event id with a TTL window, or fold the side effect into the same transaction that records the id. Never claim the broker gives you exactly-once for free.'
         />
+
+        {/* Effectively-once: how it actually works */}
+        <div className="mt-6">
+          <h3 className="text-xl md:text-2xl font-semibold text-blog-text mb-3">&ldquo;Effectively-once&rdquo; in practice — two patterns</h3>
+          <p className="text-blog-muted/60 text-lg leading-[1.8] mb-5 max-w-[72ch]">
+            The verdict above is a slogan. Here is what it actually buys you. There are only two patterns in real production code that turn at-least-once delivery into a single observable effect — pick whichever fits your side effect.
+          </p>
+          <div className="flex flex-col gap-4">
+            <TipCard title="Pattern A · Dedup table with TTL" accent={colors.cyan}>
+              The consumer keeps a small <code className="text-green-400">processed_events</code> table keyed by <code className="text-green-400">event_id</code>. On every message: <em>check</em> the table; if the id is there, ack and return; if not, do the work, <em>insert</em> the id, ack. A TTL prunes ids older than the broker&rsquo;s retention window so the table stays small. Cheap and obvious — but two consumers racing on the same redelivered message can both pass the check, so the id column needs a <code className="text-green-400">UNIQUE</code> constraint to fail one of them safely.
+            </TipCard>
+            <TipCard title="Pattern B · Same-transaction record" accent={colors.green}>
+              When your side effect <em>is</em> a database write, this is the cleaner answer: do the work <strong>and</strong> insert the <code className="text-green-400">event_id</code> in <strong>one</strong> DB transaction. If it commits, both land atomically. If the message is later redelivered, the id insert violates the primary key, the transaction rolls back, and the work doesn&rsquo;t repeat. No separate dedup store, no race window, no TTL bookkeeping.
+            </TipCard>
+          </div>
+          <div className="mt-5 p-5 md:p-6 rounded-xl border border-blog-border/15 bg-blog-surface">
+            <h4 className="font-mono text-[0.72rem] tracking-[0.14em] uppercase text-peach-300 mb-3">why &ldquo;the broker gives me exactly-once&rdquo; is a marketing lie</h4>
+            <p className="text-blog-muted/70 text-base leading-relaxed max-w-[72ch]">
+              Kafka and others advertise &ldquo;exactly-once semantics.&rdquo; What they mean is exactly-once <em>within their own ecosystem</em> — from one Kafka topic to another, inside a single transactional producer/consumer API. The moment your handler does <em>anything</em> outside that boundary — calls a third-party API, writes to a different database, sends an email, charges a card — the guarantee evaporates. The consumer&rsquo;s ack to the broker can still be lost in flight, and you are back at at-least-once at the edge. The dedup work is yours, always. Quoting the vendor claim in an interview is how you fail it.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* ───── 2. DUAL-WRITE TRAP ───── */}
@@ -479,6 +501,43 @@ export default function PubSubArticle() {
           ]}
           verdict='&ldquo;I do not dual-write. I use a transactional outbox so the event is committed atomically with the state change, then relayed — accepting at-least-once and making consumers idempotent.&rdquo; Naming this unprompted is a strong signal.'
         />
+
+        {/* The outbox pattern, step by step */}
+        <div className="mt-6">
+          <h3 className="text-xl md:text-2xl font-semibold text-blog-text mb-3">The transactional outbox, step by step</h3>
+          <p className="text-blog-muted/60 text-lg leading-[1.8] mb-4 max-w-[72ch]">
+            The trap looks innocent. You save the order, then publish the event:
+          </p>
+          <pre className="bg-[#070b0d] border border-blog-border/15 rounded-md p-4 text-sm md:text-base text-blog-muted/80 font-mono leading-relaxed mb-5 overflow-x-auto">{`db.save(order)               // write #1 — your database
+broker.publish("placed")     // write #2 — different system`}</pre>
+          <p className="text-blog-muted/60 text-lg leading-[1.8] mb-4 max-w-[72ch]">
+            Two writes, two systems, no shared transaction. A crash, a GC pause, a network blip between them and the two diverge: an order with no event (silent loss), or an event with no order (a phantom that fires emails for a purchase that never happened). Reordering them does not help — it just swaps which kind of bug you ship.
+          </p>
+          <p className="text-blog-muted/60 text-lg leading-[1.8] mb-4 max-w-[72ch]">
+            The outbox fixes it by making both writes land in the <em>same</em> system in <em>one</em> transaction:
+          </p>
+          <pre className="bg-[#070b0d] border border-blog-border/15 rounded-md p-4 text-sm md:text-base text-blog-muted/80 font-mono leading-relaxed mb-5 overflow-x-auto">{`BEGIN;
+  INSERT INTO orders  (...);
+  INSERT INTO outbox  (event_id, payload, status='pending');
+COMMIT;`}</pre>
+          <p className="text-blog-muted/60 text-lg leading-[1.8] mb-4 max-w-[72ch]">
+            Order and event row commit atomically — either both exist or neither does. The actual publish to the broker happens <em>after</em> commit, in a separate <strong className="text-blog-text">relay</strong> process that:
+          </p>
+          <ol className="text-blog-muted/60 text-lg leading-[1.8] mb-4 max-w-[72ch] list-decimal pl-6 space-y-1.5">
+            <li>Polls (or tails the WAL via change-data-capture) the outbox table for pending rows.</li>
+            <li>Calls <code className="text-green-400">publish()</code> on the broker SDK for each row.</li>
+            <li>Marks the row as <code className="text-green-400">sent</code> (or deletes it).</li>
+          </ol>
+          <p className="text-blog-muted/60 text-lg leading-[1.8] mb-5 max-w-[72ch]">
+            If the relay crashes <em>between</em> step 2 and step 3, it republishes the same row on restart. That is the at-least-once part — and the reason your consumers must still be idempotent (Decision&nbsp;1). The outbox eliminates the dual-write divergence; idempotency mops up the duplicates that the relay&rsquo;s own retries create.
+          </p>
+          <div className="p-5 md:p-6 rounded-xl border border-blog-border/15 bg-blog-surface">
+            <h4 className="font-mono text-[0.72rem] tracking-[0.14em] uppercase text-peach-300 mb-3">why &ldquo;name it unprompted&rdquo; is the signal</h4>
+            <p className="text-blog-muted/70 text-base leading-relaxed max-w-[72ch]">
+              In a staff interview, the moment you say &ldquo;the service publishes an event,&rdquo; the next correctness bug to discuss is dual-write. Volunteering &ldquo;I&rsquo;d use a transactional outbox&rdquo; <em>before</em> being asked is the cheapest available signal that you have actually shipped event-driven code in production and seen the data drift that comes from the naive version. Candidates who only mention the outbox <em>after</em> being prompted with &ldquo;what happens if the service crashes between the two writes?&rdquo; have read about it; candidates who name it first have lived it.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* ───── 3. LOG VS QUEUE ───── */}
@@ -535,6 +594,60 @@ export default function PubSubArticle() {
           ]}
           verdict='&ldquo;Depends on replay. If a future consumer needs history or I will re-derive state, a retained log. If events are transient work items, a queue. The log superpower is that adding a consumer is free and reprocessing is just rewinding an offset.&rdquo;'
         />
+
+        {/* Which broker is which model */}
+        <div className="mt-6">
+          <h3 className="text-xl md:text-2xl font-semibold text-blog-text mb-3">Which broker is which model?</h3>
+          <p className="text-blog-muted/60 text-lg leading-[1.8] mb-5 max-w-[72ch]">
+            The log-vs-queue split is not theoretical — it is baked into the technology. Naming which is which (and why) closes the loop on this decision.
+          </p>
+          <div className="flex flex-col gap-4">
+            <div className="bg-blog-surface border border-blog-border/15 rounded-xl p-5 md:p-6">
+              <div className="flex items-center gap-2.5 mb-3">
+                <span className="w-2.5 h-2.5 rounded-[3px] shrink-0" style={{ background: colors.cyan }} />
+                <h5 className="text-base font-semibold text-blog-text">Apache Kafka</h5>
+                <span className="ml-auto font-mono text-[0.65rem] tracking-[0.1em] uppercase text-blog-muted/50">log</span>
+              </div>
+              <p className="text-blog-muted/70 text-base leading-relaxed mb-3 max-w-[72ch]">
+                Distributed commit log. Retains messages on disk for a configurable window — days, weeks, or forever. Each consumer group tracks its own offset, so many groups read the same topic independently. Replay is just rewinding an offset. Scales via partitions; one partition pins to exactly one consumer in a group (so consumers &gt; partitions = idle workers).
+              </p>
+              <p className="text-blog-muted/60 text-base leading-relaxed max-w-[72ch]">
+                <strong className="text-blog-text/80">Reach for it when</strong> you will ever want replay, multi-consumer fan-out, or to add a future consumer that needs history. The interview default.
+              </p>
+            </div>
+
+            <div className="bg-blog-surface border border-blog-border/15 rounded-xl p-5 md:p-6">
+              <div className="flex items-center gap-2.5 mb-3">
+                <span className="w-2.5 h-2.5 rounded-[3px] shrink-0" style={{ background: colors.violet }} />
+                <h5 className="text-base font-semibold text-blog-text">Amazon SQS</h5>
+                <span className="ml-auto font-mono text-[0.65rem] tracking-[0.1em] uppercase text-blog-muted/50">queue</span>
+              </div>
+              <p className="text-blog-muted/70 text-base leading-relaxed mb-3 max-w-[72ch]">
+                Fully managed; no brokers, no clusters, no ops. Two flavors: <em>standard</em> (best-effort ordering, near-unlimited throughput) and <em>FIFO</em> (strict order, ~3K msg/s). A <strong className="text-blog-text/80">visibility timeout</strong> hides an in-flight message from other consumers for a configurable window; no ack inside the window → it reappears. No replay; fan-out needs SNS bolted on.
+              </p>
+              <p className="text-blog-muted/60 text-base leading-relaxed max-w-[72ch]">
+                <strong className="text-blog-text/80">Reach for it when</strong> you are on AWS, want zero operational overhead, and the workflow is fire-and-forget task distribution.
+              </p>
+            </div>
+
+            <div className="bg-blog-surface border border-blog-border/15 rounded-xl p-5 md:p-6">
+              <div className="flex items-center gap-2.5 mb-3">
+                <span className="w-2.5 h-2.5 rounded-[3px] shrink-0" style={{ background: colors.amber }} />
+                <h5 className="text-base font-semibold text-blog-text">RabbitMQ</h5>
+                <span className="ml-auto font-mono text-[0.65rem] tracking-[0.1em] uppercase text-blog-muted/50">queue</span>
+              </div>
+              <p className="text-blog-muted/70 text-base leading-relaxed mb-3 max-w-[72ch]">
+                The classic AMQP broker. Per-queue FIFO; messages removed once acked. Its differentiator is <strong className="text-blog-text/80">routing</strong> — producers publish to <em>exchanges</em> that route via <em>bindings</em> (direct, topic-pattern, fanout). Channel-level prefetch limits and ack timeouts manage in-flight ownership so two consumers don&rsquo;t double-process.
+              </p>
+              <p className="text-blog-muted/60 text-base leading-relaxed max-w-[72ch]">
+                <strong className="text-blog-text/80">Reach for it when</strong> you need sophisticated routing logic, not raw throughput. Less common in modern interviews — worth recognising, rarely the default.
+              </p>
+            </div>
+          </div>
+          <p className="text-blog-muted/50 text-base leading-relaxed mt-5 max-w-[72ch] italic">
+            Without a pre-existing preference, default to Kafka. The replay + fan-out + retention combination makes it the most versatile answer when you do not yet know what next quarter&rsquo;s consumer will need.
+          </p>
+        </div>
       </section>
 
       {/* ───── 4. PUSH VS PULL ───── */}

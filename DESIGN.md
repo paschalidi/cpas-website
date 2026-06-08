@@ -85,6 +85,31 @@ The blog uses the botanical green and peach palette as shared design tokens. Do 
 - No all-caps body copy.
 - Use `text-wrap: balance` on h1–h3.
 
+### Body Copy — Minimum Sizes (Blog)
+
+Long-form reading text must never be committed below these floors. If a card column is so narrow that body text feels cramped, **stack to a single column** instead of shrinking text.
+
+| Role | Minimum class | Notes |
+|------|---------------|-------|
+| Section lede paragraph (under each h2) | `text-lg leading-[1.8]` | The default for the paragraph that introduces a section. |
+| Card / panel body copy (`TipCard`, `DecisionCard` frame, scene description, solution card, narrator panel) | `text-base leading-relaxed` | 16px floor for anything the reader has to *read*, not scan. |
+| Caption under diagrams / figures / verdict boxes | `text-sm leading-relaxed` | Only when it's a supporting caption, not primary content. |
+| Sub-section h3 inside an article | `text-xl md:text-2xl font-semibold` | Matches `DecisionCard` title size. |
+| Footer / fine print | `text-base leading-relaxed` for the body, `text-sm` for the parenthetical line | Never `text-xs`. |
+
+**Reserved-for-UI-only sizes** (never use for sentence-level content):
+- `text-sm` — button labels, control bar text, mono badges, table cells in dense reference grids.
+- `text-xs` — column headers in matrices, legend chips.
+- `text-[0.7rem]` / `text-[0.65rem]` uppercase tracked — eyebrows ("Decision 1", "Part III"), pro/con/use mono mini-labels, "WHY" sidebar markers. Always paired with `tracking-[0.14em]`+ and `font-mono`.
+
+**Layout rule:** prefer `flex flex-col gap-4` (stacked) over `grid md:grid-cols-2` / `md:grid-cols-3` whenever the card body is more than ~40 words. Multi-column grids are for short reference tiles (matrix legend, mini-diagram pairs), not for prose.
+
+**Review checklist before committing an article:**
+1. Open the page at desktop width and check that no body paragraph or card body is below `text-base`.
+2. Section ledes are `text-lg leading-[1.8]`.
+3. Any multi-column card grid carrying prose has been justified — would single-column read better?
+4. Eyebrows are the only sub-`text-base` sentence-shaped text on the page.
+
 ## Layout
 
 - Single-page vertical scroll. No routing.
