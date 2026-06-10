@@ -24,6 +24,31 @@ COMPONENT_REGISTRY['35-pub-sub-event-system'] = PubSubArticle;
 const CachingArticle = React.lazy(() => import('../posts/36-caching/CachingArticle') as any);
 COMPONENT_REGISTRY['36-caching'] = CachingArticle;
 
+// Article 38 — DDIA Chapter 6: Partitioning
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PartitioningArticle = React.lazy(() => import('../posts/38-ddia-ch06-partitioning/PartitioningArticle') as any);
+COMPONENT_REGISTRY['38-ddia-ch06-partitioning'] = PartitioningArticle;
+
+// Article 39 — DDIA Chapter 7: Transactions
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const DDIATransactionsArticle = React.lazy(() => import('../posts/39-ddia-ch07-transactions/TransactionsArticle') as any);
+COMPONENT_REGISTRY['39-ddia-ch07-transactions'] = DDIATransactionsArticle;
+
+// Article 40 — DDIA Chapter 8: Distributed Systems
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const DistributedTroubleArticle = React.lazy(() => import('../posts/40-ddia-ch08-distributed-trouble/DistributedTroubleArticle') as any);
+COMPONENT_REGISTRY['40-ddia-ch08-distributed-trouble'] = DistributedTroubleArticle;
+
+// Article 41 — DDIA Chapter 9: Consistency & Consensus
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ConsistencyConsensusArticle = React.lazy(() => import('../posts/41-ddia-ch09-consistency-consensus/ConsistencyConsensusArticle') as any);
+COMPONENT_REGISTRY['41-ddia-ch09-consistency-consensus'] = ConsistencyConsensusArticle;
+
+// Article 42 — DDIA Chapter 10: Batch Processing
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const BatchProcessingArticle = React.lazy(() => import('../posts/42-ddia-ch10-batch-processing/BatchProcessingArticle') as any);
+COMPONENT_REGISTRY['42-ddia-ch10-batch-processing'] = BatchProcessingArticle;
+
 export function getArticleComponent(
   slug: string,
 ): React.LazyExoticComponent<React.ComponentType> | null {
