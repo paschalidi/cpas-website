@@ -1,5 +1,45 @@
 [
   {
+    "slug": "42-ddia-ch10-batch-processing",
+    "title": "DDIA Chapter 10: Batch Processing",
+    "author": "Christos Paschalidis",
+    "date": "2026-06-10",
+    "excerpt": "From Unix pipes to MapReduce to dataflow engines: turning mountains of immutable input into derived data. Interactive step-through animations for the whole pipeline.",
+    "html": "<p>From Unix pipes to MapReduce to dataflow engines: turning mountains of immutable input into derived data. Interactive step-through animations for the whole pipeline.</p>\n"
+  },
+  {
+    "slug": "41-ddia-ch09-consistency-consensus",
+    "title": "DDIA Chapter 9: Consistency and Consensus",
+    "author": "Christos Paschalidis",
+    "date": "2026-06-10",
+    "excerpt": "What it costs to make many machines behave like one, and the algorithms that pay it. Linearizability, 2PC, Raft, and ZooKeeper/etcd — with interactive animations.",
+    "html": "<p>What it costs to make many machines behave like one, and the algorithms that pay it. Linearizability, 2PC, Raft, and ZooKeeper/etcd — with interactive animations.</p>\n"
+  },
+  {
+    "slug": "40-ddia-ch08-distributed-trouble",
+    "title": "DDIA Chapter 8: The Trouble with Distributed Systems",
+    "author": "Christos Paschalidis",
+    "date": "2026-06-10",
+    "excerpt": "Networks lie, clocks drift, processes freeze — and your code has to work anyway. Partial failure, unreliable networks, clock skew, and fencing tokens — with interactive animations.",
+    "html": "<p>Networks lie, clocks drift, processes freeze — and your code has to work anyway. Partial failure, unreliable networks, clock skew, and fencing tokens — with interactive animations.</p>\n"
+  },
+  {
+    "slug": "39-ddia-ch07-transactions",
+    "title": "DDIA Chapter 7: Transactions",
+    "author": "Christos Paschalidis",
+    "date": "2026-06-10",
+    "excerpt": "The exact ways concurrent transactions corrupt your data, and what each isolation level actually stops. ACID, five race anomalies, MVCC, and serializability — with interactive animations.",
+    "html": "<p>The exact ways concurrent transactions corrupt your data, and what each isolation level actually stops. ACID, five race anomalies, MVCC, and serializability — with interactive animations.</p>\n"
+  },
+  {
+    "slug": "38-ddia-ch06-partitioning",
+    "title": "DDIA Chapter 6: Partitioning",
+    "author": "Christos Paschalidis",
+    "date": "2026-06-10",
+    "excerpt": "How to split a dataset across machines without one of them quietly catching fire. Range vs hash, hot keys, rebalancing, and request routing — with interactive animations.",
+    "html": "<p>How to split a dataset across machines without one of them quietly catching fire. Range vs hash, hot keys, rebalancing, and request routing — with interactive animations.</p>\n"
+  },
+  {
     "slug": "35-pub-sub-event-system",
     "title": "Publishing & Consuming Events — Notes",
     "author": "Christos Paschalidis",
