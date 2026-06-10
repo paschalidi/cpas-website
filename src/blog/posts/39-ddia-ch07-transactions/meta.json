@@ -1,0 +1,6 @@
+{
+  "title": "DDIA Chapter 7: Transactions",
+  "author": "Christos Paschalidis",
+  "date": "2026-06-10",
+  "excerpt": "The exact ways concurrent transactions corrupt your data, and what each isolation level actually stops. ACID, five race anomalies, MVCC, and serializability — with interactive animations."
+}

@@ -20,15 +20,29 @@ const outputPath = path.join(rootDir, 'src/blog/posts.json');
 const publicImagesDir = path.join(rootDir, 'public/blog/images');
 
 function findPostFiles() {
-  return fs
+  const entries = fs
     .readdirSync(postsDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .flatMap((entry) => {
+    .filter((entry) => entry.isDirectory());
+
+  const markdownPosts = entries.flatMap((entry) => {
+    const dir = path.join(postsDir, entry.name);
+    return ['index.md', 'index.mdx']
+      .map((fileName) => path.join(dir, fileName))
+      .filter((filePath) => fs.existsSync(filePath));
+  });
+
+  const reactComponentPosts = entries
+    .map((entry) => {
       const dir = path.join(postsDir, entry.name);
-      return ['index.md', 'index.mdx']
-        .map((fileName) => path.join(dir, fileName))
-        .filter((filePath) => fs.existsSync(filePath));
-    });
+      const metaPath = path.join(dir, 'meta.json');
+      if (fs.existsSync(metaPath)) {
+        return metaPath;
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  return [...markdownPosts, ...reactComponentPosts];
 }
 
 function normalizeDate(date) {
@@ -98,15 +112,33 @@ function parseHtmlPost(slug) {
 
 function buildPost(filePath) {
   const slug = path.basename(path.dirname(filePath));
+  const isMetaJson = path.basename(filePath) === 'meta.json';
+
+  copyPostImages(slug);
+  const htmlPost = parseHtmlPost(slug);
+
+  if (isMetaJson) {
+    const meta = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    if (!meta.title || !meta.date) {
+      throw new Error(`${filePath} must include title and date`);
+    }
+    return {
+      slug,
+      title: String(meta.title),
+      author: String(meta.author ?? 'Christos Paschalidis'),
+      date: normalizeDate(meta.date),
+      ...(meta.hero ? { hero: String(meta.hero) } : {}),
+      excerpt: String(meta.excerpt ?? ''),
+      html: htmlPost ? htmlPost.html : '<p></p>\n',
+    };
+  }
+
   const source = fs.readFileSync(filePath, 'utf8');
   const { data, content } = matter(source);
 
   if (!data.title || !data.date) {
     throw new Error(`${filePath} must include title and date frontmatter`);
   }
-
-  copyPostImages(slug);
-  const htmlPost = parseHtmlPost(slug);
 
   const post = {
     slug,
