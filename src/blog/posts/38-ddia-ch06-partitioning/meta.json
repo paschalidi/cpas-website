@@ -1,6 +1,6 @@
 {
   "title": "DDIA Chapter 6: Partitioning",
   "author": "Christos Paschalidis",
-  "date": "2025-08-15",
+  "date": "2026-06-11",
   "excerpt": "How to split a dataset across machines without one of them quietly catching fire. Range vs hash, hot keys, rebalancing, and request routing — with interactive animations."
 }

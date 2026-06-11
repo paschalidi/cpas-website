@@ -1,6 +1,6 @@
 {
   "title": "DDIA Chapter 9: Consistency and Consensus",
   "author": "Christos Paschalidis",
-  "date": "2026-03-28",
+  "date": "2026-06-11",
   "excerpt": "What it costs to make many machines behave like one, and the algorithms that pay it. Linearizability, 2PC, Raft, and ZooKeeper/etcd — with interactive animations."
 }

@@ -1,6 +1,6 @@
 {
   "title": "DDIA Chapter 8: The Trouble with Distributed Systems",
   "author": "Christos Paschalidis",
-  "date": "2026-01-12",
+  "date": "2026-06-11",
   "excerpt": "Networks lie, clocks drift, processes freeze — and your code has to work anyway. Partial failure, unreliable networks, clock skew, and fencing tokens — with interactive animations."
 }
