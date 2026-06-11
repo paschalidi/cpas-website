@@ -451,6 +451,12 @@ export default function InterviewPage() {
               </p>
             </div>
             <div className="flex items-center gap-3">
+              <a
+                href="/interview-high-level"
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc] transition-all"
+              >
+                High-Level Deck
+              </a>
               <button
                 onClick={toggleShuffle}
                 className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
