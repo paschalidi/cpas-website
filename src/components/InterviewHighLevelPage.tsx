@@ -367,7 +367,7 @@ export default function InterviewHighLevelPage() {
                   }`}
                 >
                   <span className="font-mono text-xs mr-1.5 opacity-60">{chapter.label}</span>
-                  {chapter.id}
+                  {chapter.full}
                   <span className="font-mono text-xs ml-1.5 opacity-60">{chapter.count}</span>
                 </button>
               );
