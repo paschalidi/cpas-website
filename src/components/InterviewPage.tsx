@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import DDIAThemeProvider from "../blog/components/ddia/DDIAThemeProvider";
 
 /* ─── Data ─── */
 
@@ -269,16 +270,16 @@ const flashcards: Flashcard[] = [
 /* ─── Component ─── */
 
 const sectionColors: Record<string, { bg: string; text: string; border: string }> = {
-  "A": { bg: "bg-blue-50", text: "text-blue-800", border: "border-blue-300" },
-  "B": { bg: "bg-teal-50", text: "text-teal-800", border: "border-teal-300" },
-  "C": { bg: "bg-purple-50", text: "text-purple-800", border: "border-purple-300" },
-  "D": { bg: "bg-amber-50", text: "text-amber-800", border: "border-amber-300" },
-  "E": { bg: "bg-rose-50", text: "text-rose-800", border: "border-rose-300" },
-  "F": { bg: "bg-orange-50", text: "text-orange-800", border: "border-orange-300" },
-  "G": { bg: "bg-indigo-50", text: "text-indigo-800", border: "border-indigo-300" },
-  "H": { bg: "bg-emerald-50", text: "text-emerald-800", border: "border-emerald-300" },
-  "I": { bg: "bg-cyan-50", text: "text-cyan-800", border: "border-cyan-300" },
-  "J": { bg: "bg-slate-50", text: "text-slate-800", border: "border-slate-300" },
+  "A": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
+  "B": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
+  "C": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
+  "D": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
+  "E": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
+  "F": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
+  "G": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
+  "H": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
+  "I": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
+  "J": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
 };
 
 /* shuffle array in place (Fisher-Yates) */
@@ -346,174 +347,178 @@ export default function InterviewPage() {
   const colors = sectionColors[card.sectionShort] || sectionColors["A"];
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">DDIA Staff-Engineer Flashcards</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {total} cards &middot; {shuffled ? "shuffled" : "in order"}
-          </p>
+    <DDIAThemeProvider>
+      <div className="max-w-3xl mx-auto px-4 py-12">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-10">
+          <div>
+            <h1 className="text-2xl font-bold text-[#f2fafc] font-serif tracking-tight">
+              DDIA Staff-Engineer Flashcards
+            </h1>
+            <p className="text-sm text-[#8aa6b0] mt-1 font-mono">
+              {total} cards &middot; {shuffled ? "shuffled" : "in order"}
+            </p>
+          </div>
+          <button
+            onClick={toggleShuffle}
+            className={`text-sm font-medium px-3 py-1.5 rounded-lg border border-[#1c2f37] transition-colors ${
+              shuffled
+                ? "bg-[#2a4651] text-[#f5b73d] border-[#2a4651] hover:bg-[#2a4651]"
+                : "bg-[#0a0f0c] text-[#8aa6b0] hover:bg-[#1c2f37]"
+            }`}
+          >
+            {shuffled ? "Restore order" : "Shuffle"}
+          </button>
         </div>
-        <button
-          onClick={toggleShuffle}
-          className={`text-sm px-3 py-1.5 rounded-md border transition-colors ${
-            shuffled
-              ? "bg-indigo-50 border-indigo-300 text-indigo-700 hover:bg-indigo-100"
-              : "bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100"
-          }`}
-        >
-          {shuffled ? "Restore order" : "Shuffle"}
-        </button>
-      </div>
 
-      {/* Section & card number */}
-      <div className="flex items-center justify-between mb-3">
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${colors.bg} ${colors.text} ${colors.border} border`}>
-          {sectionLabel}
-        </span>
-        <span className="text-sm text-gray-500 font-mono">
-          {index + 1} / {total}
-        </span>
-      </div>
+        {/* Section & card number */}
+        <div className="flex items-center justify-between mb-3">
+          <span className={`text-xs font-semibold px-3 py-1 rounded-full border font-mono uppercase tracking-[0.12em] ${colors.bg} ${colors.text} ${colors.border}`}>
+            {sectionLabel}
+          </span>
+          <span className="text-sm text-[#8aa6b0] font-mono">
+            {index + 1} / {total}
+          </span>
+        </div>
 
-      {/* Progress dots */}
-      <div className="flex flex-wrap gap-1 mb-6">
-        {cards.slice(0, total).map((c, i) => {
-          const mark = progressBoxes[c.id];
-          let dotClass = "w-2 h-2 rounded-full transition-colors ";
-          if (i === index) dotClass += "ring-2 ring-offset-1 ring-gray-400 ";
-          if (mark === 'correct') dotClass += "bg-green-500";
-          else if (mark === 'wrong') dotClass += "bg-red-400";
-          else dotClass += "bg-gray-200";
-          return (
-            <button
-              key={c.id}
-              onClick={() => goTo(i)}
-              className={dotClass}
-              title={`Card ${i + 1}: ${c.question.slice(0, 50)}...`}
-              aria-label={`Go to card ${i + 1}`}
-            />
-          );
-        })}
-      </div>
+        {/* Progress dots */}
+        <div className="flex flex-wrap gap-1 mb-8">
+          {cards.slice(0, total).map((c, i) => {
+            const mark = progressBoxes[c.id];
+            let dotClass = "w-2 h-2 rounded-full transition-colors ";
+            if (i === index) dotClass += "ring-2 ring-offset-1 ring-[#f3c6ad] ";
+            if (mark === 'correct') dotClass += "bg-[#34d399]";
+            else if (mark === 'wrong') dotClass += "bg-[#f87171]";
+            else dotClass += "bg-[#1c2f37]";
+            return (
+              <button
+                key={c.id}
+                onClick={() => goTo(i)}
+                className={dotClass}
+                title={`Card ${i + 1}: ${c.question.slice(0, 50)}...`}
+                aria-label={`Go to card ${i + 1}`}
+              />
+            );
+          })}
+        </div>
 
-      {/* Card */}
-      <div
-        className="cursor-pointer perspective-1000 mb-6"
-        onClick={() => setFlipped(f => !f)}
-        style={{ perspective: "1000px" }}
-      >
+        {/* Card */}
         <div
-          className="relative transition-transform duration-500 ease-in-out"
-          style={{
-            transformStyle: "preserve-3d",
-            transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
-            minHeight: "320px",
-          }}
+          className="cursor-pointer mb-8"
+          onClick={() => setFlipped(f => !f)}
+          style={{ perspective: "1000px" }}
         >
-          {/* Front — Question */}
           <div
-            className="absolute inset-0 bg-white border-2 border-gray-200 rounded-xl shadow-sm p-8 flex flex-col"
-            style={{ backfaceVisibility: "hidden" }}
+            className="relative transition-transform duration-500 ease-in-out"
+            style={{
+              transformStyle: "preserve-3d",
+              transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+              minHeight: "320px",
+            }}
           >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-xs font-mono text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
-                Q{card.id}
-              </span>
-              <span className="text-xs text-gray-400">Click to reveal answer</span>
+            {/* Front — Question */}
+            <div
+              className="absolute inset-0 bg-[#0a0f0c] border-2 border-[#1c2f37] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.4),0_8px_24px_-12px_rgba(0,0,0,0.55)] p-8 flex flex-col"
+              style={{ backfaceVisibility: "hidden" }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xs font-mono text-[#8aa6b0] bg-[#0c1a10] px-2 py-0.5 rounded border border-[#1c2f37]">
+                  Q{card.id}
+                </span>
+                <span className="text-xs text-[#8aa6b0] font-mono uppercase tracking-[0.12em]">Click to reveal answer</span>
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-xl leading-relaxed text-[#f2fafc] font-medium text-center">
+                  {card.question}
+                </p>
+              </div>
+              <div className="text-center text-sm text-[#8aa6b0] mt-4 font-mono">
+                Click or press Space to flip
+              </div>
             </div>
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-xl leading-relaxed text-gray-900 font-medium text-center">
-                {card.question}
-              </p>
-            </div>
-            <div className="text-center text-sm text-gray-400 mt-4">
-              Click or press Space to flip
-            </div>
-          </div>
 
-          {/* Back — Answer */}
-          <div
-            className="absolute inset-0 bg-white border-2 border-indigo-200 rounded-xl shadow-sm p-8 flex flex-col"
-            style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-xs font-mono text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
-                A{card.id}
-              </span>
-              <span className="text-xs text-indigo-400">Answer</span>
-            </div>
-            <div className="flex-1 flex items-center justify-center">
-              <p className="text-lg leading-relaxed text-gray-800 text-center">
-                {card.answer}
-              </p>
-            </div>
-            <div className="text-center text-sm text-gray-400 mt-4">
-              Click or press Space to flip back
+            {/* Back — Answer */}
+            <div
+              className="absolute inset-0 bg-[#0c1a10] border-2 border-[#2a4651] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.4),0_8px_24px_-12px_rgba(0,0,0,0.55)] p-8 flex flex-col"
+              style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+            >
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-xs font-mono text-[#f3c6ad] bg-[#2a4651] px-2 py-0.5 rounded border border-[#2a4651]">
+                  A{card.id}
+                </span>
+                <span className="text-xs text-[#8aa6b0] font-mono uppercase tracking-[0.12em]">Answer</span>
+              </div>
+              <div className="flex-1 flex items-center justify-center">
+                <p className="text-lg leading-relaxed text-[#f2fafc] text-center">
+                  {card.answer}
+                </p>
+              </div>
+              <div className="text-center text-sm text-[#8aa6b0] mt-4 font-mono">
+                Click or press Space to flip back
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Self-grading */}
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <span className="text-sm text-[#8aa6b0] font-mono uppercase tracking-[0.12em]">How'd you do?</span>
+          <button
+            onClick={(e) => { e.stopPropagation(); markCorrect(); }}
+            className={`px-4 py-1.5 text-sm rounded-lg border transition-colors font-medium ${
+              progressBoxes[card.id] === 'correct'
+                ? "bg-[#34d399]/15 border-[#34d399] text-[#34d399]"
+                : "bg-[#0a0f0c] border-[#1c2f37] text-[#8aa6b0] hover:bg-[#1c2f37]"
+            }`}
+          >
+            ✓ Correct
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); markWrong(); }}
+            className={`px-4 py-1.5 text-sm rounded-lg border transition-colors font-medium ${
+              progressBoxes[card.id] === 'wrong'
+                ? "bg-[#f87171]/15 border-[#f87171] text-[#f87171]"
+                : "bg-[#0a0f0c] border-[#1c2f37] text-[#8aa6b0] hover:bg-[#1c2f37]"
+            }`}
+          >
+            ✗ Missed
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => goTo(index - 1)}
+            disabled={index === 0}
+            className="px-5 py-2 text-sm font-medium rounded-lg border border-[#1c2f37] bg-[#0a0f0c] text-[#f2fafc] hover:bg-[#1c2f37] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            ← Previous
+          </button>
+
+          <span className="text-sm text-[#8aa6b0] font-mono">
+            {(() => {
+              const correctCount = Object.entries(progressBoxes).filter(([, v]) => v === 'correct').length;
+              const wrongCount = Object.entries(progressBoxes).filter(([, v]) => v === 'wrong').length;
+              if (correctCount + wrongCount === 0) return "";
+              return `${correctCount} correct, ${wrongCount} missed`;
+            })()}
+          </span>
+
+          <button
+            onClick={() => goTo(index + 1)}
+            disabled={index === total - 1}
+            className="px-5 py-2 text-sm font-medium rounded-lg border border-[#1c2f37] bg-[#0a0f0c] text-[#f2fafc] hover:bg-[#1c2f37] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >
+            Next →
+          </button>
+        </div>
+
+        {/* Keyboard shortcuts */}
+        <div className="mt-10 text-center text-xs text-[#8aa6b0] font-mono space-x-4">
+          <span>← → navigate</span>
+          <span>Space / Enter flip</span>
+        </div>
       </div>
-
-      {/* Self-grading */}
-      <div className="flex items-center justify-center gap-4 mb-6">
-        <span className="text-sm text-gray-500">How'd you do?</span>
-        <button
-          onClick={(e) => { e.stopPropagation(); markCorrect(); }}
-          className={`px-4 py-1.5 text-sm rounded-md border transition-colors ${
-            progressBoxes[card.id] === 'correct'
-              ? "bg-green-100 border-green-400 text-green-700"
-              : "bg-white border-gray-300 text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          ✓ Correct
-        </button>
-        <button
-          onClick={(e) => { e.stopPropagation(); markWrong(); }}
-          className={`px-4 py-1.5 text-sm rounded-md border transition-colors ${
-            progressBoxes[card.id] === 'wrong'
-              ? "bg-red-100 border-red-400 text-red-700"
-              : "bg-white border-gray-300 text-gray-600 hover:bg-gray-50"
-          }`}
-        >
-          ✗ Missed
-        </button>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => goTo(index - 1)}
-          disabled={index === 0}
-          className="px-5 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-        >
-          ← Previous
-        </button>
-
-        <span className="text-sm text-gray-500">
-          {(() => {
-            const correctCount = Object.entries(progressBoxes).filter(([, v]) => v === 'correct').length;
-            const wrongCount = Object.entries(progressBoxes).filter(([, v]) => v === 'wrong').length;
-            if (correctCount + wrongCount === 0) return "";
-            return `${correctCount} correct, ${wrongCount} missed`;
-          })()}
-        </span>
-
-        <button
-          onClick={() => goTo(index + 1)}
-          disabled={index === total - 1}
-          className="px-5 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-        >
-          Next →
-        </button>
-      </div>
-
-      {/* Keyboard shortcuts */}
-      <div className="mt-8 text-center text-xs text-gray-400 space-x-4">
-        <span>← → navigate</span>
-        <span>Space / Enter flip</span>
-      </div>
-    </div>
+    </DDIAThemeProvider>
   );
 }
