@@ -1,7 +1,7 @@
 ---
 title: "Concepts in FastAPI and TypeScript/Node.js"
 author: Christos Paschalidis
-date: 2026-06-08
+date: 2026-02-20
 excerpt: "A living reference of 20+ concepts that separate senior engineers from staff engineers. Asyncio internals, event loop phases, type system depth, dependency injection lifecycle, and the subtle architectural decisions that break systems at scale."
 ---
 
