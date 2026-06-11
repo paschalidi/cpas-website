@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import DDIAThemeProvider from "../blog/components/ddia/DDIAThemeProvider";
 
 /* ─── Data ─── */
@@ -12,7 +12,6 @@ interface Flashcard {
 }
 
 const flashcards: Flashcard[] = [
-  // ── A. Foundations & storage engines ──
   { id: 1, section: "Foundations & storage engines", sectionShort: "A",
     question: "Why do we report p95/p99 latency instead of the average?",
     answer: "Averages hide the tail, and the tail is what users hit: one page fans out to many backend calls, so the slowest dependency dominates (tail latency amplification). SLOs therefore target percentiles; optimizing the mean can leave p99 untouched or worse." },
@@ -35,7 +34,6 @@ const flashcards: Flashcard[] = [
     question: "\"Schemaless\" databases — what actually happened to the schema?",
     answer: "It moved, unenforced, into every reader: schema-on-read. Validation now happens implicitly at consumption time, failures shift from write-time errors to runtime surprises in consumers. Useful for heterogeneous/evolving data; dishonest as \"no schema.\"" },
 
-  // ── B. Encoding & schema evolution ──
   { id: 8, section: "Encoding & schema evolution", sectionShort: "B",
     question: "Define backward and forward compatibility, and why rolling upgrades need both.",
     answer: "Backward: new code reads old data. Forward: old code reads new data. During a rolling deploy both versions run simultaneously, each reading the other's output — through DB rows, RPC responses, queued messages. Data also outlives code by years, so backward compatibility is forever." },
@@ -52,7 +50,6 @@ const flashcards: Flashcard[] = [
     question: "What does a schema registry actually enforce, and when?",
     answer: "Each message carries a small schema ID; consumers fetch-and-cache the writer's schema and resolve it against their own. Crucially the registry is a gatekeeper: configured with a compatibility mode, it rejects an incompatible schema at publish time — turning a 3 a.m. consumer crash into a failed CI step." },
 
-  // ── C. Replication ──
   { id: 13, section: "Replication", sectionShort: "C",
     question: "What is semi-synchronous replication and why is it the standard compromise?",
     answer: "Exactly one follower is synchronous (the leader waits for its ack); the rest are async. You get a guaranteed second copy of every acknowledged write without paying every follower's latency — and without \"any follower down blocks all writes.\"" },
@@ -102,7 +99,6 @@ const flashcards: Flashcard[] = [
     question: "Replication lag jumps from 50 ms to 4 minutes. What breaks first, and what do you do?",
     answer: "First: read-your-writes (fresh actions vanish), then monotonic reads, then any business logic that read replicas assuming freshness. Actions: shift critical reads to the leader, eject replicas beyond a max-lag threshold from the read pool, shed non-essential reads, then find the cause (long transaction, migration, under-provisioned follower)." },
 
-  // ── D. Partitioning (sharding) ──
   { id: 29, section: "Partitioning (sharding)", sectionShort: "D",
     question: "Key-range vs hash partitioning: the core trade?",
     answer: "Range keeps sort order → efficient range scans and locality, but sequential keys (timestamps) hammer one partition. Hash spreads load evenly but destroys ordering → range queries become scatter-gather. Common hybrid: hash a coarse key, range-sort within (e.g. (user_id, timestamp))." },
@@ -125,7 +121,6 @@ const flashcards: Flashcard[] = [
     question: "Why is automatic rebalancing dangerous during incidents?",
     answer: "A failure-detector blip during overload can trigger mass partition movement — which consumes I/O and network precisely when the cluster has none to spare, amplifying the outage (cascading failure). Mature systems gate rebalancing behind rate limits or a human." },
 
-  // ── E. Transactions ──
   { id: 36, section: "Transactions", sectionShort: "E",
     question: "What does the A in ACID actually mean (common trap)?",
     answer: "Abortability, not concurrency: a transaction's writes either all commit or all roll back on failure — you can safely retry. Concurrent-execution guarantees are isolation's job. Conflating them is a classic screen-out question." },
@@ -157,7 +152,6 @@ const flashcards: Flashcard[] = [
     question: "When do you actually pay for serializable isolation?",
     answer: "When invariants span rows/objects that concurrent transactions read-then-write disjointly: double-booking, balance floors, uniqueness-under-race, quota enforcement. Most read-heavy paths live happily on snapshot isolation — staff answer names which transactions need it, not \"turn it on globally.\"" },
 
-  // ── F. The trouble with distributed systems ──
   { id: 46, section: "Distributed systems trouble", sectionShort: "F",
     question: "Why are timeouts the only failure detector — and what can't they tell you?",
     answer: "Asynchronous networks have no upper bound on delay, so the only signal is silence-for-too-long. A timeout cannot distinguish dead node / slow node / dead network / slow network — and crucially, whether the request was processed before the silence." },
@@ -186,7 +180,6 @@ const flashcards: Flashcard[] = [
     question: "Why must any node-level \"I'm the only writer\" belief be enforced elsewhere?",
     answer: "Because the node can be paused, partitioned, or de-elected without knowing it — local belief is always potentially stale. Authority must be validated where the data lives: epochs/fencing at storage, quorum checks at write time." },
 
-  // ── G. Consistency & consensus ──
   { id: 55, section: "Consistency & consensus", sectionShort: "G",
     question: "Linearizability in one sentence, and its price.",
     answer: "The system behaves as if there's one copy and every operation takes effect atomically at some instant between its start and finish (reads after a completed write see it). Price: coordination on every operation — latency, throughput, and unavailability during partitions." },
@@ -215,7 +208,6 @@ const flashcards: Flashcard[] = [
     question: "How do you get a linearizable read from a Raft-style leader — and the trap?",
     answer: "The leader must confirm it's still leader before answering: read-index / lease reads (check quorum or hold a clock-bounded lease) — otherwise a deposed leader serves stale reads during a partition. The trap is exactly the naive version: \"read from the leader\" without the liveness check." },
 
-  // ── H. Batch processing ──
   { id: 64, section: "Batch processing", sectionShort: "H",
     question: "Why do batch frameworks insist on immutable inputs and deterministic tasks?",
     answer: "So any failed task can be re-run anywhere with identical results — fault tolerance by recomputation instead of by protocol. Bonus: human fault tolerance — buggy job? Fix code, re-run on the same input, old outputs were never destroyed." },
@@ -226,7 +218,6 @@ const flashcards: Flashcard[] = [
     question: "One key has 100x the records and stalls the whole join. Options?",
     answer: "Detect via sampling, then: salt/split the hot key across reducers and merge after, broadcast-join the small side so the skewed key never shuffles, or special-case hot keys into a separate path. The principle: skew is a data property; the fix is in the plan, not more workers." },
 
-  // ── I. Stream processing ──
   { id: 67, section: "Stream processing", sectionShort: "I",
     question: "Log vs queue: what's the decision rule?",
     answer: "Does history have value (replay, new consumers, audit) and does per-key ordering matter? → log (retained, offset-based, fan-out to many groups). Independent expensive tasks needing per-message ack/retry and fair dispatch? → queue (delete-on-ack). Using a log as a job queue buys head-of-line blocking within partitions." },
@@ -255,7 +246,6 @@ const flashcards: Flashcard[] = [
     question: "A consumer is permanently slower than its producer. What happens?",
     answer: "On a log: lag grows until retention truncates unread data — the broker is fine, your data isn't. Respond: scale consumers (bounded by partition count → may need repartitioning), make processing cheaper/batched, shed or sample, and alert on lag-vs-retention headroom, not just lag." },
 
-  // ── J. Architecture, correctness & end-to-end thinking ──
   { id: 76, section: "Architecture & correctness", sectionShort: "J",
     question: "\"Unbundling the database\" — the pitch and the invoice.",
     answer: "Pitch: run specialized systems (OLTP, search, cache, warehouse) as the components of one logical database, glued by an ordered change log playing the WAL's role — views are derived, rebuildable by replay, failures isolated. Invoice: views lag (no cross-view read-your-writes), no cross-view transactions, the log is now tier-zero infrastructure, and event schemas are a public API with evolution duties." },
@@ -267,23 +257,22 @@ const flashcards: Flashcard[] = [
     answer: "The duplicate is born above every layer: client retries after a lost response → two legitimate requests; TCP deduped only within each connection; the broker deduped only its own resends of each message. End-to-end argument: correctness functions must live at the endpoints — the client mints an operation ID at intent time, every hop carries it, and the final write enforces it (op_id UNIQUE, insert-or-return-original). The request ID is the truth; everything below is transport." },
 ];
 
-/* ─── Component ─── */
+/* ─── Section metadata ─── */
+const SECTIONS = [
+  { id: "A", label: "Foundations", full: "Foundations & storage engines", count: 7 },
+  { id: "B", label: "Encoding", full: "Encoding & schema evolution", count: 5 },
+  { id: "C", label: "Replication", full: "Replication", count: 16 },
+  { id: "D", label: "Partitioning", full: "Partitioning (sharding)", count: 7 },
+  { id: "E", label: "Transactions", full: "Transactions", count: 10 },
+  { id: "F", label: "Distributed", full: "Distributed systems trouble", count: 9 },
+  { id: "G", label: "Consistency", full: "Consistency & consensus", count: 9 },
+  { id: "H", label: "Batch", full: "Batch processing", count: 3 },
+  { id: "I", label: "Stream", full: "Stream processing", count: 9 },
+  { id: "J", label: "Architecture", full: "Architecture & correctness", count: 3 },
+];
 
-const sectionColors: Record<string, { bg: string; text: string; border: string }> = {
-  "A": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-  "B": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-  "C": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-  "D": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-  "E": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-  "F": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-  "G": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-  "H": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-  "I": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-  "J": { bg: "bg-[#0c1a10]", text: "text-[#f2fafc]", border: "border-[#1c2f37]" },
-};
-
-/* shuffle array in place (Fisher-Yates) */
-function shuffle<T>(arr: T[]): T[] {
+/* ─── Utilities ─── */
+function shuffleArray<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -293,44 +282,50 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function InterviewPage() {
+  const [selectedSections, setSelectedSections] = useState<Set<string>>(new Set(SECTIONS.map(s => s.id)));
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [shuffled, setShuffled] = useState(false);
-  const [order, setOrder] = useState<number[]>(() => flashcards.map((_, i) => i));
-  const [progressBoxes, setProgressBoxes] = useState<Record<string, 'correct' | 'wrong' | undefined>>({});
+  const [progress, setProgress] = useState<Record<string, 'correct' | 'wrong' | undefined>>({});
 
-  const cards = shuffled ? order.map(i => flashcards[i]) : flashcards;
-  const card = cards[index];
-  const sectionLabel = card ? `${card.sectionShort}. ${card.section}` : "";
+  /* Filtered + optionally shuffled deck */
+  const deck = useMemo(() => {
+    const filtered = flashcards.filter(c => selectedSections.has(c.sectionShort));
+    if (shuffled) return shuffleArray(filtered);
+    return filtered;
+  }, [selectedSections, shuffled]);
 
-  const total = cards.length;
+  const card = deck[index];
+  const total = deck.length;
 
   const goTo = useCallback((i: number) => {
     setIndex(Math.max(0, Math.min(total - 1, i)));
     setFlipped(false);
   }, [total]);
 
+  const toggleSection = useCallback((id: string) => {
+    setSelectedSections(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        if (next.size > 1) next.delete(id);
+      } else {
+        next.add(id);
+      }
+      setIndex(0);
+      setFlipped(false);
+      return next;
+    });
+  }, []);
+
   const toggleShuffle = useCallback(() => {
-    if (shuffled) {
-      setShuffled(false);
-      setOrder(flashcards.map((_, i) => i));
-    } else {
-      setOrder(shuffle(flashcards.map((_, i) => i)));
-      setShuffled(true);
-    }
+    setShuffled(prev => !prev);
     setIndex(0);
     setFlipped(false);
-  }, [shuffled]);
+  }, []);
 
-  const markCorrect = useCallback(() => {
-    const realId = card.id;
-    setProgressBoxes(prev => ({ ...prev, [realId]: prev[realId] === 'correct' ? undefined : 'correct' }));
-  }, [card]);
-
-  const markWrong = useCallback(() => {
-    const realId = card.id;
-    setProgressBoxes(prev => ({ ...prev, [realId]: prev[realId] === 'wrong' ? undefined : 'wrong' }));
-  }, [card]);
+  const mark = useCallback((id: number, grade: 'correct' | 'wrong') => {
+    setProgress(prev => ({ ...prev, [id]: prev[id] === grade ? undefined : grade }));
+  }, []);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -342,181 +337,209 @@ export default function InterviewPage() {
     return () => window.removeEventListener("keydown", handler);
   }, [index, goTo]);
 
-  if (!card) return null;
+  /* Stats */
+  const correctCount = Object.values(progress).filter(v => v === 'correct').length;
+  const wrongCount = Object.values(progress).filter(v => v === 'wrong').length;
+  const gradedCount = correctCount + wrongCount;
 
-  const colors = sectionColors[card.sectionShort] || sectionColors["A"];
+  if (!card) {
+    return (
+      <DDIAThemeProvider>
+        <div className="min-h-screen flex items-center justify-center text-[#f2fafc]">
+          <p className="text-lg">Select at least one section to begin.</p>
+        </div>
+      </DDIAThemeProvider>
+    );
+  }
 
   return (
     <DDIAThemeProvider>
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div>
-            <h1 className="text-2xl font-bold text-[#f2fafc] font-serif tracking-tight">
-              DDIA Staff-Engineer Flashcards
-            </h1>
-            <p className="text-sm text-[#8aa6b0] mt-1 font-mono">
-              {total} cards &middot; {shuffled ? "shuffled" : "in order"}
-            </p>
-          </div>
-          <button
-            onClick={toggleShuffle}
-            className={`text-sm font-medium px-3 py-1.5 rounded-lg border border-[#1c2f37] transition-colors ${
-              shuffled
-                ? "bg-[#2a4651] text-[#f5b73d] border-[#2a4651] hover:bg-[#2a4651]"
-                : "bg-[#0a0f0c] text-[#8aa6b0] hover:bg-[#1c2f37]"
-            }`}
-          >
-            {shuffled ? "Restore order" : "Shuffle"}
-          </button>
-        </div>
-
-        {/* Section & card number */}
-        <div className="flex items-center justify-between mb-3">
-          <span className={`text-xs font-semibold px-3 py-1 rounded-full border font-mono uppercase tracking-[0.12em] ${colors.bg} ${colors.text} ${colors.border}`}>
-            {sectionLabel}
-          </span>
-          <span className="text-sm text-[#8aa6b0] font-mono">
-            {index + 1} / {total}
-          </span>
-        </div>
-
-        {/* Progress dots */}
-        <div className="flex flex-wrap gap-1 mb-8">
-          {cards.slice(0, total).map((c, i) => {
-            const mark = progressBoxes[c.id];
-            let dotClass = "w-2 h-2 rounded-full transition-colors ";
-            if (i === index) dotClass += "ring-2 ring-offset-1 ring-[#f3c6ad] ";
-            if (mark === 'correct') dotClass += "bg-[#34d399]";
-            else if (mark === 'wrong') dotClass += "bg-[#f87171]";
-            else dotClass += "bg-[#1c2f37]";
-            return (
+      <div className="min-h-screen flex flex-col items-center px-4 py-8 md:py-12">
+        {/* ═══════ Header ═══════ */}
+        <div className="w-full max-w-4xl mb-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-[#f2fafc] bg-gradient-to-r from-[#f2fafc] to-[#f2fafc]/60 bg-clip-text text-transparent">
+                DDIA Interview Deck
+              </h1>
+              <p className="text-sm text-[#8aa6b0] mt-2 font-mono">
+                {total} cards active &middot; {gradedCount} graded
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
               <button
-                key={c.id}
-                onClick={() => goTo(i)}
-                className={dotClass}
-                title={`Card ${i + 1}: ${c.question.slice(0, 50)}...`}
-                aria-label={`Go to card ${i + 1}`}
-              />
-            );
-          })}
-        </div>
-
-        {/* Card */}
-        <div
-          className="cursor-pointer mb-8"
-          onClick={() => setFlipped(f => !f)}
-          style={{ perspective: "1000px" }}
-        >
-          <div
-            className="relative transition-transform duration-500 ease-in-out"
-            style={{
-              transformStyle: "preserve-3d",
-              transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
-              minHeight: "320px",
-            }}
-          >
-            {/* Front — Question */}
-            <div
-              className="absolute inset-0 bg-[#0a0f0c] border-2 border-[#1c2f37] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.4),0_8px_24px_-12px_rgba(0,0,0,0.55)] p-8 flex flex-col"
-              style={{ backfaceVisibility: "hidden" }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xs font-mono text-[#8aa6b0] bg-[#0c1a10] px-2 py-0.5 rounded border border-[#1c2f37]">
-                  Q{card.id}
-                </span>
-                <span className="text-xs text-[#8aa6b0] font-mono uppercase tracking-[0.12em]">Click to reveal answer</span>
-              </div>
-              <div className="flex-1 flex items-center justify-center">
-                <p className="text-xl leading-relaxed text-[#f2fafc] font-medium text-center">
-                  {card.question}
-                </p>
-              </div>
-              <div className="text-center text-sm text-[#8aa6b0] mt-4 font-mono">
-                Click or press Space to flip
+                onClick={toggleShuffle}
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+                  shuffled
+                    ? "bg-[#f3c6ad]/10 border-[#f3c6ad] text-[#f3c6ad]"
+                    : "bg-transparent border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc]"
+                }`}
+              >
+                {shuffled ? "Unshuffle" : "Shuffle"}
+              </button>
+              <div className="flex items-center gap-2 text-sm font-mono text-[#8aa6b0]">
+                <span className="text-[#34d399]">{correctCount}</span>
+                <span>/</span>
+                <span className="text-[#f87171]">{wrongCount}</span>
+                <span>/</span>
+                <span>{total - gradedCount}</span>
               </div>
             </div>
+          </div>
 
-            {/* Back — Answer */}
+          {/* ═══════ Section Filters ═══════ */}
+          <div className="flex flex-wrap gap-2 mb-2">
+            {SECTIONS.map(section => {
+              const active = selectedSections.has(section.id);
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => toggleSection(section.id)}
+                  className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${
+                    active
+                      ? "bg-[#0c1a10] border-[#2a4651] text-[#f2fafc]"
+                      : "bg-transparent border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651]"
+                  }`}
+                >
+                  <span className="font-mono text-xs mr-1.5 opacity-60">{section.id}</span>
+                  {section.label}
+                  <span className="font-mono text-xs ml-1.5 opacity-60">{section.count}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ═══════ Progress Bar ═══════ */}
+        <div className="w-full max-w-4xl mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex-1 h-1.5 bg-[#1c2f37] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#f3c6ad] rounded-full transition-all duration-300"
+                style={{ width: `${((index + 1) / total) * 100}%` }}
+              />
+            </div>
+            <span className="text-sm font-mono text-[#8aa6b0] min-w-[3rem] text-right">
+              {index + 1}/{total}
+            </span>
+          </div>
+        </div>
+
+        {/* ═══════ Card ═══════ */}
+        <div className="w-full max-w-4xl mb-8">
+          <div
+            className="cursor-pointer"
+            onClick={() => setFlipped(f => !f)}
+            style={{ perspective: "1200px" }}
+          >
             <div
-              className="absolute inset-0 bg-[#0c1a10] border-2 border-[#2a4651] rounded-xl shadow-[0_1px_2px_rgba(0,0,0,0.4),0_8px_24px_-12px_rgba(0,0,0,0.55)] p-8 flex flex-col"
-              style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+              className="relative transition-transform duration-500 ease-out"
+              style={{
+                transformStyle: "preserve-3d",
+                transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                minHeight: "400px",
+              }}
             >
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xs font-mono text-[#f3c6ad] bg-[#2a4651] px-2 py-0.5 rounded border border-[#2a4651]">
-                  A{card.id}
-                </span>
-                <span className="text-xs text-[#8aa6b0] font-mono uppercase tracking-[0.12em]">Answer</span>
+              {/* Front — Question */}
+              <div
+                className="absolute inset-0 bg-[#0a0f0c] border border-[#1c2f37] rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.4),0_8px_24px_-12px_rgba(0,0,0,0.55)] p-8 md:p-10 flex flex-col"
+                style={{ backfaceVisibility: "hidden" }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-xs font-mono text-[#8aa6b0] bg-[#0c1a10] px-3 py-1 rounded-md border border-[#1c2f37]">
+                    Q{card.id}
+                  </span>
+                  <span className="text-xs font-mono text-[#8aa6b0] uppercase tracking-[0.12em]">
+                    {card.section}
+                  </span>
+                </div>
+                <div className="flex-1 flex items-center justify-center">
+                  <p className="text-xl md:text-2xl leading-relaxed text-[#f2fafc] font-medium text-center max-w-3xl">
+                    {card.question}
+                  </p>
+                </div>
+                <div className="text-center text-sm text-[#8aa6b0] mt-6 font-mono">
+                  Click or press Space to reveal
+                </div>
               </div>
-              <div className="flex-1 flex items-center justify-center">
-                <p className="text-lg leading-relaxed text-[#f2fafc] text-center">
-                  {card.answer}
-                </p>
-              </div>
-              <div className="text-center text-sm text-[#8aa6b0] mt-4 font-mono">
-                Click or press Space to flip back
+
+              {/* Back — Answer */}
+              <div
+                className="absolute inset-0 bg-[#0c1a10] border border-[#2a4651] rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.4),0_8px_24px_-12px_rgba(0,0,0,0.55)] p-8 md:p-10 flex flex-col"
+                style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-xs font-mono text-[#f3c6ad] bg-[#2a4651] px-3 py-1 rounded-md border border-[#2a4651]">
+                    A{card.id}
+                  </span>
+                  <span className="text-xs font-mono text-[#8aa6b0] uppercase tracking-[0.12em]">
+                    {card.section}
+                  </span>
+                </div>
+                <div className="flex-1 flex items-center justify-center">
+                  <p className="text-lg md:text-xl leading-relaxed text-[#f2fafc] text-center max-w-3xl">
+                    {card.answer}
+                  </p>
+                </div>
+                <div className="text-center text-sm text-[#8aa6b0] mt-6 font-mono">
+                  Click or press Space to flip back
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Self-grading */}
-        <div className="flex items-center justify-center gap-4 mb-8">
-          <span className="text-sm text-[#8aa6b0] font-mono uppercase tracking-[0.12em]">How'd you do?</span>
-          <button
-            onClick={(e) => { e.stopPropagation(); markCorrect(); }}
-            className={`px-4 py-1.5 text-sm rounded-lg border transition-colors font-medium ${
-              progressBoxes[card.id] === 'correct'
-                ? "bg-[#34d399]/15 border-[#34d399] text-[#34d399]"
-                : "bg-[#0a0f0c] border-[#1c2f37] text-[#8aa6b0] hover:bg-[#1c2f37]"
-            }`}
-          >
-            ✓ Correct
-          </button>
-          <button
-            onClick={(e) => { e.stopPropagation(); markWrong(); }}
-            className={`px-4 py-1.5 text-sm rounded-lg border transition-colors font-medium ${
-              progressBoxes[card.id] === 'wrong'
-                ? "bg-[#f87171]/15 border-[#f87171] text-[#f87171]"
-                : "bg-[#0a0f0c] border-[#1c2f37] text-[#8aa6b0] hover:bg-[#1c2f37]"
-            }`}
-          >
-            ✗ Missed
-          </button>
-        </div>
+        {/* ═══════ Controls ═══════ */}
+        <div className="w-full max-w-4xl">
+          {/* Self-grading */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <button
+              onClick={(e) => { e.stopPropagation(); mark(card.id, 'correct'); }}
+              className={`px-5 py-2.5 text-sm font-medium rounded-lg border transition-all ${
+                progress[card.id] === 'correct'
+                  ? "bg-[#34d399]/10 border-[#34d399] text-[#34d399]"
+                  : "bg-transparent border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc]"
+              }`}
+            >
+              ✓ Got it
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); mark(card.id, 'wrong'); }}
+              className={`px-5 py-2.5 text-sm font-medium rounded-lg border transition-all ${
+                progress[card.id] === 'wrong'
+                  ? "bg-[#f87171]/10 border-[#f87171] text-[#f87171]"
+                  : "bg-transparent border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc]"
+              }`}
+            >
+              ✗ Missed
+            </button>
+          </div>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => goTo(index - 1)}
-            disabled={index === 0}
-            className="px-5 py-2 text-sm font-medium rounded-lg border border-[#1c2f37] bg-[#0a0f0c] text-[#f2fafc] hover:bg-[#1c2f37] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          >
-            ← Previous
-          </button>
+          {/* Navigation */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => goTo(index - 1)}
+              disabled={index === 0}
+              className="px-5 py-2.5 text-sm font-medium rounded-lg border border-[#1c2f37] bg-[#0a0f0c] text-[#f2fafc] hover:bg-[#1c2f37] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              ← Previous
+            </button>
 
-          <span className="text-sm text-[#8aa6b0] font-mono">
-            {(() => {
-              const correctCount = Object.entries(progressBoxes).filter(([, v]) => v === 'correct').length;
-              const wrongCount = Object.entries(progressBoxes).filter(([, v]) => v === 'wrong').length;
-              if (correctCount + wrongCount === 0) return "";
-              return `${correctCount} correct, ${wrongCount} missed`;
-            })()}
-          </span>
+            <button
+              onClick={() => goTo(index + 1)}
+              disabled={index === total - 1}
+              className="px-5 py-2.5 text-sm font-medium rounded-lg border border-[#1c2f37] bg-[#0a0f0c] text-[#f2fafc] hover:bg-[#1c2f37] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Next →
+            </button>
+          </div>
 
-          <button
-            onClick={() => goTo(index + 1)}
-            disabled={index === total - 1}
-            className="px-5 py-2 text-sm font-medium rounded-lg border border-[#1c2f37] bg-[#0a0f0c] text-[#f2fafc] hover:bg-[#1c2f37] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-          >
-            Next →
-          </button>
-        </div>
-
-        {/* Keyboard shortcuts */}
-        <div className="mt-10 text-center text-xs text-[#8aa6b0] font-mono space-x-4">
-          <span>← → navigate</span>
-          <span>Space / Enter flip</span>
+          {/* Keyboard hints */}
+          <div className="mt-8 text-center text-xs text-[#8aa6b0] font-mono space-x-4">
+            <span>← → navigate</span>
+            <span>Space flip</span>
+            <span>1-9 grade</span>
+          </div>
         </div>
       </div>
     </DDIAThemeProvider>
