@@ -415,7 +415,7 @@ export default function InterviewHighLevelPage() {
                     Q{card.id}
                   </span>
                   <span className="text-xs font-mono text-[#8aa6b0] uppercase tracking-[0.12em]">
-                    Ch. {card.chapter} — {card.section}
+                    {card.section}
                   </span>
                 </div>
                 <div className="flex-1 flex items-center justify-center">
@@ -438,7 +438,7 @@ export default function InterviewHighLevelPage() {
                     A{card.id}
                   </span>
                   <span className="text-xs font-mono text-[#8aa6b0] uppercase tracking-[0.12em]">
-                    Ch. {card.chapter} — {card.section}
+                    {card.section}
                   </span>
                 </div>
                 <div className="flex-1 flex items-center justify-center">
