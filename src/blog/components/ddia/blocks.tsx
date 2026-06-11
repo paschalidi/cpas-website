@@ -52,10 +52,10 @@ export function Callout({
   const s = calloutStyles[type];
   return (
     <aside
-      className="my-7 rounded-r-lg border-l-2 bg-[var(--bg-soft)]/60 py-3 pl-5 pr-4 text-[0.97rem] leading-relaxed"
+      className="my-7 rounded-r-lg border-l-2 bg-[var(--bg-soft)]/60 py-3 pl-5 pr-4 text-base leading-relaxed"
       style={{ borderLeftColor: s.color }}
     >
-      <p className="mb-1 font-mono text-[11px] uppercase tracking-[0.15em]" style={{ color: s.color }}>
+      <p className="mb-1 font-mono text-xs uppercase tracking-[0.15em]" style={{ color: s.color }}>
         {s.label}
         {title ? (
           <span className="text-[var(--muted)] normal-case tracking-normal"> &middot; {title}</span>
@@ -98,15 +98,15 @@ export function InTheWild({
           <circle cx="12" cy="12" r="10" />
           <path d="M2 12h20M12 2a15 15 0 0 1 0 20 15 15 0 0 1 0-20z" />
         </svg>
-        <span className="font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-[var(--accent)]">
+        <span className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--accent)]">
           In the wild
         </span>
-        <span className="truncate text-[13px] font-medium text-[var(--ink)]">{title}</span>
+        <span className="truncate text-sm font-medium text-[var(--ink)]">{title}</span>
       </div>
-      <div className="space-y-2 px-4 py-3 text-[0.95rem] leading-relaxed [&>p]:m-0">
+      <div className="space-y-2 px-4 py-3 text-base leading-relaxed [&>p]:m-0">
         {children}
       </div>
-      <p className="border-t border-[var(--line)] px-4 py-2 text-[12.5px] text-[var(--muted)]">
+      <p className="border-t border-[var(--line)] px-4 py-2 text-xs text-[var(--muted)]">
         Sources:{" "}
         {sources.map((s, i) => (
           <span key={s.href}>
@@ -132,7 +132,7 @@ export function InTheWild({
 export function KeyTakeaways({ items }: { items: ReactNode[] }) {
   return (
     <div className="my-7 rounded-lg border border-[var(--line)] p-5">
-      <p className="font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-[var(--accent)] mb-4">
+      <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--accent)] mb-4">
         If you only remember 5 things
       </p>
       <ol className="space-y-3">
@@ -141,7 +141,7 @@ export function KeyTakeaways({ items }: { items: ReactNode[] }) {
             <span className="font-mono text-lg font-semibold leading-snug text-[var(--accent)]">
               {i + 1}
             </span>
-            <span className="text-[0.97rem] leading-relaxed">{item}</span>
+            <span className="text-base leading-relaxed">{item}</span>
           </li>
         ))}
       </ol>
@@ -162,17 +162,17 @@ export function CheatTable({
 }) {
   return (
     <figure className="my-7">
-      <figcaption className="font-mono text-[0.6875rem] uppercase tracking-[0.18em] text-[var(--accent)] mb-2">
+      <figcaption className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--accent)] mb-2">
         {caption}
       </figcaption>
       <div className="thin-scroll overflow-x-auto rounded-lg border border-[var(--line)]">
-        <table className="w-full border-collapse text-[0.875rem] leading-[1.5]">
+        <table className="w-full border-collapse text-sm leading-[1.5]">
           <thead>
             <tr>
               {head.map((h) => (
-                <th
+                  <th
                   key={h}
-                  className="font-mono text-[0.7rem] uppercase tracking-[0.08em] text-left text-[var(--muted)] border-b-2 border-[var(--line-strong)] px-3 py-2 whitespace-nowrap"
+                  className="font-mono text-xs uppercase tracking-[0.08em] text-left text-[var(--muted)] border-b-2 border-[var(--line-strong)] px-3 py-2 whitespace-nowrap"
                 >
                   {h}
                 </th>
@@ -196,7 +196,7 @@ export function CheatTable({
         </table>
       </div>
       {footnote ? (
-        <p className="mt-2 text-[12.5px] leading-relaxed text-[var(--muted)]">{footnote}</p>
+        <p className="mt-2 text-xs leading-relaxed text-[var(--muted)]">{footnote}</p>
       ) : null}
     </figure>
   );
@@ -207,11 +207,11 @@ export function InterviewQA({ items }: { items: { q: string; a: ReactNode }[] })
     <div className="my-7 space-y-2">
       {items.map((item, i) => (
         <details key={i} className="rounded-lg border border-[var(--line)] px-4 py-3">
-          <summary className="text-[0.97rem] font-medium text-[var(--ink)] cursor-pointer list-none flex gap-2 items-baseline">
+          <summary className="text-base font-medium text-[var(--ink)] cursor-pointer list-none flex gap-2 items-baseline">
             <span className="text-[var(--accent)] font-mono font-semibold flex-shrink-0">+</span>
             {item.q}
           </summary>
-          <div className="mt-2 space-y-2 pl-5 text-[0.95rem] leading-relaxed text-[var(--muted)] [&>p]:m-0">
+          <div className="mt-2 space-y-2 pl-5 text-base leading-relaxed text-[var(--muted)] [&>p]:m-0">
             {item.a}
           </div>
         </details>
@@ -229,14 +229,14 @@ export function Misconceptions({
     <div className="my-7 space-y-4">
       {items.map((m, i) => (
         <div key={i} className="rounded-lg border border-[var(--line)] p-4">
-          <p className="m-0 text-[0.95rem] leading-relaxed">
-            <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--bad)]">
+          <p className="m-0 text-base leading-relaxed">
+            <span className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--bad)]">
               Myth&nbsp;
             </span>
             <span className="italic text-[var(--muted)]">&ldquo;{m.myth}&rdquo;</span>
           </p>
-          <p className="m-0 mt-2 text-[0.95rem] leading-relaxed">
-            <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--ok)]">
+          <p className="m-0 mt-2 text-base leading-relaxed">
+            <span className="font-mono text-xs uppercase tracking-[0.12em] text-[var(--ok)]">
               Reality&nbsp;
             </span>
             {m.reality}
