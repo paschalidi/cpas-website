@@ -1,0 +1,467 @@
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import DDIAThemeProvider from "../blog/components/ddia/DDIAThemeProvider";
+
+/* ─── Data ─── */
+
+interface Flashcard {
+  id: number;
+  section: string;
+  chapter: number;
+  question: string;
+  answer: string;
+}
+
+const flashcards: Flashcard[] = [
+  { id: 1, section: "Trade-Offs in Data Systems Architecture", chapter: 1,
+    question: "\"Separation of storage and compute\" — what does the defining cloud-native pattern actually change?",
+    answer: "Storage lives in a shared, durable, elastic layer (object storage); compute\nis stateless-ish and scales — or shuts off — independently. Consequences:\nyou can resize/replace compute without migrating data, multiple engines can\nshare one copy of the data, and durability is the storage service's problem.\nThe trade: every read crosses a network, so caching layers and columnar\nformats become load-bearing. Modern warehouses and lakehouses are this\npattern; it also quietly resurrects shared-disk architecture.\n*Ch. 1 — \"Cloud Native System Architecture\"; Ch. 4 — \"Cloud Data Warehouses\"*" },
+  { id: 2, section: "Trade-Offs in Data Systems Architecture", chapter: 1,
+    question: "Data warehouse vs data lake — and what did the shift from ETL to ELT change?",
+    answer: "A warehouse stores curated, schema-on-write tables optimized for SQL\nanalytics; a lake stores raw files (schema-on-read) cheaply, deferring\nstructure to consumers. ELT (load raw first, transform inside the\nwarehouse/lake) won because storage got cheap and transformation logic\nchanges often — keeping the raw immutable data means you can re-derive when\nthe logic evolves, the same rebuildability principle as everywhere else in\nthe book. The cost: governance — a lake without discipline is a swamp.\n*Ch. 1 — \"Data Warehousing\", \"Systems of Record and Derived Data\"*" },
+  { id: 3, section: "Trade-Offs in Data Systems Architecture", chapter: 1,
+    question: "What do serverless/FaaS architectures force you to do with state?",
+    answer: "Externalize it. Function instances are ephemeral and may cold-start, so all\nstate lives in databases, object stores, caches, or queues — which makes\ndata-system choices (latency to the store, connection limits, idempotency\nof handlers that *will* be retried) the real architecture, with the\nfunctions as glue. The trade: operational simplicity and per-request\neconomics vs cold-start latency, vendor coupling, and harder\nlocal/long-running workloads.\n*Ch. 1 — \"Microservices and Serverless\", \"Operations in the Cloud Era\"*" },
+  { id: 4, section: "Defining Nonfunctional Requirements", chapter: 2,
+    question: "Why does latency explode as utilization approaches 100% — and what's the design consequence?",
+    answer: "Queueing: requests vary in cost, servers process limited work in parallel,\nand a few slow requests make others wait behind them (head-of-line\nblocking). Near saturation, queue length — and thus response time — grows\nnonlinearly; the system feels fine at 70% and terrible at 95%. Consequence:\ncapacity-plan for tail latency at *peak*, keep headroom on purpose, and\ntreat rising queue depth as the earliest overload signal.\n*Ch. 2 — \"Latency and Response Time\", \"Use of Response Time Metrics\"*" },
+  { id: 5, section: "Defining Nonfunctional Requirements", chapter: 2,
+    question: "Shared-memory vs shared-disk vs shared-nothing — and which one is quietly back?",
+    answer: "Shared-memory = one big machine (scale-up: simple, expensive, a ceiling).\nShared-nothing = independent nodes coordinating over the network (scale-out:\nthe dominant model, at the price of distributed-systems problems).\nShared-disk — many compute nodes over common storage — was niche, but\ncloud object storage revived it: storage/compute separation (card 1) *is*\nshared-disk reborn, with the contention problems mitigated by immutable\nfiles and caching.\n*Ch. 2 — \"Shared-Memory, Shared-Disk, and Shared-Nothing Architectures\"*" },
+  { id: 6, section: "Defining Nonfunctional Requirements", chapter: 2,
+    question: "What's the methodological trap in reporting percentiles?",
+    answer: "You can't average them: the mean of ten servers' p99s is not the fleet's\np99, and aggregating pre-computed percentiles is statistically meaningless —\nkeep histograms and merge those. Also measure where the user is (client- or\nedge-side): server-side timing misses queueing in front of the service,\nwhich is precisely what degrades first under load (card 4).\n*Ch. 2 — \"Average, Median, and Percentiles\", \"Use of Response Time Metrics\"*" },
+  { id: 7, section: "Defining Nonfunctional Requirements", chapter: 2,
+    question: "Why do mature systems inject faults on purpose?",
+    answer: "Because fault-tolerance code that's never exercised is broken by default —\nthe bugs hide in recovery paths, not steady state. Deliberately killing\nprocesses, dropping packets, and failing dependencies (chaos-engineering\nstyle, in test *and* production) converts \"we believe we tolerate node\nloss\" into routinely demonstrated fact, and trains humans on the runbooks\ntoo — addressing the largest fault source: people.\n*Ch. 2 — \"Fault Tolerance\", \"Humans and Reliability\"*" },
+  { id: 8, section: "Data Models and Query Languages", chapter: 3,
+    question: "Star and snowflake schemas — why does analytics model data this way?",
+    answer: "A central fact table of events (one row per sale/click, very long,\nnarrow-ish) surrounded by dimension tables (who/what/where/when —\nproducts, customers, dates). Queries scan facts, filter and group by joined\ndimensions — a shape that matches columnar storage perfectly. Snowflake =\ndimensions further normalized; stars are usually preferred for query\nsimplicity. The design point: analytical models optimize for *aggregation\nacross events*, not entity lookup — opposite of OLTP modeling.\n*Ch. 3 — \"Stars and Snowflakes: Schemas for Analytics\"*" },
+  { id: 9, section: "Data Models and Query Languages", chapter: 3,
+    question: "What is GraphQL actually — and what is it not?",
+    answer: "A query language for APIs, not databases: clients declare the shape of\ndata they need; a server-side layer resolves it against backend services and\nstores. It solves over/under-fetching and mobile round-trips. It is *not* a\ndatabase query language or a data model — resolvers can hide N+1 query\nstorms, and someone still designs the storage underneath. In design\ndiscussions: GraphQL moves the join to the API layer; the database problems\nremain yours.\n*Ch. 3 — \"GraphQL\"*" },
+  { id: 10, section: "Data Models and Query Languages", chapter: 3,
+    question: "Why do ML and scientific workloads get their own data model (DataFrames/matrices)?",
+    answer: "Because their operations are bulk transformations over columns and matrices\n— feature engineering, linear algebra — not row-at-a-time lookups or joins\nby key. DataFrames blend relational-ish operations with array computing,\nand data flows to them as bulk exports of derived data (from lakes/\nwarehouses) rather than transactional reads. Knowing this explains why \"the\nML team wants a copy of everything\" is an architecture-by-derivation\nproblem, not a database-access problem.\n*Ch. 3 — \"DataFrames, Matrices, and Arrays\"*" },
+  { id: 11, section: "Storage and Retrieval", chapter: 4,
+    question: "What keeps LSM reads fast, and what's the LSM failure mode operators watch for?",
+    answer: "A key may live in the memtable or any SSTable, so reads check newest→oldest\n— bounded by Bloom filters (skip files that definitely lack the key) and\ncompaction (merge files so there are few places to look). The failure\nmode: compaction falling behind under write pressure — files pile up, reads\ntouch more of them, disk fills with un-merged data, and read latency\ndegrades *because of writes*. \"LSM reads got slow\" usually means \"compaction\nlost the race.\"\n*Ch. 4 — \"Log-Structured Storage\", \"Comparing B-Trees and LSM-Trees\"*" },
+  { id: 12, section: "Storage and Retrieval", chapter: 4,
+    question: "Why does every serious storage engine have a write-ahead log, even B-trees?",
+    answer: "Crash recovery: pages/structures get modified in multi-step operations, and\na crash mid-step would corrupt them — so every change is first appended to a\nlog; on restart, replay the log to restore consistency. The conceptual\npayoff is bigger than recovery: the WAL is an ordered, complete record of\nchanges, which is exactly what replication ships (Ch. 6) and CDC taps\n(Ch. 12). The log isn't an implementation detail; it's the database's\nspine.\n*Ch. 4 — \"B-Trees\" (WAL discussion), \"Log-Structured Storage\"*" },
+  { id: 13, section: "Storage and Retrieval", chapter: 4,
+    question: "Clustered, covering, and heap-referencing indexes — what's the actual choice?",
+    answer: "Where does the *row* live relative to the index? Heap + secondary\nindexes: indexes hold pointers; every hit costs an extra lookup, but rows\nhave one home. Clustered index: the table *is* stored in index order\n(e.g. by primary key) — primary-key range reads are beautifully fast;\nsecondary lookups go through the key. Covering index: store selected\ncolumns *inside* a secondary index so hot queries never touch the row —\nfaster reads, bought with extra write amplification and storage. It's the\nread/write trade-off, applied per query.\n*Ch. 4 — \"Storing Values Within the Index\", \"Multicolumn and Secondary Indexes\"*" },
+  { id: 14, section: "Storage and Retrieval", chapter: 4,
+    question: "What do in-memory databases actually buy — given disk-based DBs cache hot data in RAM anyway?",
+    answer: "Not \"avoiding disk reads\" — a warm cache already does that. The win is\navoiding the *format*: no encoding data structures into disk-page layouts,\nno buffer-pool management overhead, and the freedom to offer structures\nthat are awkward on disk (rich data types, priority queues). Durability\nstill comes from a log, snapshots, or replication — memory-first doesn't\nmean durability-optional, it means the disk format stops dictating the\ndesign.\n*Ch. 4 — \"Keeping Everything in Memory\"*" },
+  { id: 15, section: "Encoding and Evolution", chapter: 5,
+    question: "What are the ground rules that make a schema change safe in both directions?",
+    answer: "Tagged formats (Protobuf): add fields only with new tag numbers and\ndefaults; never reuse or renumber a tag (old bytes would silently misparse);\nunknown tags are skippable, which is what lets old code read new data.\nAvro: fields match by name between writer's and reader's schema;\nreader-only fields need defaults (that's the compatibility test), and\nthe writer's schema must travel (file header or registry). One sentence:\n*evolution safety is mechanical, and therefore checkable before deploy.*\n*Ch. 5 — \"Protocol Buffers\", \"Avro\", \"The Merits of Schemas\"*" },
+  { id: 16, section: "Encoding and Evolution", chapter: 5,
+    question: "In an event pipeline, where do schemas live and where is compatibility enforced?",
+    answer: "Messages are tiny, so each carries a small schema ID; a registry\nstores the schemas, consumers fetch-and-cache by ID and resolve against\ntheir own reader schema. The strategic part: the registry is configured\nwith a compatibility mode and rejects incompatible schemas at publish\ntime — turning a would-be 3 a.m. consumer crash into a failed CI step for\nthe producer. Compatibility becomes infrastructure-enforced, not\nconvention-hoped.\n*Ch. 5 — \"Avro\", \"The Merits of Schemas\", \"Event-Driven Architectures\"*" },
+  { id: 17, section: "Encoding and Evolution", chapter: 5,
+    question: "Durable execution / workflow engines (new in 2e) — what's the core mechanism and its catch?",
+    answer: "Long-running business processes (payments, provisioning) are written as\ncode whose progress is persisted as an event history; after a crash, the\nworkflow *replays* deterministically to its last state and continues —\nretries, timers, and human-wait steps survive process death. The catch:\nreplay demands determinism — side effects must go through recorded\nactivities (executed once, result stored), and *versioning* workflow code\nis the hard part, since old histories must still replay against it\n(chapter-5 evolution rules, applied to code).\n*Ch. 5 — \"Durable Execution and Workflows\"*" },
+  { id: 18, section: "Encoding and Evolution", chapter: 5,
+    question: "Why is a message queue described as a \"time capsule\" for schemas?",
+    answer: "Messages written before a deploy are consumed after it; backlogs and\ndead-letter replays resurrect messages that are hours or months old. So\nconsumers face an *archive* of every schema version ever produced, not just\nthe current one — forward compatibility lives longest here, and event\nschemas must be treated as public, versioned APIs with the strictest\ndiscipline of any boundary.\n*Ch. 5 — \"Event-Driven Architectures\", \"Modes of Dataflow\"*" },
+  { id: 19, section: "Replication", chapter: 6,
+    question: "What makes failover genuinely hard? Name the three classic hazards.",
+    answer: "(1) Lost acknowledged writes — with async replication, the promoted\nfollower may lack writes the old leader confirmed; discarding them revokes\ndurability, and external systems that saw those writes now disagree.\n(2) Split brain — the old leader returns still believing it leads;\nwithout epochs/fencing, two nodes accept writes. (3) Timeout tuning —\ntoo short and load spikes trigger spurious failovers (adding load to a\nstressed system), too long and outages stretch. This trio is why mature\nteams often keep a human approving the final switch.\n*Ch. 6 — \"Handling Node Outages\", \"Synchronous Versus Asynchronous Replication\"*" },
+  { id: 20, section: "Replication", chapter: 6,
+    question: "Statement vs WAL-shipping vs logical replication — why does the log format matter strategically?",
+    answer: "Statement-based ships SQL text — nondeterminism (NOW(), RANDOM())\ndiverges replicas. Physical WAL ships exact bytes — deterministic but\nlocks replicas to the same engine version, blocking zero-downtime upgrades.\nLogical (row-based) ships \"row X changed from A to B\" —\nversion-tolerant (upgrade replicas first, then fail over) and, the\nstrategic part, consumable by external systems: logical replication is\nthe doorway through which CDC (Ch. 12) and the whole derived-data\narchitecture walk.\n*Ch. 6 — \"Implementation of Replication Logs\"*" },
+  { id: 21, section: "Replication", chapter: 6,
+    question: "In leaderless systems, how does data heal — and what do sloppy quorums change?",
+    answer: "Two repair paths: read repair (a quorum read that sees a stale replica\nwrites the fresh value back — heals hot keys) and anti-entropy (a\nbackground process diffs replicas and syncs — heals cold keys nobody\nreads; without it, rarely-read data stays stale indefinitely). Sloppy\nquorums accept writes on substitute nodes during a partition (with\nhinted handoff back to the home nodes later) — availability rescued, but w\nacks no longer overlap the home set, so the w+r>n read guarantee is\nsuspended until hints deliver.\n*Ch. 6 — \"Writing to the Database When a Node Is Down\", \"Leaderless Replication\"*" },
+  { id: 22, section: "Replication", chapter: 6,
+    question: "What makes a CRDT mergeable — and where does that matter now (2e)?",
+    answer: "The data type's operations are designed to be commutative/convergent:\nany two replicas can apply each other's updates in any order and\nmathematically *must* reach the same state — counters that merge by\nsumming per-replica increments, sets with add/remove semantics, sequence\ntypes for collaborative text. No conflict handler to write, no LWW data\nloss. The 2e relevance: sync engines and local-first software — every\ndevice is a writer, offline edits are normal, and CRDTs make convergence\nautomatic instead of an app-code chore. The trade: you must express your\ndomain in CRDT-shaped types, and some invariants (uniqueness, \"at most N\")\nfundamentally still need coordination.\n*Ch. 6 — \"Sync Engines and Local-First Software\", \"Dealing with Conflicting Writes\"*" },
+  { id: 23, section: "Sharding", chapter: 7,
+    question: "Sharding for multitenancy (new 2e section) — what's the actual design question?",
+    answer: "Whether a tenant is your unit of sharding: tenant-per-shard (or\ntenant-per-database) gives isolation — noisy neighbors contained, per-tenant\nmigration, backup, deletion, and compliance become operations on a shard —\nat the cost of skew (one whale tenant outgrows its shard) and operational\nsprawl for thousands of tiny tenants. Shared shards pool small tenants\nefficiently but make isolation, per-tenant SLOs, and \"delete this customer\neverywhere\" harder. Most real systems end up hybrid: pooled small tenants,\ndedicated shards for whales.\n*Ch. 7 — \"Sharding for Multitenancy\"*" },
+  { id: 24, section: "Sharding", chapter: 7,
+    question: "Consistent hashing with virtual nodes vs many-fixed-partitions — what problem do both solve, and how?",
+    answer: "Both decouple key placement from cluster size so rebalancing moves ~1/N of\nthe data instead of everything (the `mod N` disaster). Consistent\nhashing: nodes own arcs of a hash ring; *virtual nodes* (many tokens per\nphysical node) even out load statistically and spread a failed node's data\nacross many successors. Fixed partitions: create far more partitions\nthan nodes up front; rebalance by reassigning whole partitions via a\nmetadata map. Same goal, different machinery — and the fixed-partition\napproach is the more common one in practice (Kafka-style), so don't equate\n\"sharding\" with \"the ring.\"\n*Ch. 7 — \"Sharding by Hash of Key\", \"Operations: Automatic Versus Manual Rebalancing\"*" },
+  { id: 25, section: "Sharding", chapter: 7,
+    question: "Request routing: who knows where partition 17 lives, and why does that knowledge need consensus?",
+    answer: "Three placements of the routing map: a routing tier (proxies consult\nit), partition-aware clients (the driver holds it), or any-node\nforwarding (every node knows enough to forward). All reduce to one\nrequirement: an authoritative, highly available record of\npartition→node assignment that updates *consistently* during rebalances —\ntwo routers disagreeing mid-move means misdirected writes. That's why the\nassignment typically lives in a consensus-backed coordination service\n(Ch. 10), and why \"metadata service down\" stalls an otherwise healthy\ncluster.\n*Ch. 7 — \"Request Routing\"*" },
+  { id: 26, section: "Transactions", chapter: 8,
+    question: "How does MVCC implement snapshot isolation — and what's its operational bill?",
+    answer: "Writers never overwrite: each write creates a new row version tagged\nwith its transaction ID; each transaction's snapshot rule is \"see versions\ncommitted before I began.\" Readers and writers therefore never block each\nother. The bill: old versions accumulate and must be garbage-collected\n(Postgres's VACUUM), and a long-running transaction pins the oldest visible\nsnapshot — blocking cleanup, bloating tables, and stalling replication\napply. \"A 6-hour analytics query on the primary\" is how this bites in real\ndesigns.\n*Ch. 8 — \"Snapshot Isolation and Repeatable Read\"*" },
+  { id: 27, section: "Transactions", chapter: 8,
+    question: "What's the practical toolbox for preventing lost updates?",
+    answer: "In preference order: push the update into the database (atomic ops:\n`UPDATE … SET n = n + 1`) so there's no read-modify-write gap; explicit\nlocking (`SELECT … FOR UPDATE`) when logic must run in the app;\ncompare-and-set (update only if the value is unchanged, retry\notherwise); or rely on the engine's automatic detection under snapshot\nisolation (abort the stale writer, retry). In replicated multi-writer\nstores none of these apply locally — you're in version-vector/merge\nterritory instead.\n*Ch. 8 — \"Preventing Lost Updates\"*" },
+  { id: 28, section: "Transactions", chapter: 8,
+    question: "Beyond \"use serializable\" — what's the materialize-the-conflict pattern for write skew and phantoms?",
+    answer: "Write skew happens because the conflicting transactions touch *disjoint*\nrows; phantoms because the conflicting row doesn't exist yet. The pattern:\nintroduce a row that both transactions must touch — a row per on-call\nshift to lock, a pre-created row per bookable room-slot whose unique\nconstraint arbitrates — converting an invisible conflict into an ordinary\nlock or constraint violation. It's often cheaper and clearer than turning\non serializable isolation globally, and it shows you understand *why* the\nanomaly occurs.\n*Ch. 8 — \"Write Skew and Phantoms\"*" },
+  { id: 29, section: "Transactions", chapter: 8,
+    question: "How does data modeling buy you out of distributed transactions?",
+    answer: "Strong guarantees are cheap within one object/row/document/partition:\nsingle-object atomicity, per-document transactions, single-partition\nserial execution. So co-locate what must change together — model the\naggregate as one document, choose partition keys so the invariant lives in\none shard — and the need for 2PC/sagas evaporates for most flows.\nConversely, scattering one logical change across services is what\n*creates* distributed-transaction problems. First question in design\nreviews: \"can we re-model so this is single-partition?\"\n*Ch. 8 — \"Single-Object and Multi-Object Operations\", \"Actual Serial Execution\"*" },
+  { id: 30, section: "Transactions", chapter: 8,
+    question: "Distributed transactions inside one system vs across heterogeneous systems — why does the 2e treat them so differently?",
+    answer: "Database-internal distributed transactions (a sharded database\ncommitting across its own partitions) can work well: one vendor controls\nall participants, and the commit decision can itself be consensus-\nreplicated — removing 2PC's fatal single-coordinator blocking flaw.\nAcross different systems (your DB + a queue + a search engine via\nXA-style protocols), 2PC's in-doubt stalls, lowest-common-denominator\nsemantics, and operational pain dominate — which is why integration across\nsystems moved to logs + exactly-once message processing instead. Same\nprotocol, opposite verdicts, depending on who owns the participants.\n*Ch. 8 — \"Database-Internal Distributed Transactions\", \"Distributed Transactions Across Different Systems\"*" },
+  { id: 31, section: "The Trouble with Distributed Systems", chapter: 9,
+    question: "What does TCP actually guarantee — and what does it pointedly not?",
+    answer: "Within one connection: ordered, deduplicated, retransmitted byte delivery.\nIt does not guarantee your request was *processed* (the connection can\ndie after delivery, before the reply), and its guarantees end at the\nconnection — a retry on a *new* connection is, to TCP, unrelated traffic.\nThat's why duplicates and unknown-outcome are application-level facts no\ntransport fixes, and why exactly-once must be built above (end-to-end\nargument, Ch. 13).\n*Ch. 9 — \"The Limitations of TCP\", \"Unreliable Networks\"*" },
+  { id: 32, section: "The Trouble with Distributed Systems", chapter: 9,
+    question: "A request times out. Walk the disciplined response.",
+    answer: "Accept the ambiguity: it may have executed. Retry only if the operation is\nidempotent — naturally, or via an idempotency key the server dedupes on.\nSpace retries with exponential backoff + jitter (synchronized retries\nre-DDoS the dependency), cap them with a retry budget, and retry at\none layer only (stacked retries multiply: 3 layers × 3 attempts = 27\ncalls). Then make the timeout itself deliberate: derived from the\ndependency's tail latency, not a folk constant.\n*Ch. 9 — \"Timeouts and Unbounded Delays\", \"Fault Detection\"; Ch. 8 — \"Exactly-Once Message Processing Revisited\"*" },
+  { id: 33, section: "The Trouble with Distributed Systems", chapter: 9,
+    question: "Walk the fencing-token mechanism — and why can't the lock holder just re-check its lease?",
+    answer: "The lock service issues a monotonically increasing token with each\ngrant; clients attach it to every write; the protected resource remembers\nthe highest token seen and rejects lower ones. Re-checking can't work\nbecause a process pause (GC, VM migration) can land *between* the check and\nthe write — the holder validates its lease, freezes, expires, and wakes to\nwrite as a zombie. The principle: safety must be enforced where the\nwrites land, by something that can't be paused along with the client.\n*Ch. 9 — \"Process Pauses\", \"Distributed Locks and Leases\"*" },
+  { id: 34, section: "The Trouble with Distributed Systems", chapter: 9,
+    question: "How do you use clocks safely when you must rely on them?",
+    answer: "Treat a timestamp as an interval, not a point: clock readings carry an\nuncertainty bound (NTP error; or tight GPS/atomic bounds in Spanner-style\nTrueTime), and correctness logic must respect it — e.g. commit-wait:\nhold a transaction's commit until its uncertainty interval has fully\npassed, so timestamp order matches real order. The portable lessons: never\norder cross-node events by raw wall clocks, use monotonic clocks for\ndurations, and *monitor* clock skew like any other failure mode — almost\nnobody does until it bites.\n*Ch. 9 — \"Clock Synchronization and Accuracy\", \"Relying on Synchronized Clocks\"*" },
+  { id: 35, section: "Consistency and Consensus", chapter: 10,
+    question: "Linearizability vs serializability — disentangle them in two sentences.",
+    answer: "Serializability is about *transactions*: the multi-object history is\nequivalent to *some* serial order — which may disagree with real time (a\nserializable system can serve stale snapshots). Linearizability is\nabout *single-object recency in real time*: once anyone sees a write,\neveryone does. They're orthogonal; both together is strict\nserializability. Saying \"we're serializable, so reads are fresh\" is the\nprecise confusion this card exists to kill.\n*Ch. 10 — \"What Makes a System Linearizable?\"; Ch. 8 — \"Serializability\"*" },
+  { id: 36, section: "Consistency and Consensus", chapter: 10,
+    question: "\"We run Raft, so reads from the leader are consistent.\" What's wrong, and what are the fixes?",
+    answer: "A leader can be deposed and not know it (partitioned, paused) — its\nlocal reads then return stale data while the new leader commits elsewhere:\nnot linearizable. Fixes: read-index (leader confirms it's still leader\nwith a quorum check before serving), lease reads (serve locally during\na clock-bounded lease — fast, but correctness now leans on bounded clock\ndrift), or route reads through the log like writes (slow, simple). Many\nproduction \"strongly consistent\" claims quietly skip this — it's a great\nprobing question from either side of the table.\n*Ch. 10 — \"Implementing Linearizable Systems\", \"Consensus in Practice\"*" },
+  { id: 37, section: "Consistency and Consensus", chapter: 10,
+    question: "How do epochs plus quorum overlap prevent two leaders from both deciding?",
+    answer: "Every election increments an epoch/term; replicas reject messages from\nolder epochs — so a stale leader's writes bounce (consensus's built-in\nfencing token). Elections require a majority, and any two majorities\noverlap — so a new epoch's quorum always contains someone who knows\nabout the latest committed entries and the newest epoch, making stale\nleadership detectable and committed data survivable across leader changes.\nOne line: *epochs say who's newest; overlap guarantees someone in the room\nremembers.*\n*Ch. 10 — \"Consensus\", \"The Many Faces of Consensus\"; Ch. 9 — \"The Majority Rules\"*" },
+  { id: 38, section: "Consistency and Consensus", chapter: 10,
+    question: "Snowflake-style ID generators — what do they give up to avoid coordination?",
+    answer: "Structure: timestamp bits + node ID + per-node sequence → unique,\n*roughly* time-sortable IDs at huge throughput with zero coordination\nper ID. What's given up: linearizable ordering — clock skew between nodes\nmeans ID order only approximates event order, and an ID is *not* proof of\nhappened-before. If IDs must be strictly monotonic (audit sequences, fencing\ntokens), you're back to a single-writer or consensus-backed generator — as\nexpensive as the guarantee it makes. Most systems want snowflakes and only\n*think* they want monotonic.\n*Ch. 10 — \"ID Generators and Logical Clocks\", \"Linearizable ID Generators\"*" },
+  { id: 39, section: "Batch Processing", chapter: 11,
+    question: "Batch on object stores + ephemeral compute — what changed from the HDFS era?",
+    answer: "Compute clusters used to *own* the data (HDFS on the same machines,\nmove-code-to-data); now durable data lives in object storage and\ncompute clusters spin up, read over the network, write results, and\ndisappear. Wins: elasticity, pay-per-job, many engines over one copy,\ndurability outsourced. Costs: network reads (mitigated by columnar\nformats + caching) and object-store semantics — immutable objects,\nlist/rename quirks — which push job design toward write-once outputs and\nexplicit manifests. It's storage/compute separation (card 1) applied to\nbatch.\n*Ch. 11 — \"Object Stores\", \"Distributed Filesystems\"*" },
+  { id: 40, section: "Batch Processing", chapter: 11,
+    question: "How do you choose a distributed join strategy?",
+    answer: "Ask what you know about the inputs. Know nothing → shuffle join:\nrepartition both sides by key over the network so matches co-locate\n(general, expensive — the shuffle dominates). One side small →\nbroadcast join: ship it whole to every worker; the big side never\nmoves. Both sides already partitioned (and sorted) by the key →\nmerge in place, no shuffle. And the universal saboteur: a hot key\nstalls the whole job, because one key's records can't be parallelized —\nfix by salting the key or broadcasting around it, not by adding workers.\n*Ch. 11 — \"Joins and Grouping\", \"Shuffling Data\"*" },
+  { id: 41, section: "Batch Processing", chapter: 11,
+    question: "Why must batch jobs be side-effect-free with atomically published outputs?",
+    answer: "Tasks retry and run speculatively, so any task may execute more than\nonce — a job that emails users or mutates an external store mid-run\nduplicates effects on every retry, and a half-failed run leaves the world\nhalf-changed with no rollback. Discipline: compute pure outputs to a\nstaging location, publish atomically on success (consumers see complete\nold or complete new, never a mix), keep the previous output for instant\nrollback, and do any real-world effects after commit, idempotently.\n*Ch. 11 — \"Batch Processing in Distributed Systems\", \"MapReduce\"*" },
+  { id: 42, section: "Stream Processing", chapter: 12,
+    question: "Consumer groups, offsets, and lag — why is this design so operationally pleasant?",
+    answer: "A group divides partitions (not messages) among members: one reader per\npartition preserves order; parallelism scales to the partition count (size\nit generously — repartitioning later is a project). Progress is one\ncommitted offset per partition — crash recovery is \"resume from\noffset,\" no per-message broker state. Lag (head minus committed) is the\nsingle staleness metric; the alert that matters is lag *versus retention* —\n\"hours until unread data is deleted\" — not absolute lag.\n*Ch. 12 — \"Log-Based Message Brokers\"*" },
+  { id: 43, section: "Stream Processing", chapter: 12,
+    question: "The transactional outbox — solve \"update the DB and publish an event, atomically\" without 2PC.",
+    answer: "In one local ACID transaction, write the business row *and* an event\nrow into an `outbox` table — one commit, both or neither. A relay (poller,\nor CDC on the outbox table itself) publishes outbox rows to the stream;\nsince the relay is at-least-once, consumers dedupe by event ID. Atomicity\nis borrowed from the only place it's cheap — a single database — and the\nevent can carry intent (\"OrderPlaced\"), richer than a row diff. This is\nthe most-asked integration pattern in design interviews; say it with the\ndedupe caveat attached.\n*Ch. 12 — \"Keeping Systems in Sync\", \"Change Data Capture\"; Ch. 8 — \"Exactly-Once Message Processing Revisited\"*" },
+  { id: 44, section: "Stream Processing", chapter: 12,
+    question: "Log compaction — what does a compacted topic give you?",
+    answer: "Compaction keeps, per key, only the latest value (and eventually drops\nkeys whose latest value is a deletion tombstone) — the topic becomes\n\"current state of every key, as a log,\" bounded by keyspace size rather\nthan time. Payoff: a bootstrappable changelog — a new consumer (fresh\ncache, rebuilt index, recovering processor state) reads it from the start\nand arrives at full current state, no separate snapshot system. Caveats:\nintermediate history is gone, and tombstones must be retained long enough\nfor slow consumers to learn about deletions.\n*Ch. 12 — \"Log-Based Message Brokers\", \"State, Streams, and Immutability\"*" },
+  { id: 45, section: "Stream Processing", chapter: 12,
+    question: "The three stream joins — and the temporal gotcha that breaks reprocessing.",
+    answer: "Stream–stream: correlate two event streams within a window (searches ↔\nclicks); buffered, keyed state bounded by the window. Stream–table:\nenrich events against reference data held as local state, kept current by\nconsuming that table's changelog. Table–table: two changelogs in, a\nmaintained materialized view out. The gotcha: stream–table joins enrich\nagainst state as of processing time — replay last month's events today\nand they join against *today's* table, so reprocessing isn't deterministic\nunless you keep versioned/temporal state and join as-of the event's\ntimestamp. Naming that trade-off is the differentiator.\n*Ch. 12 — \"Stream Joins\"*" },
+  { id: 46, section: "A Philosophy of Streaming Systems", chapter: 13,
+    question: "How do you change the logic or schema of a derived view without downtime?",
+    answer: "Reprocess in parallel, then switch: keep the raw log; start a second\njob/pipeline with the new logic reading from the beginning; let it build\nview-v2 alongside the serving view-v1; when v2 catches the head, switch\nreads atomically; keep v1 briefly for rollback. Migrations, bug fixes, and\n\"what if we'd always computed it this way?\" all become replay + compare +\nswitch — the gradual-migration superpower that justifies keeping raw\nimmutable input in the first place.\n*Ch. 13 — \"Batch and Stream Processing\", \"Combining Specialized Tools by Deriving Data\"*" },
+  { id: 47, section: "A Philosophy of Streaming Systems", chapter: 13,
+    question: "Enforce a uniqueness constraint at scale without a lock service.",
+    answer: "Let a log decide: route all claims for a given value (username, seat,\nSKU reservation) through one partition — the partition's total order makes\nthe first claim win and the rest fail, deterministically, with a\nsingle-threaded-per-partition processor emitting accepted/rejected events.\nLinearizable *for that key*, horizontally scalable across keys, no lock\nservice in the hot path. For constraints spanning partitions, choose:\nmulti-partition transactions, or the apology pattern — permit the rare\nviolation, detect it from the log, compensate (how overbooking has always\nworked).\n*Ch. 13 — \"Enforcing Constraints\", \"Aiming for Correctness\"*" },
+  { id: 48, section: "A Philosophy of Streaming Systems", chapter: 13,
+    question: "\"Observing derived state\" — what does it mean to extend dataflow all the way to the client?",
+    answer: "If every view is a fold over a change stream, the user's screen is just the\nlast view in the chain — so instead of request/response polling, push\nstate changes to clients: subscriptions, live queries, offline-capable\napps that sync (meeting Ch. 6's local-first thread from the other side).\nThe write path (events → views) and read path (views → screens) become one\ncontinuous dataflow. The costs are real — fan-out to millions of\nsubscribers, reconnect/catch-up semantics — but the model explains where\n\"real-time collaborative\" products come from architecturally.\n*Ch. 13 — \"Designing Applications Around Dataflow\", \"Observing Derived State\"*" },
+  { id: 49, section: "Doing the Right Thing", chapter: 14,
+    question: "How does \"delete this user\" actually work in a log-based, replay-everything architecture?",
+    answer: "Deletion becomes a propagation problem with acceptance criteria: emit\ndeletion events every derived view must honor; use tombstones on\ncompacted topics so changelogs really drop the keys; bound retention on raw\ntopics so history ages out; and for data spread across logs, views, and\nbackups, use crypto-shredding — encrypt per user, delete the key, and\neverything encrypted under it becomes unreadable everywhere at once. Then\n*verify* by audit/replay that it's gone. Privacy regulation made this an\nengineering requirement, not a policy memo — which is precisely the\nchapter's point.\n*Ch. 14 — \"Privacy and Use of Data\", \"Legislation and Self-Regulation\"; Ch. 13 — \"Trust, but Verify\"*\n*Pairing drill: take any main-ideas card from the 66-deck and find its deeper\nsiblings here (e.g., \"dual writes are broken\" → outbox 43, compaction 44,\nreprocess-and-switch 46). If you can move fluently between the headline and\nthe mechanism, you can survive any follow-up an interviewer throws.*" },
+];
+
+/* ─── Chapter metadata ─── */
+const CHAPTERS = [
+  { id: 1, label: "Ch. 1", full: "Trade-Offs in Data Systems Architecture", count: 3 },
+  { id: 2, label: "Ch. 2", full: "Defining Nonfunctional Requirements", count: 4 },
+  { id: 3, label: "Ch. 3", full: "Data Models and Query Languages", count: 3 },
+  { id: 4, label: "Ch. 4", full: "Storage and Retrieval", count: 4 },
+  { id: 5, label: "Ch. 5", full: "Encoding and Evolution", count: 4 },
+  { id: 6, label: "Ch. 6", full: "Replication", count: 4 },
+  { id: 7, label: "Ch. 7", full: "Sharding", count: 3 },
+  { id: 8, label: "Ch. 8", full: "Transactions", count: 5 },
+  { id: 9, label: "Ch. 9", full: "The Trouble with Distributed Systems", count: 4 },
+  { id: 10, label: "Ch. 10", full: "Consistency and Consensus", count: 4 },
+  { id: 11, label: "Ch. 11", full: "Batch Processing", count: 3 },
+  { id: 12, label: "Ch. 12", full: "Stream Processing", count: 4 },
+  { id: 13, label: "Ch. 13", full: "A Philosophy of Streaming Systems", count: 3 },
+  { id: 14, label: "Ch. 14", full: "Doing the Right Thing", count: 1 },
+];
+
+/* ─── Utilities ─── */
+function shuffleArray<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+export default function InterviewDeeperPage() {
+  const [selectedChapters, setSelectedChapters] = useState<Set<number>>(new Set(CHAPTERS.map(c => c.id)));
+  const [index, setIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const [shuffled, setShuffled] = useState(false);
+  const [progress, setProgress] = useState<Record<string, 'correct' | 'wrong' | undefined>>({});
+
+  /* Filtered + optionally shuffled deck */
+  const deck = useMemo(() => {
+    const filtered = flashcards.filter(c => selectedChapters.has(c.chapter));
+    if (shuffled) return shuffleArray(filtered);
+    return filtered;
+  }, [selectedChapters, shuffled]);
+
+  const card = deck[index];
+  const total = deck.length;
+
+  const goTo = useCallback((i: number) => {
+    setIndex(Math.max(0, Math.min(total - 1, i)));
+    setFlipped(false);
+  }, [total]);
+
+  const toggleChapter = useCallback((id: number) => {
+    setSelectedChapters(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        if (next.size > 1) next.delete(id);
+      } else {
+        next.add(id);
+      }
+      setIndex(0);
+      setFlipped(false);
+      return next;
+    });
+  }, []);
+
+  const toggleShuffle = useCallback(() => {
+    setShuffled(prev => !prev);
+    setIndex(0);
+    setFlipped(false);
+  }, []);
+
+  const mark = useCallback((id: number, grade: 'correct' | 'wrong') => {
+    setProgress(prev => ({ ...prev, [id]: prev[id] === grade ? undefined : grade }));
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") goTo(index - 1);
+      else if (e.key === "ArrowRight" || e.key === "ArrowDown") goTo(index + 1);
+      else if (e.key === " " || e.key === "Enter") { e.preventDefault(); setFlipped(f => !f); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [index, goTo]);
+
+  /* Stats */
+  const correctCount = Object.values(progress).filter(v => v === 'correct').length;
+  const wrongCount = Object.values(progress).filter(v => v === 'wrong').length;
+  const gradedCount = correctCount + wrongCount;
+
+  if (!card) {
+    return (
+      <DDIAThemeProvider>
+        <div className="min-h-screen flex items-center justify-center text-[#f2fafc]">
+          <p className="text-lg">Select at least one chapter to begin.</p>
+        </div>
+      </DDIAThemeProvider>
+    );
+  }
+
+  return (
+    <DDIAThemeProvider>
+      <div className="min-h-screen flex flex-col items-center px-4 pt-24 md:pt-32 pb-12 md:pb-16">
+        {/* ═══════ Header ═══════ */}
+        <div className="w-full max-w-4xl mb-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-[#f2fafc] bg-gradient-to-r from-[#f2fafc] to-[#f2fafc]/60 bg-clip-text text-transparent">
+                DDIA 2e — Deeper
+              </h1>
+              <p className="text-sm text-[#8aa6b0] mt-2 font-mono">
+                {total} cards active &middot; {gradedCount} graded
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <a
+                href="/interview"
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc] transition-all"
+              >
+                Detailed
+              </a>
+              <a
+                href="/interview-high-level"
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc] transition-all"
+              >
+                Main Ideas
+              </a>
+              <button
+                onClick={toggleShuffle}
+                className={`px-4 py-2 text-sm font-medium rounded-lg border transition-all ${
+                  shuffled
+                    ? "bg-[#f3c6ad]/10 border-[#f3c6ad] text-[#f3c6ad]"
+                    : "bg-transparent border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc]"
+                }`}
+              >
+                {shuffled ? "Unshuffle" : "Shuffle"}
+              </button>
+              <div className="flex items-center gap-2 text-sm font-mono text-[#8aa6b0]">
+                <span className="text-[#34d399]">{correctCount}</span>
+                <span>/</span>
+                <span className="text-[#f87171]">{wrongCount}</span>
+                <span>/</span>
+                <span>{total - gradedCount}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ═══════ Chapter Filters ═══════ */}
+          <div className="flex flex-wrap gap-2 mb-2">
+            {CHAPTERS.map(chapter => {
+              const active = selectedChapters.has(chapter.id);
+              return (
+                <button
+                  key={chapter.id}
+                  onClick={() => toggleChapter(chapter.id)}
+                  className={`px-3 py-1.5 rounded-lg border text-sm font-medium transition-all ${
+                    active
+                      ? "bg-[#0c1a10] border-[#2a4651] text-[#f2fafc]"
+                      : "bg-transparent border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651]"
+                  }`}
+                >
+                  <span className="font-mono text-xs mr-1.5 opacity-60">{chapter.label}</span>
+                  {chapter.full}
+                  <span className="font-mono text-xs ml-1.5 opacity-60">{chapter.count}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ═══════ Progress Bar ═══════ */}
+        <div className="w-full max-w-4xl mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex-1 h-1.5 bg-[#1c2f37] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#f3c6ad] rounded-full transition-all duration-300"
+                style={{ width: `${((index + 1) / total) * 100}%` }}
+              />
+            </div>
+            <span className="text-sm font-mono text-[#8aa6b0] min-w-[3rem] text-right">
+              {index + 1}/{total}
+            </span>
+          </div>
+        </div>
+
+        {/* ═══════ Card ═══════ */}
+        <div className="w-full max-w-4xl mb-8">
+          <div
+            className="cursor-pointer"
+            onClick={() => setFlipped(f => !f)}
+            style={{ perspective: "1200px" }}
+          >
+            <div
+              className="relative transition-transform duration-500 ease-out"
+              style={{
+                transformStyle: "preserve-3d",
+                transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                minHeight: "400px",
+              }}
+            >
+              {/* Front — Question */}
+              <div
+                className="absolute inset-0 bg-[#0a0f0c] border border-[#1c2f37] rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.4),0_8px_24px_-12px_rgba(0,0,0,0.55)] p-8 md:p-10 flex flex-col"
+                style={{ backfaceVisibility: "hidden" }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-xs font-mono text-[#8aa6b0] bg-[#0c1a10] px-3 py-1 rounded-md border border-[#1c2f37]">
+                    Q{card.id}
+                  </span>
+                  <span className="text-xs font-mono text-[#8aa6b0] uppercase tracking-[0.12em]">
+                    {card.section}
+                  </span>
+                </div>
+                <div className="flex-1 flex items-center justify-center">
+                  <p className="text-xl md:text-2xl leading-relaxed text-[#f2fafc] font-medium text-center max-w-3xl">
+                    {card.question}
+                  </p>
+                </div>
+                <div className="text-center text-sm text-[#8aa6b0] mt-6 font-mono">
+                  Click or press Space to reveal
+                </div>
+              </div>
+
+              {/* Back — Answer */}
+              <div
+                className="absolute inset-0 bg-[#0c1a10] border border-[#2a4651] rounded-2xl shadow-[0_1px_2px_rgba(0,0,0,0.4),0_8px_24px_-12px_rgba(0,0,0,0.55)] p-8 md:p-10 flex flex-col"
+                style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <span className="text-xs font-mono text-[#f3c6ad] bg-[#2a4651] px-3 py-1 rounded-md border border-[#2a4651]">
+                    A{card.id}
+                  </span>
+                  <span className="text-xs font-mono text-[#8aa6b0] uppercase tracking-[0.12em]">
+                    {card.section}
+                  </span>
+                </div>
+                <div className="flex-1 flex items-center justify-center">
+                  <p className="text-lg md:text-xl leading-relaxed text-[#f2fafc] text-center max-w-3xl">
+                    {card.answer}
+                  </p>
+                </div>
+                <div className="text-center text-sm text-[#8aa6b0] mt-6 font-mono">
+                  Click or press Space to flip back
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ═══════ Controls ═══════ */}
+        <div className="w-full max-w-4xl">
+          {/* Self-grading */}
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <button
+              onClick={(e) => { e.stopPropagation(); mark(card.id, 'correct'); }}
+              className={`px-5 py-2.5 text-sm font-medium rounded-lg border transition-all ${
+                progress[card.id] === 'correct'
+                  ? "bg-[#34d399]/10 border-[#34d399] text-[#34d399]"
+                  : "bg-transparent border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc]"
+              }`}
+            >
+              ✓ Got it
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); mark(card.id, 'wrong'); }}
+              className={`px-5 py-2.5 text-sm font-medium rounded-lg border transition-all ${
+                progress[card.id] === 'wrong'
+                  ? "bg-[#f87171]/10 border-[#f87171] text-[#f87171]"
+                  : "bg-transparent border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc]"
+              }`}
+            >
+              ✗ Missed
+            </button>
+          </div>
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => goTo(index - 1)}
+              disabled={index === 0}
+              className="px-5 py-2.5 text-sm font-medium rounded-lg border border-[#1c2f37] bg-[#0a0f0c] text-[#f2fafc] hover:bg-[#1c2f37] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              ← Previous
+            </button>
+
+            <button
+              onClick={() => goTo(index + 1)}
+              disabled={index === total - 1}
+              className="px-5 py-2.5 text-sm font-medium rounded-lg border border-[#1c2f37] bg-[#0a0f0c] text-[#f2fafc] hover:bg-[#1c2f37] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              Next →
+            </button>
+          </div>
+
+          {/* Keyboard hints */}
+          <div className="mt-8 text-center text-xs text-[#8aa6b0] font-mono space-x-4">
+            <span>← → navigate</span>
+            <span>Space flip</span>
+            <span>1-9 grade</span>
+          </div>
+        </div>
+      </div>
+    </DDIAThemeProvider>
+  );
+}

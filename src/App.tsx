@@ -10,6 +10,7 @@ import { BlogPost } from './components/BlogPost';
 import { ContactPage } from './components/ContactPage';
 import InterviewPage from './components/InterviewPage';
 import InterviewHighLevelPage from './components/InterviewHighLevelPage';
+import InterviewDeeperPage from './components/InterviewDeeperPage';
 import { Analytics } from '@vercel/analytics/react';
 
 function Home() {
@@ -70,6 +71,7 @@ function App() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/interview" element={<InterviewPage />} />
         <Route path="/interview-high-level" element={<InterviewHighLevelPage />} />
+        <Route path="/interview-deeper" element={<InterviewDeeperPage />} />
       </Routes>
       <Analytics />
     </div>

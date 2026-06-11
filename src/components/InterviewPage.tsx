@@ -455,7 +455,13 @@ export default function InterviewPage() {
                 href="/interview-high-level"
                 className="px-4 py-2 text-sm font-medium rounded-lg border border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc] transition-all"
               >
-                High-Level Deck
+                High-Level
+              </a>
+              <a
+                href="/interview-deeper"
+                className="px-4 py-2 text-sm font-medium rounded-lg border border-[#1c2f37] text-[#8aa6b0] hover:border-[#2a4651] hover:text-[#f2fafc] transition-all"
+              >
+                Deeper
               </a>
               <button
                 onClick={toggleShuffle}
