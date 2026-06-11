@@ -438,7 +438,7 @@ export default function InterviewPage() {
 
   return (
     <DDIAThemeProvider>
-      <div className="min-h-screen flex flex-col items-center px-4 py-8 md:py-12">
+      <div className="min-h-screen flex flex-col items-center px-4 pt-24 md:pt-32 pb-12 md:pb-16">
         {/* ═══════ Header ═══════ */}
         <div className="w-full max-w-4xl mb-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
