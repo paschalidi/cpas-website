@@ -131,7 +131,7 @@ const flashcards: Flashcard[] = [
     answer: "Actual serial execution (one transaction at a time per partition —\nviable when data fits memory and transactions are short stored procedures),\ntwo-phase locking (pessimistic: block on conflict; deadlocks, fragile\nlatency under contention), and serializable snapshot isolation\n(optimistic: run on snapshots, abort on dangerous patterns; retry storms\nunder contention). Pick by contention rate and transaction length." },
   { id: 40, section: "Transactions", chapter: 8,
     question: "Why is two-phase commit avoided across systems — and what's the modern alternative (2e)?",
-    answer: "After voting yes, a participant is in doubt — stuck holding locks until\na possibly-crashed coordinator decides; plus latency and an availability\nproduct of all parties. The 2nd edition's reframing: integrate systems with\nexactly-once message processing instead — idempotence, atomic\noffset+output commits, and end-to-end identifiers, i.e. transactions\nrecast as careful messaging." },
+    answer: "After a participant votes \"yes\" in prepare, it is in doubt — it cannot\nunilaterally commit or abort until the coordinator decides. If the coordinator\ncrashes (or network drops), the participant holds locks indefinitely, stalling\nunrelated transactions until recovery. That's the core sin: 2PC couples the\navailability of all participants to one coordinator, and a single failure\nblocks the whole chain. Add latency (multiple round trips + fsyncs) and the\noperational pain of XA across heterogeneous systems.\nThe 2nd edition reframes cross-system integration: don't wrap distributed\ntransactions around updates. Instead, use exactly-once message processing —\nordered logs (one system of record), idempotent operations keyed by unique\nidentifiers, and atomic offset+output commits in the streaming layer. The\nend-to-end operation ID collapses duplicates born above any single layer, so\nretries are safe without a blocking coordinator. Transactions become careful\nmessaging, not a distributed lock." },
   { id: 41, section: "The Trouble with Distributed Systems", chapter: 9,
     question: "What single property defines distributed systems trouble?",
     answer: "Partial failure: in one machine things either work or crash; across\nmachines, *some* parts fail, *sometimes*, in nondeterministic ways — and you\noften can't even tell what failed. All the chapter's machinery exists\nbecause of this one property." },
@@ -367,7 +367,7 @@ export default function InterviewHighLevelPage() {
                   }`}
                 >
                   <span className="font-mono text-xs mr-1.5 opacity-60">{chapter.label}</span>
-                  {chapter.full}
+                  {chapter.id}
                   <span className="font-mono text-xs ml-1.5 opacity-60">{chapter.count}</span>
                 </button>
               );
@@ -415,7 +415,7 @@ export default function InterviewHighLevelPage() {
                     Q{card.id}
                   </span>
                   <span className="text-xs font-mono text-[#8aa6b0] uppercase tracking-[0.12em]">
-                    {card.section}
+                    Ch. {card.chapter} — {card.section}
                   </span>
                 </div>
                 <div className="flex-1 flex items-center justify-center">
@@ -438,7 +438,7 @@ export default function InterviewHighLevelPage() {
                     A{card.id}
                   </span>
                   <span className="text-xs font-mono text-[#8aa6b0] uppercase tracking-[0.12em]">
-                    {card.section}
+                    Ch. {card.chapter} — {card.section}
                   </span>
                 </div>
                 <div className="flex-1 flex items-center justify-center">

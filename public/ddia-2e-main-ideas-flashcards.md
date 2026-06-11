@@ -361,12 +361,21 @@ under contention). Pick by contention rate and transaction length.
 📖 *Ch. 8 — "Serializability", "Actual Serial Execution", "Two-Phase Locking", "Serializable Snapshot Isolation"*
 
 **40. Why is two-phase commit avoided across systems — and what's the modern alternative (2e)?**
-After voting yes, a participant is **in doubt** — stuck holding locks until
-a possibly-crashed coordinator decides; plus latency and an availability
-product of all parties. The 2nd edition's reframing: integrate systems with
-**exactly-once message processing** instead — idempotence, atomic
-offset+output commits, and end-to-end identifiers, i.e. transactions
-recast as careful messaging.
+After a participant votes "yes" in prepare, it is **in doubt** — it cannot
+unilaterally commit or abort until the coordinator decides. If the coordinator
+crashes (or network drops), the participant holds locks indefinitely, stalling
+unrelated transactions until recovery. That's the core sin: 2PC couples the
+availability of all participants to one coordinator, and a single failure
+blocks the whole chain. Add latency (multiple round trips + fsyncs) and the
+operational pain of XA across heterogeneous systems.
+
+The 2nd edition reframes cross-system integration: don't wrap distributed
+transactions around updates. Instead, use **exactly-once message processing** —
+ordered logs (one system of record), idempotent operations keyed by unique
+identifiers, and atomic offset+output commits in the streaming layer. The
+end-to-end operation ID collapses duplicates born above any single layer, so
+retries are safe without a blocking coordinator. Transactions become careful
+messaging, not a distributed lock.
 📖 *Ch. 8 — "Distributed Transactions", "Two-Phase Commit", "Exactly-Once Message Processing Revisited"*
 
 ---
