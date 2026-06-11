@@ -1,0 +1,6 @@
+{
+  "title": "DDIA Staff-Engineer Flashcards",
+  "author": "Christos Paschalidis",
+  "date": "2026-06-11",
+  "excerpt": "78 question/answer cards distilled from Designing Data-Intensive Applications, weighted toward staff-level system-design interviews: trade-offs, failure modes, guarantees-vs-folklore, and production judgment."
+}

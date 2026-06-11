@@ -1,5 +1,13 @@
 [
   {
+    "slug": "47-ddia-staff-flashcards",
+    "title": "DDIA Staff-Engineer Flashcards",
+    "author": "Christos Paschalidis",
+    "date": "2026-06-11",
+    "excerpt": "78 question/answer cards distilled from Designing Data-Intensive Applications, weighted toward staff-level system-design interviews: trade-offs, failure modes, guarantees-vs-folklore, and production judgment.",
+    "html": "<p></p>\n"
+  },
+  {
     "slug": "46-ddia-ch12-future-of-data",
     "title": "DDIA Chapter 12: Future of Data Systems",
     "author": "Christos Paschalidis",
