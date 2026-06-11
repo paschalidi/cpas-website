@@ -1,0 +1,6 @@
+{
+  "title": "DDIA Chapter 4: Encoding and Evolution",
+  "author": "Christos Paschalidis",
+  "date": "2026-04-15",
+  "excerpt": "JSON vs binary formats, Protocol Buffers and Avro, schema evolution, rolling upgrades, and dataflow through databases, services, and messages."
+}

@@ -1,6 +1,6 @@
 {
   "title": "DDIA Chapter 10: Batch Processing",
   "author": "Christos Paschalidis",
-  "date": "2026-06-11",
+  "date": "2026-06-06",
   "excerpt": "From Unix pipes to MapReduce to dataflow engines: turning mountains of immutable input into derived data. Interactive step-through animations for the whole pipeline."
 }

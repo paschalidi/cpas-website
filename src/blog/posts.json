@@ -1,9 +1,25 @@
 [
   {
+    "slug": "46-ddia-ch12-future-of-data",
+    "title": "DDIA Chapter 12: Future of Data Systems",
+    "author": "Christos Paschalidis",
+    "date": "2026-06-10",
+    "excerpt": "Data integration with derived state, unbundling the database, reprocessing with lambda vs kappa, end-to-end correctness, and the ethics of data systems.",
+    "html": "<p></p>\n"
+  },
+  {
+    "slug": "45-ddia-ch11-stream-processing",
+    "title": "DDIA Chapter 11: Stream Processing",
+    "author": "Christos Paschalidis",
+    "date": "2026-06-08",
+    "excerpt": "Logs vs queues, change data capture and event sourcing, event time vs processing time, windows and watermarks, stream joins and fault tolerance.",
+    "html": "<p></p>\n"
+  },
+  {
     "slug": "42-ddia-ch10-batch-processing",
     "title": "DDIA Chapter 10: Batch Processing",
     "author": "Christos Paschalidis",
-    "date": "2026-06-11",
+    "date": "2026-06-06",
     "excerpt": "From Unix pipes to MapReduce to dataflow engines: turning mountains of immutable input into derived data. Interactive step-through animations for the whole pipeline.",
     "html": "<p></p>\n"
   },
@@ -37,6 +53,22 @@
     "author": "Christos Paschalidis",
     "date": "2026-05-01",
     "excerpt": "How to split a dataset across machines without one of them quietly catching fire. Range vs hash, hot keys, rebalancing, and request routing — with interactive animations.",
+    "html": "<p></p>\n"
+  },
+  {
+    "slug": "44-ddia-ch05-replication",
+    "title": "DDIA Chapter 5: Replication",
+    "author": "Christos Paschalidis",
+    "date": "2026-04-22",
+    "excerpt": "Leader-based replication, replication lag and session guarantees, multi-leader conflicts, and leaderless quorums — with step-through animations.",
+    "html": "<p></p>\n"
+  },
+  {
+    "slug": "43-ddia-ch04-encoding-evolution",
+    "title": "DDIA Chapter 4: Encoding and Evolution",
+    "author": "Christos Paschalidis",
+    "date": "2026-04-15",
+    "excerpt": "JSON vs binary formats, Protocol Buffers and Avro, schema evolution, rolling upgrades, and dataflow through databases, services, and messages.",
     "html": "<p></p>\n"
   },
   {

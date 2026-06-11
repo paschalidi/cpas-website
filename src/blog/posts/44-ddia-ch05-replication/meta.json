@@ -1,0 +1,6 @@
+{
+  "title": "DDIA Chapter 5: Replication",
+  "author": "Christos Paschalidis",
+  "date": "2026-04-22",
+  "excerpt": "Leader-based replication, replication lag and session guarantees, multi-leader conflicts, and leaderless quorums — with step-through animations."
+}

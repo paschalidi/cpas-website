@@ -1,0 +1,6 @@
+{
+  "title": "DDIA Chapter 11: Stream Processing",
+  "author": "Christos Paschalidis",
+  "date": "2026-06-08",
+  "excerpt": "Logs vs queues, change data capture and event sourcing, event time vs processing time, windows and watermarks, stream joins and fault tolerance."
+}

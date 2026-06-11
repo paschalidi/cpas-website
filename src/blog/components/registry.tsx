@@ -49,6 +49,26 @@ COMPONENT_REGISTRY['41-ddia-ch09-consistency-consensus'] = ConsistencyConsensusA
 const BatchProcessingArticle = React.lazy(() => import('../posts/42-ddia-ch10-batch-processing/BatchProcessingArticle') as any);
 COMPONENT_REGISTRY['42-ddia-ch10-batch-processing'] = BatchProcessingArticle;
 
+// Article 43 — DDIA Chapter 4: Encoding & Evolution
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const EncodingEvolutionArticle = React.lazy(() => import('../posts/43-ddia-ch04-encoding-evolution/EncodingEvolutionArticle') as any);
+COMPONENT_REGISTRY['43-ddia-ch04-encoding-evolution'] = EncodingEvolutionArticle;
+
+// Article 44 — DDIA Chapter 5: Replication
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ReplicationArticle = React.lazy(() => import('../posts/44-ddia-ch05-replication/ReplicationArticle') as any);
+COMPONENT_REGISTRY['44-ddia-ch05-replication'] = ReplicationArticle;
+
+// Article 45 — DDIA Chapter 11: Stream Processing
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const StreamProcessingArticle = React.lazy(() => import('../posts/45-ddia-ch11-stream-processing/StreamProcessingArticle') as any);
+COMPONENT_REGISTRY['45-ddia-ch11-stream-processing'] = StreamProcessingArticle;
+
+// Article 46 — DDIA Chapter 12: Future of Data Systems
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const FutureOfDataArticle = React.lazy(() => import('../posts/46-ddia-ch12-future-of-data/FutureOfDataArticle') as any);
+COMPONENT_REGISTRY['46-ddia-ch12-future-of-data'] = FutureOfDataArticle;
+
 export function getArticleComponent(
   slug: string,
 ): React.LazyExoticComponent<React.ComponentType> | null {
