@@ -291,7 +291,7 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export default function FlashcardDeck() {
+export default function InterviewPage() {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [shuffled, setShuffled] = useState(false);

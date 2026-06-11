@@ -68,12 +68,6 @@ COMPONENT_REGISTRY['45-ddia-ch11-stream-processing'] = StreamProcessingArticle;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const FutureOfDataArticle = React.lazy(() => import('../posts/46-ddia-ch12-future-of-data/FutureOfDataArticle') as any);
 COMPONENT_REGISTRY['46-ddia-ch12-future-of-data'] = FutureOfDataArticle;
-
-// Article 47 — DDIA Staff-Engineer Flashcards
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const FlashcardDeck = React.lazy(() => import('../posts/47-ddia-staff-flashcards/FlashcardDeck') as any);
-COMPONENT_REGISTRY['47-ddia-staff-flashcards'] = FlashcardDeck;
-
 export function getArticleComponent(
   slug: string,
 ): React.LazyExoticComponent<React.ComponentType> | null {
