@@ -252,7 +252,7 @@ export default function DesignInterviewsPage() {
               <span className="font-mono text-xs text-[#F3C6AD] tracking-wider shrink-0">
                 {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
               </span>
-              <h1 className="text-sm md:text-base font-medium text-[#F8F7F4] truncate">
+              <h1 className="text-base md:text-lg font-medium text-[#F8F7F4] truncate">
                 {q.title}
               </h1>
             </div>
@@ -310,7 +310,7 @@ export default function DesignInterviewsPage() {
                 </span>
               </div>
               <div className="bg-[#0C2A17]/60 border border-[#F8F7F4]/10 rounded-xl p-5 md:p-6">
-                <p className="text-base md:text-lg leading-relaxed text-[#F8F7F4]">
+                <p className="text-lg md:text-xl leading-relaxed text-[#F8F7F4]">
                   {q.prompt}
                 </p>
               </div>
@@ -323,7 +323,7 @@ export default function DesignInterviewsPage() {
                   Clarify
                 </span>
               </div>
-              <div className="text-[#F8F7F4]/80 text-sm md:text-base leading-relaxed whitespace-pre-line">
+              <div className="text-[#F8F7F4] text-base md:text-lg leading-relaxed whitespace-pre-line">
                 {q.clarify}
               </div>
             </section>
@@ -335,7 +335,7 @@ export default function DesignInterviewsPage() {
                   Envelope
                 </span>
               </div>
-              <div className="text-[#F8F7F4]/80 text-sm md:text-base leading-relaxed whitespace-pre-line">
+              <div className="text-[#F8F7F4] text-base md:text-lg leading-relaxed whitespace-pre-line">
                 {q.envelope}
               </div>
             </section>
@@ -348,7 +348,7 @@ export default function DesignInterviewsPage() {
                 </span>
               </div>
               <div className="bg-[#0C2A17]/40 border border-[#F8F7F4]/5 rounded-xl p-5 md:p-6 overflow-x-auto">
-                <pre className="text-xs md:text-sm font-mono text-[#F8F7F4]/90 leading-relaxed whitespace-pre">
+                <pre className="text-sm md:text-base font-mono text-[#F8F7F4] leading-relaxed whitespace-pre">
                   {q.design}
                 </pre>
               </div>
@@ -361,7 +361,7 @@ export default function DesignInterviewsPage() {
                   Deep Dives
                 </span>
               </div>
-              <div className="text-[#F8F7F4]/80 text-sm md:text-base leading-relaxed whitespace-pre-line">
+              <div className="text-[#F8F7F4] text-base md:text-lg leading-relaxed whitespace-pre-line">
                 {q.deepDives}
               </div>
             </section>
@@ -373,7 +373,7 @@ export default function DesignInterviewsPage() {
                   Failure Modes & Operations
                 </span>
               </div>
-              <div className="text-[#F8F7F4]/80 text-sm md:text-base leading-relaxed whitespace-pre-line">
+              <div className="text-[#F8F7F4] text-base md:text-lg leading-relaxed whitespace-pre-line">
                 {q.failureModes}
               </div>
             </section>
@@ -386,7 +386,7 @@ export default function DesignInterviewsPage() {
                     If Pushed
                   </span>
                 </div>
-                <div className="text-[#F8F7F4]/80 text-sm md:text-base leading-relaxed whitespace-pre-line">
+                <div className="text-[#F8F7F4] text-base md:text-lg leading-relaxed whitespace-pre-line">
                   {q.ifPushed}
                 </div>
               </section>
