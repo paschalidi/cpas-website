@@ -17,7 +17,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 }
 
 export default function InterviewPage() {
-  const [activeTab, setActiveTab] = useState<Tab>("detailed");
+  const [activeTab, setActiveTab] = useState<Tab>("main-ideas");
   const [selectedSections, setSelectedSections] = useState<Set<string>>(new Set(SECTIONS.map(s => s.id)));
   const [selectedChaptersMain, setSelectedChaptersMain] = useState<Set<number>>(new Set(MAIN_CHAPTERS.map(c => c.id)));
   const [selectedChaptersDeep, setSelectedChaptersDeep] = useState<Set<number>>(new Set(DEEP_CHAPTERS.map(c => c.id)));
@@ -144,23 +144,16 @@ export default function InterviewPage() {
 
   /* Tab config */
   const tabs: { id: Tab; label: string }[] = [
-    { id: "detailed", label: `Detailed (${detailedCards.length})` },
     { id: "main-ideas", label: `Main Ideas (${mainIdeasCards.length})` },
     { id: "deeper", label: `Deeper (${deeperCards.length})` },
+    { id: "detailed", label: `Detailed (${detailedCards.length})` },
   ];
 
   /* Card header text based on tab */
   const cardHeader = useMemo(() => {
     if (!card) return "";
-    switch (activeTab) {
-      case "detailed":
-        return card.section;
-      case "main-ideas":
-        return `Ch. ${(card as typeof mainIdeasCards[0]).chapter} — ${card.section}`;
-      case "deeper":
-        return card.section;
-    }
-  }, [card, activeTab]);
+    return card.section;
+  }, [card]);
 
   if (!card) {
     return (
@@ -261,9 +254,9 @@ export default function InterviewPage() {
                   }`}
                 >
                   <span className="font-mono text-xs mr-1.5 opacity-60">
-                    {activeTab === "detailed" ? item.id : item.label}
+                    {item.id}
                   </span>
-                  {activeTab === "detailed" ? item.label : activeTab === "main-ideas" ? item.id : item.full}
+                  {activeTab === "detailed" ? item.label : item.full}
                   <span className="font-mono text-xs ml-1.5 opacity-60">{item.count}</span>
                 </button>
               );
