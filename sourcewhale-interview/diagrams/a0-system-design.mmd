@@ -1,0 +1,70 @@
+graph TB
+    Browser["Recruiter Web App"]
+    Sourcing["Sourcing Tools / Integrations"]
+
+    LB["API Gateway / Load Balancer"]
+
+    subgraph app["Application Tier — stateless, autoscaled"]
+        API["API Servers"]
+    end
+
+    subgraph workers["Worker Fleets — independently scaled"]
+        Scanner["Scheduler Workers"]
+        Relay["Outbox Relay"]
+        Channel["Channel Send Workers"]
+        Bulk["Bulk Enrollment Workers"]
+        Reply["Inbound Reply Workers"]
+    end
+
+    subgraph data["Data & Messaging"]
+        PG[("Postgres: primary + read replicas")]
+        Redis[("Redis: rate limits, locks")]
+        MQ[["Message Queue"]]
+        DLQ[["Dead-Letter Queue"]]
+    end
+
+    subgraph ext["External Providers"]
+        Email["Email (SMTP / API)"]
+        SMS["Twilio (SMS)"]
+    end
+
+    Browser --> LB
+    Sourcing --> LB
+    LB --> API
+
+    API --> PG
+    API --> MQ
+    API --> Bulk
+
+    Scanner --> PG
+    Relay --> PG
+    Relay --> MQ
+    MQ --> Scanner
+    MQ --> Channel
+    MQ --> Reply
+    Bulk --> PG
+
+    Channel --> Redis
+    Channel --> PG
+    Channel --> Email
+    Channel --> SMS
+    Channel -.->|exhausted retries| DLQ
+
+    Email -.->|reply| Reply
+    SMS -.->|STOP| Reply
+    Reply --> PG
+    Reply --> MQ
+
+    classDef client fill:#dbeafe,stroke:#3b82f6,color:#1e3a8a;
+    classDef edge fill:#fef9c3,stroke:#ca8a04,color:#713f12;
+    classDef appcls fill:#dcfce7,stroke:#16a34a,color:#14532d;
+    classDef workercls fill:#ede9fe,stroke:#7c3aed,color:#4c1d95;
+    classDef datacls fill:#fee2e2,stroke:#dc2626,color:#7f1d1d;
+    classDef extcls fill:#f1f5f9,stroke:#64748b,color:#334155;
+
+    class Browser,Sourcing client;
+    class LB edge;
+    class API appcls;
+    class Scanner,Relay,Channel,Bulk,Reply workercls;
+    class PG,Redis,MQ,DLQ datacls;
+    class Email,SMS extcls;

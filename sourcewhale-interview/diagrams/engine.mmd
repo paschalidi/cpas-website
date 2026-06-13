@@ -1,0 +1,43 @@
+sequenceDiagram
+    autonumber
+    participant DB as Postgres (cursor / attempt / outbox)
+    participant Scan as Scanner
+    participant Relay as Outbox Relay
+    participant Q as Queue
+    participant W as Channel Worker
+    participant P as Provider
+    participant DLQ as Dead-Letter Queue
+
+    Note over DB,Scan: CURSOR DRIVES TIMING
+    loop every poll interval
+        Scan->>DB: claim active enrollments due (next_run_at <= now, SKIP LOCKED)
+        Note over Scan,DB: ONE transaction (atomic)
+        Scan->>DB: re-check status = active
+        Scan->>DB: INSERT attempt(sending, idempotency_key)
+        Scan->>DB: advance cursor (step + 1, snap next_run_at + jitter)
+        Scan->>DB: INSERT outbox(send command)
+    end
+
+    Note over Relay,Q: OUTBOX -> QUEUE (no dual-write)
+    Relay->>DB: poll undispatched outbox
+    Relay->>Q: publish send command (at-least-once)
+    Relay->>DB: mark outbox dispatched
+
+    Note over Q,P: QUEUE DRIVES DELIVERY
+    Q->>W: deliver send command
+    W->>W: rate limit + circuit breaker
+
+    alt breaker open or throttled
+        W->>Q: re-queue with backoff
+    else ok to send
+        W->>P: send (idempotency key)
+        alt success
+            P-->>W: accepted (provider message id)
+            W->>DB: attempt = sent (never re-sent)
+        else transient failure
+            W->>Q: re-queue with backoff (capped)
+        else permanent or retries exhausted
+            W->>DLQ: dead-letter the touchpoint
+            W->>DB: pause enrollment on step + flag for recruiter
+        end
+    end
